@@ -1,0 +1,41 @@
+[gd_scene load_steps=3 format=3 uid="uid://cixj4aur0a7rw"]
+
+[ext_resource type="PackedScene" uid="uid://caql5maj28m6r" path="res://scenes/plinko_drone.tscn" id="1_7puak"]
+[ext_resource type="PackedScene" uid="uid://c8de5rbrn437a" path="res://scenes/obstacle.tscn" id="3_0r5mg"]
+
+[node name="Node2D" type="Node2D"]
+
+[node name="Camera2D" type="Camera2D" parent="."]
+zoom = Vector2(2, 2)
+
+[node name="Drone1" parent="." instance=ExtResource("1_7puak")]
+position = Vector2(-196, 38)
+motion_mode = 1
+move_speed = 50.0
+
+[node name="Drone2" parent="." instance=ExtResource("1_7puak")]
+position = Vector2(-193, -55)
+motion_mode = 1
+move_speed = 50.0
+avoid_probability = 1.0
+
+[node name="StaticBody2D" parent="." instance=ExtResource("3_0r5mg")]
+position = Vector2(-38, 46)
+
+[node name="StaticBody2D2" parent="." instance=ExtResource("3_0r5mg")]
+position = Vector2(-86, -60)
+
+[node name="StaticBody2D3" parent="." instance=ExtResource("3_0r5mg")]
+position = Vector2(79, 82)
+
+[node name="StaticBody2D4" parent="." instance=ExtResource("3_0r5mg")]
+position = Vector2(-134, -113)
+
+[node name="StaticBody2D5" parent="." instance=ExtResource("3_0r5mg")]
+position = Vector2(-132, 92)
+
+[node name="StaticBody2D6" parent="." instance=ExtResource("3_0r5mg")]
+position = Vector2(100, -67)
+
+[node name="StaticBody2D7" parent="." instance=ExtResource("3_0r5mg")]
+position = Vector2(168, 3)
