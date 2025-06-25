@@ -15,3 +15,9 @@ NOTE: like real life plinko, drones can get stuck.
 ## The Obstacles
 
 The obstacles are static & just kind of sit there.
+
+## The Scanner
+
+Reads when drones enter its area. Optionally writes to a csv file with a given filename.
+The scanner actually creates .txt files because godot throws errors when creating .csv files.
+The data is still organized in csv format though.

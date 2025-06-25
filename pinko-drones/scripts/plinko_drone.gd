@@ -2,10 +2,10 @@ extends CharacterBody2D
 class_name PlinkoDrone
 
 # drone variables:
-@export var move_speed: float
+@export var move_speed: float = 100
 
 # float for turning left or right. Left is 0, Right is 1
-@export_range(0, 1, 0.01, "suffix:%") var avoid_probability: float
+@export_range(0, 1, 0.01, "suffix:%") var avoid_probability: float = 0.5
 
 # scanners for obstacles.
 # detector one monitors if the drone is about to hit an obstacle.
@@ -67,12 +67,10 @@ func obstacle_detected(detector: Area2D) -> bool:
 
 # change the state to advancing.
 func change_state_advancing():
-	print("advancing")
 	current_state = states.ADVANCING
 
 # change the state to avoiding.
 func change_state_avoiding():
-	print("avoiding")
 	set_velocity(Vector2(0,0))
 	
 	# set a random direction based on the probability
