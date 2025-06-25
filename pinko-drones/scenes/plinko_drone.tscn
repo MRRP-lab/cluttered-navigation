@@ -1,6 +1,6 @@
 [gd_scene load_steps=8 format=3 uid="uid://caql5maj28m6r"]
 
-[ext_resource type="Script" path="res://scripts/plinko_drone.gd" id="1_bxgiq"]
+[ext_resource type="Script" uid="uid://ctl0g4j2d4hk1" path="res://scripts/plinko_drone.gd" id="1_bxgiq"]
 [ext_resource type="Texture2D" uid="uid://crj3wiutlqsob" path="res://assets/crazyflie.png" id="1_homxk"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_d6ama"]
@@ -19,7 +19,10 @@ size = Vector2(42, 4)
 size = Vector2(42, 4)
 
 [node name="Drone" type="CharacterBody2D"]
+scale = Vector2(0.5, 0.5)
 script = ExtResource("1_bxgiq")
+move_speed = 50.0
+avoid_probability = 0.5
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 shape = SubResource("CircleShape2D_d6ama")

@@ -8,34 +8,79 @@
 [node name="Camera2D" type="Camera2D" parent="."]
 zoom = Vector2(2, 2)
 
-[node name="Drone1" parent="." instance=ExtResource("1_7puak")]
-position = Vector2(-196, 38)
+[node name="Obstacles_group" type="Node2D" parent="."]
+
+[node name="StaticBody2D" parent="Obstacles_group" instance=ExtResource("3_0r5mg")]
+position = Vector2(-93, 133)
+
+[node name="StaticBody2D8" parent="Obstacles_group" instance=ExtResource("3_0r5mg")]
+position = Vector2(-93, 42)
+
+[node name="StaticBody2D9" parent="Obstacles_group" instance=ExtResource("3_0r5mg")]
+position = Vector2(-143, 135)
+
+[node name="StaticBody2D10" parent="Obstacles_group" instance=ExtResource("3_0r5mg")]
+position = Vector2(-92, -43)
+
+[node name="StaticBody2D11" parent="Obstacles_group" instance=ExtResource("3_0r5mg")]
+position = Vector2(-92, -88)
+
+[node name="StaticBody2D2" parent="Obstacles_group" instance=ExtResource("3_0r5mg")]
+position = Vector2(-93, -135)
+
+[node name="StaticBody2D3" parent="Obstacles_group" instance=ExtResource("3_0r5mg")]
+position = Vector2(-23, -5)
+
+[node name="StaticBody2D5" parent="Obstacles_group" instance=ExtResource("3_0r5mg")]
+position = Vector2(-93, 88)
+
+[node name="StaticBody2D6" parent="Obstacles_group" instance=ExtResource("3_0r5mg")]
+position = Vector2(55, -35)
+
+[node name="StaticBody2D7" parent="Obstacles_group" instance=ExtResource("3_0r5mg")]
+position = Vector2(54, 32)
+
+[node name="StaticBody2D15" parent="Obstacles_group" instance=ExtResource("3_0r5mg")]
+position = Vector2(235, -104)
+
+[node name="StaticBody2D16" parent="Obstacles_group" instance=ExtResource("3_0r5mg")]
+position = Vector2(234, -37)
+
+[node name="StaticBody2D17" parent="Obstacles_group" instance=ExtResource("3_0r5mg")]
+position = Vector2(237, 32)
+
+[node name="StaticBody2D18" parent="Obstacles_group" instance=ExtResource("3_0r5mg")]
+position = Vector2(236, 99)
+
+[node name="StaticBody2D14" parent="Obstacles_group" instance=ExtResource("3_0r5mg")]
+position = Vector2(143, 67)
+
+[node name="StaticBody2D12" parent="Obstacles_group" instance=ExtResource("3_0r5mg")]
+position = Vector2(144, -70)
+
+[node name="StaticBody2D13" parent="Obstacles_group" instance=ExtResource("3_0r5mg")]
+position = Vector2(143, -3)
+
+[node name="StaticBody2D4" parent="Obstacles_group" instance=ExtResource("3_0r5mg")]
+position = Vector2(-140, -135)
+
+[node name="Drones_Group" type="Node2D" parent="."]
+
+[node name="Drone1" parent="Drones_Group" instance=ExtResource("1_7puak")]
+position = Vector2(-248, -8)
 motion_mode = 1
 move_speed = 50.0
 
-[node name="Drone2" parent="." instance=ExtResource("1_7puak")]
-position = Vector2(-193, -55)
+[node name="Drone2" parent="Drones_Group" instance=ExtResource("1_7puak")]
+position = Vector2(-196, -31)
 motion_mode = 1
 move_speed = 50.0
-avoid_probability = 1.0
 
-[node name="StaticBody2D" parent="." instance=ExtResource("3_0r5mg")]
-position = Vector2(-38, 46)
+[node name="Drone" parent="Drones_Group" instance=ExtResource("1_7puak")]
+position = Vector2(-272, -60)
 
-[node name="StaticBody2D2" parent="." instance=ExtResource("3_0r5mg")]
-position = Vector2(-86, -60)
+[node name="Drone3" parent="Drones_Group" instance=ExtResource("1_7puak")]
+position = Vector2(-307, -11)
 
-[node name="StaticBody2D3" parent="." instance=ExtResource("3_0r5mg")]
-position = Vector2(79, 82)
-
-[node name="StaticBody2D4" parent="." instance=ExtResource("3_0r5mg")]
-position = Vector2(-134, -113)
-
-[node name="StaticBody2D5" parent="." instance=ExtResource("3_0r5mg")]
-position = Vector2(-132, 92)
-
-[node name="StaticBody2D6" parent="." instance=ExtResource("3_0r5mg")]
-position = Vector2(100, -67)
-
-[node name="StaticBody2D7" parent="." instance=ExtResource("3_0r5mg")]
-position = Vector2(168, 3)
+[node name="Drone4" parent="Drones_Group" instance=ExtResource("1_7puak")]
+position = Vector2(-277, 26)

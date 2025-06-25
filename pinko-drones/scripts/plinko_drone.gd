@@ -5,12 +5,13 @@ class_name PlinkoDrone
 @export var move_speed: float
 
 # float for turning left or right. Left is 0, Right is 1
+# Equal probability of either direction is 0.5
 @export_range(0, 1, 0.01, "suffix:%") var avoid_probability: float
 
 # scanners for obstacles.
 # detector one monitors if the drone is about to hit an obstacle.
 # detector 2 makes sure the drone won't crash into the same obstacle again after avoiding it.
-# detector 3 makes sure the drone won't crash going sideways
+# detectors 3 and 4 makes sure the drone won't crash going sideways
 @onready var detector: Area2D = $detector
 @onready var detector_2: Area2D = $detector2
 @onready var detector_3: Area2D = $detector3
@@ -76,7 +77,8 @@ func change_state_avoiding():
 	set_velocity(Vector2(0,0))
 	
 	# set a random direction based on the probability
-	direction = 1 if randf() < avoid_probability else -1
+	var rng = randf()
+	direction = 1 if rng < avoid_probability else -1
 	
 	current_state = states.AVOIDING
 
