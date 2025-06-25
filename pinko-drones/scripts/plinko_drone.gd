@@ -68,15 +68,15 @@ func obstacle_detected(detector: Area2D) -> bool:
 
 # change the state to advancing.
 func change_state_advancing():
-	print("advancing")
+
 	current_state = states.ADVANCING
 
 # change the state to avoiding.
 func change_state_avoiding():
-	print("avoiding")
+
 	set_velocity(Vector2(0,0))
 	
-	# set a random direction based on the probability
+	# Set a random direction based off 
 	var rng = randf()
 	direction = 1 if rng < avoid_probability else -1
 	
