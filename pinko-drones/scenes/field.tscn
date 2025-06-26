@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=3 uid="uid://cixj4aur0a7rw"]
 
 [ext_resource type="PackedScene" uid="uid://caql5maj28m6r" path="res://scenes/plinko_drone.tscn" id="1_7puak"]
-[ext_resource type="PackedScene" uid="uid://c8de5rbrn437a" path="res://scenes/obstacle.tscn" id="3_0r5mg"]
+[ext_resource type="Script" path="res://scenes/init.gd" id="1_hha2i"]
 [ext_resource type="PackedScene" uid="uid://15ljtini214q" path="res://scenes/drone_scanner.tscn" id="3_v64ix"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_hlxp5"]
@@ -10,7 +10,11 @@ size = Vector2(20, 628)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_45xs3"]
 size = Vector2(20, 635)
 
-[node name="Node2D" type="Node2D"]
+[node name="Node2D" type="Node2D" node_paths=PackedStringArray("field")]
+script = ExtResource("1_hha2i")
+start_pos = Vector2(-200, 0)
+field = NodePath(".")
+obstacle_shape = "triangle"
 
 [node name="Camera2D" type="Camera2D" parent="."]
 
@@ -27,30 +31,6 @@ position = Vector2(-431, 29)
 
 [node name="Drone4" parent="." instance=ExtResource("1_7puak")]
 position = Vector2(-515, -21)
-
-[node name="StaticBody2D" parent="." instance=ExtResource("3_0r5mg")]
-position = Vector2(-27, 53)
-
-[node name="StaticBody2D2" parent="." instance=ExtResource("3_0r5mg")]
-position = Vector2(-101, -31)
-
-[node name="StaticBody2D3" parent="." instance=ExtResource("3_0r5mg")]
-position = Vector2(144, 88)
-
-[node name="StaticBody2D4" parent="." instance=ExtResource("3_0r5mg")]
-position = Vector2(-142, -172)
-
-[node name="StaticBody2D5" parent="." instance=ExtResource("3_0r5mg")]
-position = Vector2(-207, 132)
-
-[node name="StaticBody2D6" parent="." instance=ExtResource("3_0r5mg")]
-position = Vector2(83, -114)
-
-[node name="StaticBody2D7" parent="." instance=ExtResource("3_0r5mg")]
-position = Vector2(191, -23)
-
-[node name="StaticBody2D8" parent="." instance=ExtResource("3_0r5mg")]
-position = Vector2(-236, -72)
 
 [node name="DroneScanner" parent="." instance=ExtResource("3_v64ix")]
 position = Vector2(559, -2)

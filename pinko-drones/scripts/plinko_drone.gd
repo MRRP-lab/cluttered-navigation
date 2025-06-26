@@ -80,6 +80,7 @@ func change_state_avoiding():
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
+	#ObstacleGenerator.generate_obstacles()
 	current_state = states.ADVANCING
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
