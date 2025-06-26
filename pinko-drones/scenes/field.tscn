@@ -1,53 +1,58 @@
-[gd_scene load_steps=6 format=3 uid="uid://cixj4aur0a7rw"]
+[gd_scene load_steps=7 format=3 uid="uid://cixj4aur0a7rw"]
 
-[ext_resource type="PackedScene" uid="uid://caql5maj28m6r" path="res://scenes/plinko_drone.tscn" id="1_7puak"]
-[ext_resource type="Script" path="res://scenes/init.gd" id="1_hha2i"]
-[ext_resource type="PackedScene" uid="uid://15ljtini214q" path="res://scenes/drone_scanner.tscn" id="3_v64ix"]
+[ext_resource type="Script" path="res://scenes/Initialize.gd" id="1_pn4dk"]
+[ext_resource type="Script" path="res://scripts/drone_scanner.gd" id="2_prmp5"]
+[ext_resource type="Texture2D" uid="uid://de2hrv06jns1o" path="res://assets/green.png" id="3_lptdg"]
+[ext_resource type="Texture2D" uid="uid://vich32apnncj" path="res://assets/red.png" id="4_7156t"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_hlxp5"]
-size = Vector2(20, 628)
+[sub_resource type="CircleShape2D" id="CircleShape2D_ttalb"]
+radius = 47.5184
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_45xs3"]
-size = Vector2(20, 635)
+[sub_resource type="CircleShape2D" id="CircleShape2D_pn4dk"]
+radius = 54.037
 
-[node name="Node2D" type="Node2D" node_paths=PackedStringArray("field")]
-script = ExtResource("1_hha2i")
-start_pos = Vector2(-200, 0)
-field = NodePath(".")
-obstacle_shape = "triangle"
+[node name="Simulator" type="Node2D" node_paths=PackedStringArray("start", "end", "obstacles", "drones")]
+script = ExtResource("1_pn4dk")
+droneNum = 7
+start = NodePath("Start")
+end = NodePath("End")
+obstacles = NodePath("Obstacles_Group")
+drones = NodePath("Drones_Group")
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="Camera" type="Camera2D" parent="."]
+zoom = Vector2(2, 2)
+metadata/_edit_lock_ = true
 
-[node name="Drone1" parent="." instance=ExtResource("1_7puak")]
-position = Vector2(-514, 28)
-motion_mode = 1
+[node name="Obstacles_Group" type="Node2D" parent="."]
+position = Vector2(-54, 3)
 
-[node name="Drone2" parent="." instance=ExtResource("1_7puak")]
-position = Vector2(-431, -21)
-motion_mode = 1
+[node name="Drones_Group" type="Node2D" parent="."]
 
-[node name="Drone3" parent="." instance=ExtResource("1_7puak")]
-position = Vector2(-431, 29)
-
-[node name="Drone4" parent="." instance=ExtResource("1_7puak")]
-position = Vector2(-515, -21)
-
-[node name="DroneScanner" parent="." instance=ExtResource("3_v64ix")]
-position = Vector2(559, -2)
-drone_threshold = 4
-write_to_file = true
-filename = "drones-exit"
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="DroneScanner"]
-position = Vector2(-245, 0)
-shape = SubResource("RectangleShape2D_hlxp5")
-
-[node name="DroneScanner2" parent="." instance=ExtResource("3_v64ix")]
-position = Vector2(-342, -5)
-drone_threshold = 4
-write_to_file = true
+[node name="Start" type="Area2D" parent="."]
+position = Vector2(-240, 0)
+script = ExtResource("2_prmp5")
 filename = "drones-enter"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="DroneScanner2"]
-position = Vector2(47, 2)
-shape = SubResource("RectangleShape2D_45xs3")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Start"]
+shape = SubResource("CircleShape2D_ttalb")
+
+[node name="Sprite2D" type="Sprite2D" parent="Start/CollisionShape2D"]
+modulate = Color(1, 1, 1, 0.305882)
+scale = Vector2(0.19, 0.19)
+texture = ExtResource("3_lptdg")
+metadata/_edit_lock_ = true
+
+[node name="End" type="Area2D" parent="."]
+position = Vector2(-16, -14)
+script = ExtResource("2_prmp5")
+filename = "drones-exit"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="End"]
+position = Vector2(249, 0)
+shape = SubResource("CircleShape2D_pn4dk")
+
+[node name="Sprite2D" type="Sprite2D" parent="End/CollisionShape2D"]
+modulate = Color(1, 1, 1, 0.305882)
+scale = Vector2(0.215, 0.215)
+texture = ExtResource("4_7156t")
+metadata/_edit_lock_ = true
