@@ -8,8 +8,8 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_ttalb"]
 radius = 47.5184
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_pn4dk"]
-radius = 54.037
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_j1wh3"]
+size = Vector2(20, 310)
 
 [node name="Simulator" type="Node2D" node_paths=PackedStringArray("start", "end", "obstacles", "drones")]
 script = ExtResource("1_pn4dk")
@@ -20,11 +20,10 @@ obstacles = NodePath("Obstacles_Group")
 drones = NodePath("Drones_Group")
 
 [node name="Camera" type="Camera2D" parent="."]
-zoom = Vector2(2, 2)
 metadata/_edit_lock_ = true
 
 [node name="Obstacles_Group" type="Node2D" parent="."]
-position = Vector2(-54, 3)
+position = Vector2(-140, 0)
 
 [node name="Drones_Group" type="Node2D" parent="."]
 
@@ -48,8 +47,8 @@ script = ExtResource("2_prmp5")
 filename = "drones-exit"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="End"]
-position = Vector2(249, 0)
-shape = SubResource("CircleShape2D_pn4dk")
+position = Vector2(299, 15)
+shape = SubResource("RectangleShape2D_j1wh3")
 
 [node name="Sprite2D" type="Sprite2D" parent="End/CollisionShape2D"]
 modulate = Color(1, 1, 1, 0.305882)
