@@ -2,19 +2,25 @@ extends Node2D
 class_name Swarm_Sim
 
 
+@export_group("Obstacle Generation")
 @export var obstacle_shape := "triangle"  ## Shape of the obstacle field, either 'triangle' or 'rectangle'
 @export var obstacle_width := 4  ## Number of obstacles along the y-axis of the field. If triangular, the width of the base
 @export var obstacle_depth := 4  ## Number of obstacles along the x-axis of the field. If triangular, this is ignored
 @export var obstacle_spacing := 60  ## Spacing in pixels between obstacles
-@export_range(0, 100, 1, "suffix:%") var obstacle_randomization: int  ## Degree of randomization. Higher value -> larger randomization offset
+@export_range(0, 100, 1, "suffix:%") var obstacle_randomization: float  ## Degree of randomization. Higher value -> larger randomization offset
+@export var obstacle_scale := 1.0
 
+@export_group("Drone Properties")
 @export var droneNum: int
-
 @export_range(1, 180, 1, "suffix:°") var Minimum_Angle: float
+
+@export_group("Nodes")
 @export var start: Node2D
 @export var end: Node2D
 @export var obstacles: Node2D
 @export var drones: Node2D
+
+const OBSTACLE_SIZE = 32
 
 # Optionally initialize the board.
 func _ready() -> void:
@@ -53,6 +59,13 @@ func generate_triangle(start_point: Vector2) -> void:
 			
 			new_obstacle.position.x = start_point.x + (row * obstacle_spacing)
 			new_obstacle.position.y = start_point.y + (col * obstacle_spacing) - (row * obstacle_spacing / 2)
+			new_obstacle.apply_scale(Vector2(obstacle_scale, obstacle_scale))
+			
+			# Randomize the position:
+			var max_rand_offset = ((obstacle_spacing / 2) - (obstacle_scale * OBSTACLE_SIZE) / 2) * (obstacle_randomization / 100)
+			var rand_vector = Vector2(max_rand_offset * randf_range(-1, 1), max_rand_offset * randf_range(-1, 1))
+			new_obstacle.position += rand_vector
+			
 			obstacles.add_child(new_obstacle)
 
 ## Generates obstacles in a rectangular plinko formation
@@ -72,5 +85,11 @@ func generate_rectangle(start_point: Vector2) -> void:
 			
 			new_obstacle.position.x = start_point.x + (row * obstacle_spacing)
 			new_obstacle.position.y = start_point.y + (col * obstacle_spacing) - (width * obstacle_spacing) / 2 + (obstacle_spacing / 2)
-			obstacles.add_child(new_obstacle)
+			new_obstacle.apply_scale(Vector2(obstacle_scale, obstacle_scale))
 			
+			# Randomize the position:
+			var max_rand_offset = ((obstacle_spacing / 2) - (obstacle_scale * OBSTACLE_SIZE) / 2) * (obstacle_randomization / 100)
+			var rand_vector = Vector2(max_rand_offset * randf_range(-1, 1), max_rand_offset * randf_range(-1, 1))
+			new_obstacle.position += rand_vector
+			
+			obstacles.add_child(new_obstacle)
