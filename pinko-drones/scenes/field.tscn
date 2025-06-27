@@ -13,7 +13,6 @@ size = Vector2(20, 310)
 
 [node name="Simulator" type="Node2D" node_paths=PackedStringArray("start", "end", "obstacles", "drones")]
 script = ExtResource("1_pn4dk")
-obstacle_randomization = 50.0
 droneNum = 7
 start = NodePath("Start")
 end = NodePath("End")
