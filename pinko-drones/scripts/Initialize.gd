@@ -10,7 +10,7 @@ class_name Swarm_Sim
 
 @export var droneNum: int
 
-@export_range(1, 180, 1, "suffix:°") var Minimum_Angle: float
+@export_range(1, 180, 1, "suffix:°") var Maximum_Angle: float
 @export var start: Node2D
 @export var end: Node2D
 @export var obstacles: Node2D
@@ -18,6 +18,7 @@ class_name Swarm_Sim
 
 # Optionally initialize the board.
 func _ready() -> void:
+	Maximum_Angle = deg_to_rad(Maximum_Angle)
 	print("Hello World!")
 	var start_point = obstacles.position + Vector2(140, 0)
 	if obstacle_shape == "triangle":
@@ -25,7 +26,10 @@ func _ready() -> void:
 	else:
 		generate_rectangle(start_point)
 	
-	# Initialize drones in start region based on the parameters.
+	create_drones()
+
+# Initialize drones in start region based on the parameters.
+func create_drones():
 	var drone = preload("res://scenes/plinko_drone.tscn")
 	for i in range(droneNum):
 		var newDrone = drone.instantiate()
@@ -33,13 +37,19 @@ func _ready() -> void:
 		newDrone.name = str("drone_", i)
 		newDrone.move_speed = 50
 		
+		var start_offset = Vector2(-start.get_child(0).shape.radius, 0)
+		var end_offset = Vector2(end.get_child(0).shape.size.x/2, 0)
+		
+		newDrone.start_point = start.global_position + start_offset
+		newDrone.end_point = end.global_position
+		newDrone.max_angle = Maximum_Angle
+		
 		var randOffset = Vector2(randf() * 50 - 25, randf() * 50 - 25)
 		newDrone.position = start.position + randOffset
 		
 		drones.add_child(newDrone)
 		print("Drone sprite texture:", newDrone.get_node("Sprite2D").texture)
 		print("Drone position", newDrone.position)
-
 
 ## Generates obstacles in a triangular plinko formation
 func generate_triangle(start_point: Vector2) -> void:
@@ -74,3 +84,8 @@ func generate_rectangle(start_point: Vector2) -> void:
 			new_obstacle.position.y = start_point.y + (col * obstacle_spacing) - (width * obstacle_spacing) / 2 + (obstacle_spacing / 2)
 			obstacles.add_child(new_obstacle)
 			
+
+func _draw() -> void:
+	var endpoint = Vector2(-cos(Maximum_Angle), sin(Maximum_Angle)) * 400
+	draw_line(end.global_position, end.global_position + endpoint, "red", 3)
+	draw_line(end.global_position, end.global_position + endpoint * Vector2(1, -1), "red", 3)

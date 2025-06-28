@@ -1,19 +1,20 @@
 [gd_scene load_steps=7 format=3 uid="uid://cixj4aur0a7rw"]
 
-[ext_resource type="Script" path="res://scenes/Initialize.gd" id="1_pn4dk"]
-[ext_resource type="Script" path="res://scripts/drone_scanner.gd" id="2_prmp5"]
+[ext_resource type="Script" uid="uid://j2woj4a7fmjo" path="res://scripts/Initialize.gd" id="1_pn4dk"]
+[ext_resource type="Script" uid="uid://b40ihcvxwxnd2" path="res://scripts/drone_scanner.gd" id="2_prmp5"]
 [ext_resource type="Texture2D" uid="uid://de2hrv06jns1o" path="res://assets/green.png" id="3_lptdg"]
 [ext_resource type="Texture2D" uid="uid://vich32apnncj" path="res://assets/red.png" id="4_7156t"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ttalb"]
 radius = 47.5184
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_j1wh3"]
-size = Vector2(20, 310)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7156t"]
+size = Vector2(106, 492.125)
 
 [node name="Simulator" type="Node2D" node_paths=PackedStringArray("start", "end", "obstacles", "drones")]
 script = ExtResource("1_pn4dk")
-droneNum = 7
+droneNum = 10
+Maximum_Angle = 45.0
 start = NodePath("Start")
 end = NodePath("End")
 obstacles = NodePath("Obstacles_Group")
@@ -42,13 +43,14 @@ texture = ExtResource("3_lptdg")
 metadata/_edit_lock_ = true
 
 [node name="End" type="Area2D" parent="."]
-position = Vector2(-16, -14)
+position = Vector2(290, 0)
 script = ExtResource("2_prmp5")
 filename = "drones-exit"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="End"]
-position = Vector2(299, 15)
-shape = SubResource("RectangleShape2D_j1wh3")
+position = Vector2(-50, 0)
+shape = SubResource("RectangleShape2D_7156t")
+debug_color = Color(0.929412, 0, 0.447059, 0.266667)
 
 [node name="Sprite2D" type="Sprite2D" parent="End/CollisionShape2D"]
 modulate = Color(1, 1, 1, 0.305882)
