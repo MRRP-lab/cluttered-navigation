@@ -132,7 +132,6 @@ func change_state_avoiding():
 	# Set a random avoid direction based off the percent the drone exists
 	# between the angled boundary from the end
 	var rng = randf()
-	print(str(rng, " vs. ", (avoid_probability + vertical_percent)))
 	direction = 1 if rng < (avoid_probability + vertical_percent) else -1
 	
 	current_state = states.AVOIDING
