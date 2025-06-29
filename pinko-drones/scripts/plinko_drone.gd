@@ -10,8 +10,9 @@ class_name PlinkoDrone
 
 @export var start_point: Vector2
 @export var end_point: Vector2
-@export var max_angle: float
 
+@export var max_angle: float
+@export var weighted: bool
 # scanners for obstacles.
 # detector one monitors if the drone is about to hit an obstacle.
 # detector 2 makes sure the drone won't crash into the same obstacle again after avoiding it.
@@ -71,7 +72,7 @@ func reenter():
 		if (position.x > end_point.x):
 			x_component = Vector2(-1 * move_speed, 0)
 		
-		y_component += Vector2(0,1 * move_speed)
+		y_component += Vector2(0, 1 * move_speed)
 		if (global_position.y > end_point.y):
 			y_component *= -1
 		set_velocity(x_component + y_component)
@@ -94,15 +95,22 @@ func is_out_of_bounds() -> bool:
 
 func angle_from_end() -> float:
 	return angle_between(start_point, end_point, global_position)
-func get_angle_to_end() -> float:
-	return angle_between(start_point, global_position, end_point)
+
 #Angle in radians from points that make up angle ABC.
 func angle_between(A, B, C) -> float:
 	var v1 = (A - B).normalized()
 	var v2 = (C - B).normalized()
 	return acos(v1.dot(v2))
-	
 
+
+# returns 0.5 to -0.5 based on the angle of the drone to the end
+func get_vertical_percent() -> float:
+	var percent = angle_from_end() / (max_angle * 2) 
+	if (global_position.y < end_point.y):
+		return percent
+	else:
+		return -percent
+	
 
 # change the state to advancing.
 func change_state_advancing():
@@ -116,12 +124,16 @@ func change_state_finished():
 
 # change the state to avoiding.
 func change_state_avoiding():
-
 	set_velocity(Vector2(0,0))
 	
-	# Set a random direction based off 
+	var vertical_percent = 0
+	if (weighted):
+		vertical_percent = get_vertical_percent()
+	# Set a random avoid direction based off the percent the drone exists
+	# between the angled boundary from the end
 	var rng = randf()
-	direction = 1 if rng < avoid_probability else -1
+	print(str(rng, " vs. ", (avoid_probability + vertical_percent)))
+	direction = 1 if rng < (avoid_probability + vertical_percent) else -1
 	
 	current_state = states.AVOIDING
 

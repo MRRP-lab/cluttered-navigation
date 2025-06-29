@@ -13,7 +13,10 @@ size = Vector2(106, 492.125)
 
 [node name="Simulator" type="Node2D" node_paths=PackedStringArray("start", "end", "obstacles", "drones")]
 script = ExtResource("1_pn4dk")
+obstacle_width = 6
+obstacle_depth = 6
 droneNum = 10
+weighted_direction = true
 Maximum_Angle = 45.0
 start = NodePath("Start")
 end = NodePath("End")

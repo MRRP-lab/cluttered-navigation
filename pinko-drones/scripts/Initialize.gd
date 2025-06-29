@@ -9,6 +9,7 @@ class_name Swarm_Sim
 @export_range(0, 100, 1, "suffix:%") var obstacle_randomization: int  ## Degree of randomization. Higher value -> larger randomization offset
 
 @export var droneNum: int
+@export var weighted_direction: bool
 
 @export_range(1, 180, 1, "suffix:°") var Maximum_Angle: float
 @export var start: Node2D
@@ -39,10 +40,11 @@ func create_drones():
 		
 		var start_offset = Vector2(-start.get_child(0).shape.radius, 0)
 		var end_offset = Vector2(end.get_child(0).shape.size.x/2, 0)
-		
 		newDrone.start_point = start.global_position + start_offset
 		newDrone.end_point = end.global_position
+		
 		newDrone.max_angle = Maximum_Angle
+		newDrone.weighted = weighted_direction
 		
 		var randOffset = Vector2(randf() * 50 - 25, randf() * 50 - 25)
 		newDrone.position = start.position + randOffset
