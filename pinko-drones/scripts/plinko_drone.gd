@@ -22,6 +22,10 @@ class_name PlinkoDrone
 @onready var detector_3: Area2D = $detector3
 @onready var detector_4: Area2D = $detector4
 
+# Entered & Exited for logging purposes.
+var time_entered
+var time_exited
+
 # basic state machine for plinko-based drone control.
 enum states {
 	ADVANCING,
