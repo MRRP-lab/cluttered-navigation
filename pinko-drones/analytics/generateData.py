@@ -9,7 +9,7 @@ DRONE_COUNTS = range(2, 2 + SIMULATIONS)
 DRONE_DATA_FILE = "cluttered-navigation/drones-data.txt"
 
 def run_sim(drone_count, sim_id):
-    print(f"Sim {sim_id+1}/{SIMULATIONS} with {drone_count} drones...")
+    print(f"Running simulation {sim_id+1}/{SIMULATIONS} with {drone_count} drones...")
     env = {**os.environ, "DRONE_COUNT": str(drone_count)}
     cmd = [GODOT_PATH, "--headless", "--path", PROJECT_PATH, "--quit", "--", f"--drone-count={drone_count}", f"--sim-id={sim_id}"]
     subprocess.run(cmd, env=env)
