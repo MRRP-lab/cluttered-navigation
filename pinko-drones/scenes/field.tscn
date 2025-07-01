@@ -15,7 +15,7 @@ size = Vector2(106, 492.125)
 script = ExtResource("1_pn4dk")
 obstacle_width = 6
 obstacle_depth = 6
-droneNum = 10
+droneNum = 20
 weighted_direction = true
 Maximum_Angle = 45.0
 start = NodePath("Start")
@@ -25,8 +25,8 @@ drones = NodePath("Drones_Group")
 logger = NodePath("logger")
 log_button = NodePath("Button")
 timer_wait_time_ms = 100
-filename_ee = "testfile-entry-exit"
-filename_cont = "testfile-motionpath"
+filename_ee = "sample-20-ee"
+filename_cont = "sample-20-cont"
 
 [node name="Button" type="Button" parent="."]
 offset_left = -564.0

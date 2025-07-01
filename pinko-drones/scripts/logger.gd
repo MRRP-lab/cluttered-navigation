@@ -6,19 +6,26 @@ class_name Logger
 # export variables
 @export var simulator: Swarm_Sim ## simulator
 @export var drones: Node2D ## drone container
-@export_enum("Decentralized", "Centralized") var strategy: String = "Decentralized" ## flag for what strategy the drones are using. Is passed to the output file.
+var strategy: String
 
 # Area2D nodes we're using to monitor the drones.
 var area_ee: Area2D   # enter/exit monitoring
 var timer: Timer      # timer for continuous monitoring.
 
-var motionplan_data_array = [["strategy", "droneCount", "droneID", "timeStamp", "x", "y"]]
+var motionplan_data_array = [["strategy", "droneCount", "maxAngle", "droneID", "timeStamp", "x", "y"]]
 
 const LOGGER_RECTANGLE_ENTER_EXIT = preload("res://resources/logger_rectangle_enter_exit.tres")
 
 # --------- INITIALIZATION ------------ #
 
 func _ready() -> void:
+	
+	# update strategy var for logging:
+	strategy = simulator.control.to_lower()
+	if strategy == "centralized":
+		pass
+	elif simulator.weighted_direction:
+		strategy += "Weighted"
 	
 	# set up Area2D
 	area_ee = Area2D.new()
@@ -59,10 +66,10 @@ var drone_exited = func(body: Node2D):
 func log_data_ee(filepath: String):
 	var file = FileAccess.open(filepath, FileAccess.WRITE) # open file
 	
-	file.store_csv_line(["strategy", "droneCount", "droneID", "entryTime", "exitTime"]) # write header
+	file.store_csv_line(["strategy", "droneCount", "maxAngle", "droneID", "entryTime", "exitTime"]) # write header
 	
 	for drone in drones.get_children(): # write data
-		var log = PackedStringArray([strategy, simulator.droneNum, drone.get_instance_id(), drone.time_entered, drone.time_exited])
+		var log = PackedStringArray([strategy, simulator.droneNum, rad_to_deg(simulator.Maximum_Angle), drone.get_instance_id(), drone.time_entered, drone.time_exited])
 		file.store_csv_line(log)
 	
 	file.close() # prevent data leaks
@@ -72,7 +79,7 @@ func log_data_ee(filepath: String):
 ## called every time the timer ticks. logs drone position/time data to an array.
 func timer_timeout():
 	for drone in drones.get_children(): # write data
-		var log = PackedStringArray([strategy, simulator.droneNum, drone.get_instance_id(), Time.get_ticks_msec(), drone.position.x, drone.position.y])
+		var log = PackedStringArray([strategy, simulator.droneNum, rad_to_deg(simulator.Maximum_Angle), drone.get_instance_id(), Time.get_ticks_msec(), drone.position.x, drone.position.y])
 		motionplan_data_array.append(log)
 
 ## writes continuous motionplan data to a specified output file.

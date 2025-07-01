@@ -11,7 +11,8 @@ class_name Swarm_Sim
 @export var obstacle_scale := 1.0  ## Scale of the obstacle image and collision circle
 
 @export_group("Drone Properties")
-@export var droneNum: int
+@export_enum("Centralized", "Decentralized") var control: String = "Decentralized" ## right now used for logging.
+@export var droneNum: int ## Number of drones to generate
 @export var weighted_direction: bool
 
 @export_range(1, 180, 1, "suffix:°") var Maximum_Angle: float
