@@ -1,5 +1,8 @@
 extends Area2D
 
+## ATTENTION: This script is no longer used. Use logger.gd to log data to files
+# --------------------------------------------------------------------------- #
+
 # drone_list stores data about the drones as a multidimentional array
 var drone_list = []
 var count = 0

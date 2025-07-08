@@ -1,7 +1,11 @@
 # PLINKO DRONES
 
 A simulation of drones in a plinko environment with rudimentary object avoidance.
-Open this file folder in GODOT (Ideally GODOT 4)
+Open this file folder in GODOT (Ideally GODOT 4.4)
+
+## The Simulator:
+
+The simulator runs the simulation & can be used to configure parameters, using the inspector panel.
 
 ## The Drones:
 
@@ -10,14 +14,16 @@ When encountering an obstacle, they move either left or right with a customizeab
 Drones switch direction if about to collide with an obstacle from the side.
 Obstacles can include other drones.
 
+Drones can also be configured to weight their probability using the angle to the goal location.
+Drone count & directional weighting is configured in the inspector.
+
 NOTE: like real life plinko, drones can get stuck.
 
-## The Obstacles
+## The Logger:
 
-The obstacles are static & just kind of sit there.
+Logs entry/exit data as well as motionpath data for the drones.
+Also logs some metadata.
+Change the filename of the desired output files in the simulators inspector.
 
-## The Scanner
-
-Reads when drones enter its area. Optionally writes to a csv file with a given filename.
-The scanner actually creates .txt files because godot throws errors when creating .csv files.
-The data is still organized in csv format though.
+filename_ee is the name of the file to store entry/exit data.
+filename_cont is the name of the file for continuous/motionpath data.

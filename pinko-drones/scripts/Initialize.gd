@@ -3,7 +3,7 @@ class_name Swarm_Sim
 
 
 @export_group("Obstacle Generation")
-@export var obstacle_shape := "triangle"  ## Shape of the obstacle field, either 'triangle' or 'rectangle'
+@export_enum("triangle", "rectangle") var obstacle_shape := "triangle"  ## Shape of the obstacle field, either 'triangle' or 'rectangle'
 @export var obstacle_width := 4  ## Number of obstacles along the y-axis of the field. If triangular, the width of the base
 @export var obstacle_depth := 4  ## Number of obstacles along the x-axis of the field. If triangular, this is ignored
 @export var obstacle_spacing := 60  ## Spacing in pixels between obstacles
@@ -11,7 +11,8 @@ class_name Swarm_Sim
 @export var obstacle_scale := 1.0  ## Scale of the obstacle image and collision circle
 
 @export_group("Drone Properties")
-@export var droneNum: int
+@export_enum("Centralized", "Decentralized") var control: String = "Decentralized" ## right now used for logging.
+@export var droneNum: int ## Number of drones to generate
 @export var weighted_direction: bool
 
 @export_range(1, 180, 1, "suffix:°") var Maximum_Angle: float
@@ -21,6 +22,13 @@ class_name Swarm_Sim
 @export var end: Node2D
 @export var obstacles: Node2D
 @export var drones: Node2D
+@export var logger: Logger
+
+@export_group("Logging")
+@export var log_button: Button      ## button pressed to log data to files.
+@export var timer_wait_time_ms: int ## how often (in milliseconds) to capture drones' motionpath data.
+@export var filename_ee: String     ## ee: Entry/Exit. The name of the file to which entry/exit data will be sent to. Do not include the filepath or extension.
+@export var filename_cont: String   ## cont: continuous. The name of the file to which continuous motionpath data will be sent to. Do not include the filepath or extension.
 
 const OBSTACLE_SIZE = 32  # size in pixels of the obstacle image
 
@@ -35,6 +43,9 @@ func _ready() -> void:
 		generate_rectangle(start_point)
 	
 	create_drones()
+	logger.init_timer(timer_wait_time_ms)
+	
+	log_button.connect("pressed", log_data)
 
 # Initialize drones in start region based on the parameters.
 func create_drones():
@@ -106,8 +117,16 @@ func randomize_position() -> Vector2:
 	var max_rand_offset = ((obstacle_spacing / 2) - (obstacle_scale * OBSTACLE_SIZE) / 2) * (obstacle_randomization / 100)
 	var rand_vector = Vector2(max_rand_offset * randf_range(-1, 1), max_rand_offset * randf_range(-1, 1))
 	return rand_vector
-	
+
 func _draw() -> void:
 	var endpoint = Vector2(-cos(Maximum_Angle), sin(Maximum_Angle)) * 400
 	draw_line(end.global_position, end.global_position + endpoint, "red", 3)
 	draw_line(end.global_position, end.global_position + endpoint * Vector2(1, -1), "red", 3)
+
+## Logs data to the specified files
+func log_data():
+	var filepath_ee = "res://output-data/" + filename_ee + ".txt"
+	var filepath_cont = "res://output-data/" + filename_cont + ".txt"
+	
+	logger.log_data_ee(filepath_ee)
+	logger.log_data_cont(filepath_cont)
