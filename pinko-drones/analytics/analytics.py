@@ -71,3 +71,8 @@ def makespanStats():
 	plt.show()
 
 # def spacialStats():
+
+def main():
+    makespanStats()
+    spacialStates()
+    
