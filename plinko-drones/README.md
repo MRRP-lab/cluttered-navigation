@@ -37,3 +37,8 @@ From the command line, you can run scripts with the following command:
 ```
 
 Only tested on WSL so far, next step is to figure out how to initialize the sim, then start a run with logging.
+
+## Analysis
+
+The analysis script can be used to analyze the data collected by the logger.
+It processes data files to compute and visualize makespan and spatial statistics for comparing drone navigation strategies.
