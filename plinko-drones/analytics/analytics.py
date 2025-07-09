@@ -152,41 +152,55 @@ def testMakespan():
     else:
         print("No valid data to plot.")
 
+def analyzeBothFixed(rootFolder, strategies):
+    """
+    Analyze and plot makespan for bothFixed (by strategy).
+    """
+    dataBoth = []
+    for strategy in strategies:
+        bothFixedPath = os.path.join(rootFolder, 'makespan', strategy, 'bothFixed')
+        if os.path.isdir(bothFixedPath):
+            fileName = next((f for f in os.listdir(bothFixedPath) if f.endswith('.txt')), None)
+            if fileName:
+                filePath = os.path.join(bothFixedPath, fileName)
+                makespanVal = makespanSingleFile(filePath)
+                dataBoth.append((strategy, makespanVal))
+    barChart(dataBoth, "Makespan by Strategy (Both Fixed)")
+
+def analyzeAngleFixed(rootFolder, strategies):
+    """
+    Analyze and plot makespan vs angle for each strategy (angleFixed).
+    """
+    for strategy in strategies:
+        angleFixedPath = os.path.join(rootFolder, 'makespan', strategy, 'angleFixed')
+        if os.path.isdir(angleFixedPath):
+            dataAngle = makespanFolder(angleFixedPath, 'angle')
+            scatterPlot(dataAngle, f"Makespan vs Angle ({strategy.capitalize()})", xLabel="Angle", yLabel="Makespan")
+
+def analyzeCountFixed(rootFolder, strategies):
+    """
+    Analyze and plot makespan vs drone count for each strategy (countFixed).
+    """
+    for strategy in strategies:
+        countFixedPath = os.path.join(rootFolder, 'makespan', strategy, 'countFixed')
+        if os.path.isdir(countFixedPath):
+            dataCount = makespanFolder(countFixedPath, 'droneCount')
+            scatterPlot(dataCount, f"Makespan vs Drone Count ({strategy.capitalize()})", xLabel="Drone Count", yLabel="Makespan")
+
 # --- Main Analysis and Plotting Routine ---
 def main():
     """
     Main function to traverse the folder structure and generate all required plots for makespan analysis.
-    Generates bar and scatter plots for both centralized and decentralized strategies, for bothFixed, angleFixed, and countFixed experiments.
+    Calls separate analysis functions for bothFixed, angleFixed, and countFixed.
     """
     rootFolder = './root'  # Path to the root data folder (update as needed)
     if not os.path.isdir(rootFolder):
         print(f"Warning: root folder '{rootFolder}' does not exist. Please update the path.")
         return
     strategies = ['centralized', 'decentralized']  # The two navigation strategies
-    dataBoth = []  # List to store (strategy, makespan) tuples for bothFixed
-    
-    for strategy in strategies:
-        # --- Both Fixed: Compare makespan for each strategy ---
-        bothFixedPath = os.path.join(rootFolder, 'makespan', strategy, 'bothFixed')
-        if os.path.isdir(bothFixedPath):
-            files = [f for f in os.listdir(bothFixedPath) if f.endswith('.txt')]
-            if files:
-                filePath = os.path.join(bothFixedPath, files[0])  # Use the first file found
-                makespanVal = makespanSingleFile(filePath)
-                dataBoth.append((strategy, makespanVal))
-    barChart(dataBoth, "Makespan by Strategy (Both Fixed)")  # Plot bar chart for bothFixed
-
-    for strategy in strategies:
-        # --- Angle Fixed: Makespan vs Angle for each strategy ---
-        angleFixedPath = os.path.join(rootFolder, 'makespan', strategy, 'angleFixed')
-        if os.path.isdir(angleFixedPath):
-            dataAngle = makespanFolder(angleFixedPath, 'angle')
-            scatterPlot(dataAngle, f"Makespan vs Angle ({strategy.capitalize()})", xLabel="Angle", yLabel="Makespan")
-        # --- Count Fixed: Makespan vs Drone Count for each strategy ---
-        countFixedPath = os.path.join(rootFolder, 'makespan', strategy, 'countFixed')
-        if os.path.isdir(countFixedPath):
-            dataCount = makespanFolder(countFixedPath, 'droneCount')
-            scatterPlot(dataCount, f"Makespan vs Drone Count ({strategy.capitalize()})", xLabel="Drone Count", yLabel="Makespan")
+    analyzeBothFixed(rootFolder, strategies)
+    analyzeAngleFixed(rootFolder, strategies)
+    analyzeCountFixed(rootFolder, strategies)
 
 # --- Entry Point ---
 if __name__ == "__main__":
