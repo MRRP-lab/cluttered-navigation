@@ -128,10 +128,11 @@ def traversalFolder(folderPath, xAxis):
     return data
 
 # --- Bar Chart Plotting ---
-def barChart(data, title):
+def barChart(data, title, yLabel):
     """
-    Plots a bar chart for makespan by strategy (used for bothFixed analysis).
-    Expects data as a list of (x, makespan) tuples, where x is typically the strategy name.
+    Plots a bar chart for makespan or traversal time by strategy (used for bothFixed analysis).
+    Expects data as a list of (x, y) tuples, where x is typically the strategy name.
+    yLabel (str): Label for the y-axis (e.g., 'Makespan' or 'Avg Traversal Time').
     """
     if not data:
         print(f"No data for {title}")
@@ -139,7 +140,7 @@ def barChart(data, title):
     xValues, yValues = zip(*data)  # Unpack x and y values
     plt.bar(xValues, yValues)
     plt.title(title)
-    plt.ylabel('Makespan')
+    plt.ylabel(yLabel)
     plt.xlabel('Strategy')
     plt.show()
 
@@ -217,12 +218,13 @@ def testMakespan():
     else:
         print("No valid data to plot.")
 
-# --- Analysis Function for Fixed droneCount and angle ---
+# --- Analysis Function for Fixed droneCount and Fixed angle ---
 def analyzeBothFixed(rootFolder, strategies):
     """
-    Analyze and plot makespan for bothFixed (by strategy).
+    Analyze and plot makespan and average traversal time for bothFixed (by strategy).
     """
-    dataBoth = []
+    dataBothMakespan = []
+    dataBothTraversal = []
     for strategy in strategies:
         bothFixedPath = os.path.join(rootFolder, 'makespan', strategy, 'bothFixed')
         if os.path.isdir(bothFixedPath):
@@ -230,30 +232,37 @@ def analyzeBothFixed(rootFolder, strategies):
             if fileName:
                 filePath = os.path.join(bothFixedPath, fileName)
                 makespanVal = makespanSingleFile(filePath)
-                dataBoth.append((strategy, makespanVal))
-    barChart(dataBoth, "Makespan by Strategy (Both Fixed)")
+                traversalVal = traversalSingleFile(filePath)
+                dataBothMakespan.append((strategy, makespanVal))
+                dataBothTraversal.append((strategy, traversalVal))
+    barChart(dataBothMakespan, "Makespan by Strategy (Both Fixed)", yLabel="Makespan")
+    barChart(dataBothTraversal, "Avg Traversal Time by Strategy (Both Fixed)", yLabel="Avg Traversal Time")
 
 # --- Analysis Function for Variable droneCount and Fixed angle ---
 def analyzeAngleFixed(rootFolder, strategies):
     """
-    Analyze and plot makespan vs angle for each strategy (angleFixed).
+    Analyze and plot makespan and average traversal time vs angle for each strategy (angleFixed).
     """
     for strategy in strategies:
         angleFixedPath = os.path.join(rootFolder, 'makespan', strategy, 'angleFixed')
         if os.path.isdir(angleFixedPath):
-            dataAngle = makespanFolder(angleFixedPath, 'angle')
-            scatterPlot(dataAngle, f"Makespan vs Angle ({strategy.capitalize()})", xLabel="Angle", yLabel="Makespan")
+            dataAngleMakespan = makespanFolder(angleFixedPath, 'angle')
+            dataAngleTraversal = traversalFolder(angleFixedPath, 'angle')
+            scatterPlot(dataAngleMakespan, f"Makespan vs Angle ({strategy.capitalize()})", xLabel="Angle", yLabel="Makespan")
+            scatterPlot(dataAngleTraversal, f"Avg Traversal Time vs Angle ({strategy.capitalize()})", xLabel="Angle", yLabel="Avg Traversal Time")
 
 # --- Analysis Function for Fixed droneCount and Variable angle ---
 def analyzeCountFixed(rootFolder, strategies):
     """
-    Analyze and plot makespan vs drone count for each strategy (countFixed).
+    Analyze and plot makespan and average traversal time vs drone count for each strategy (countFixed).
     """
     for strategy in strategies:
         countFixedPath = os.path.join(rootFolder, 'makespan', strategy, 'countFixed')
         if os.path.isdir(countFixedPath):
-            dataCount = makespanFolder(countFixedPath, 'droneCount')
-            scatterPlot(dataCount, f"Makespan vs Drone Count ({strategy.capitalize()})", xLabel="Drone Count", yLabel="Makespan")
+            dataCountMakespan = makespanFolder(countFixedPath, 'droneCount')
+            dataCountTraversal = traversalFolder(countFixedPath, 'droneCount')
+            scatterPlot(dataCountMakespan, f"Makespan vs Drone Count ({strategy.capitalize()})", xLabel="Drone Count", yLabel="Makespan")
+            scatterPlot(dataCountTraversal, f"Avg Traversal Time vs Drone Count ({strategy.capitalize()})", xLabel="Drone Count", yLabel="Avg Traversal Time")
 
 # --- Main Analysis and Plotting Routine ---
 def main():
