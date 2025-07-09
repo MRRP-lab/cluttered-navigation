@@ -62,6 +62,71 @@ def makespanFolder(folderPath, xAxis):
             data.append((xValue, yValue))  # Only add valid data
     return data
 
+# --- Traversal Time Calculation for a Single File ---
+def traversalSingleFile(filePath):
+    """
+    Calculates the average traversal time for all drones (lines) in a single file.
+    Traversal time is defined as exitTime - entryTime for each valid line.
+    Skips lines with malformed data or missing exit times.
+    Args:
+        filePath (str): Path to the data file.
+    Returns:
+        float: The average traversal time for all valid drones, or None if no valid data.
+    """
+    traversalTimes = []
+    with open(filePath, 'r') as file:
+        for line in file:
+            vals = line.strip().split(',')
+            if len(vals) < 6:
+                continue  # Skip malformed lines
+            if vals[5].strip() == '<null>':
+                continue  # Skip lines with missing exit time
+            try:
+                entryTime = float(vals[4])
+                exitTime = float(vals[5])
+                traversalTimes.append(exitTime - entryTime)
+            except ValueError:
+                continue  # Skip lines with non-numeric times
+    if traversalTimes:
+        return sum(traversalTimes) / len(traversalTimes)
+    else:
+        return None
+
+# --- Traversal Time Calculation for a Folder of Files ---
+def traversalFolder(folderPath, xAxis):
+    """
+    Collects (x, avgTraversalTime) data from all .txt files in a folder for plotting.
+    The x value is extracted from the first line of each file: droneCount (index 1) or angle (index 2).
+    Ignores files that do not have valid data or x values.
+    Args:
+        folderPath (str): Path to the folder containing data files.
+        xAxis (str): The variable to use as the x-axis ('droneCount' or 'angle').
+    Returns:
+        list: List of (x, avgTraversalTime) tuples for valid data files.
+    """
+    data = []
+    for fileName in os.listdir(folderPath):
+        if not fileName.endswith('.txt'):
+            continue  # Only process .txt files
+        filePath = os.path.join(folderPath, fileName)
+        xValue = None
+        try:
+            with open(filePath, 'r') as f:
+                firstLine = f.readline()
+                vals = firstLine.strip().split(',')
+                if len(vals) < 3:
+                    xValue = None
+                elif xAxis == 'droneCount':
+                    xValue = int(vals[1])
+                elif xAxis == 'angle':
+                    xValue = float(vals[2])
+        except Exception:
+            xValue = None
+        yValue = traversalSingleFile(filePath)
+        if xValue is not None and yValue is not None:
+            data.append((xValue, yValue))
+    return data
+
 # --- Bar Chart Plotting ---
 def barChart(data, title):
     """
@@ -152,6 +217,7 @@ def testMakespan():
     else:
         print("No valid data to plot.")
 
+# --- Analysis Function for Fixed droneCount and angle ---
 def analyzeBothFixed(rootFolder, strategies):
     """
     Analyze and plot makespan for bothFixed (by strategy).
@@ -167,6 +233,7 @@ def analyzeBothFixed(rootFolder, strategies):
                 dataBoth.append((strategy, makespanVal))
     barChart(dataBoth, "Makespan by Strategy (Both Fixed)")
 
+# --- Analysis Function for Variable droneCount and Fixed angle ---
 def analyzeAngleFixed(rootFolder, strategies):
     """
     Analyze and plot makespan vs angle for each strategy (angleFixed).
@@ -177,6 +244,7 @@ def analyzeAngleFixed(rootFolder, strategies):
             dataAngle = makespanFolder(angleFixedPath, 'angle')
             scatterPlot(dataAngle, f"Makespan vs Angle ({strategy.capitalize()})", xLabel="Angle", yLabel="Makespan")
 
+# --- Analysis Function for Fixed droneCount and Variable angle ---
 def analyzeCountFixed(rootFolder, strategies):
     """
     Analyze and plot makespan vs drone count for each strategy (countFixed).
