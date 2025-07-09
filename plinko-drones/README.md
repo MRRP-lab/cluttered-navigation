@@ -27,3 +27,13 @@ Change the filename of the desired output files in the simulators inspector.
 
 filename_ee is the name of the file to store entry/exit data.
 filename_cont is the name of the file for continuous/motionpath data.
+
+## Headless Usage
+
+From the command line, you can run scripts with the following command:
+
+```bash
+/path/to/godot/headless --path /path/to/dir/containing/project.godot/ --headless --script scripts/run_sim_headless.gd
+```
+
+Only tested on WSL so far, next step is to figure out how to initialize the sim, then start a run with logging.
