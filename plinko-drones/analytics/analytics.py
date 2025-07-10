@@ -26,11 +26,11 @@ def parseSpatialFile(filePath):
     with open(filePath) as file:
         for line in file:
             vals = line.strip().split(',')
-            if len(vals) < 6 or vals[5].strip() == '<null>':
+            if len(vals) < 7 or vals[5].strip() == '<null>' or vals[6].strip() == '<null>':
                 continue
             try:
                 timeStamp = int(vals[4])
-                x, y = float(vals[0]), float(vals[1])
+                x, y = float(vals[5]), float(vals[6])
                 positionsByTime.setdefault(timeStamp, []).append((x, y))
             except ValueError:
                 continue
@@ -85,7 +85,14 @@ def extractEmd(filePath, referenceArray=None):
     if not positionsByTime:
         return None
     if referenceArray is None:
-        referenceArray = np.array(positionsByTime.get(0, []))
+        # Find the first non-empty time step for reference
+        for t in sorted(positionsByTime):
+            arr = np.array(positionsByTime[t])
+            if arr.size > 0:
+                referenceArray = arr
+                break
+        else:
+            return None
     emdVals = []
     for t in sorted(positionsByTime):
         positionsArray = np.array(positionsByTime[t])
