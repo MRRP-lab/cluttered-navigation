@@ -1,5 +1,6 @@
 import os
 import random
+import math
 
 # Configuration for experiment structure
 top_dir = os.path.join(os.path.dirname(__file__), "sampleOutput", "root")
@@ -31,12 +32,22 @@ def make_makespan_file(path, strategy, count, angle, fixed_type):
 def make_spatial_file(path, strategy, count, angle, fixed_type):
     # 7 columns, one line per drone per second (10 seconds)
     lines = []
+    angle_rad = math.radians(angle)
     for t in range(10):
         for drone in range(count):
-            base = t * 0.5 + drone * 0.1
-            # Centralized is always better (lower traversal)
-            x = base + (0 if strategy == "centralized" else 0.2)
-            y = base + 0.7 + (0 if strategy == "centralized" else 0.2)
+            # Spread drones in a fan based on angle and count
+            if count > 1:
+                theta = (-angle_rad/2) + (angle_rad * drone / (count-1))
+            else:
+                theta = 0
+            # Centralized: tighter, Decentralized: more dispersed
+            base_radius = 1.0 + 0.1 * t
+            radius = base_radius + (0 if strategy == "centralized" else 0.2 * drone)
+            x = radius * math.cos(theta) + (0 if strategy == "centralized" else 0.2)
+            y = radius * math.sin(theta) + (0 if strategy == "centralized" else 0.2)
+            # Add some random noise for realism
+            x += random.uniform(-0.05, 0.05)
+            y += random.uniform(-0.05, 0.05)
             lines.append(f"{strategy}Weighted,{count},{angle},100{drone+1},{t},{x:.2f},{y:.2f}")
     with open(path, "w") as f:
         f.write("\n".join(lines) + "\n")
