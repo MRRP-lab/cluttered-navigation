@@ -30,13 +30,16 @@ filename_cont is the name of the file for continuous/motionpath data.
 
 ## Headless Usage
 
-From the command line, you can run scripts with the following command:
+
+
+
+Linux: run a single simulation without visualization with the following command:
 
 ```bash
-/path/to/godot/headless --path /path/to/dir/containing/project.godot/ --headless --script scripts/run_sim_headless.gd
+godot --headless --script scripts/run_sim_headless.gd -- [USER ARGS]
 ```
 
-Only tested on WSL so far, next step is to figure out how to initialize the sim, then start a run with logging.
+(In theory this should work on WSL, but doesn't)
 
 ## Analysis
 
