@@ -32,7 +32,6 @@ func load_and_run_simulation(angle: float, N: int, weighted=true):
 
     # DEFAULTS
     ###
-
     sim.obstacle_width = 6
     sim.obstacle_depth = 6
     sim.log_button.emit_signal("pressed")
@@ -57,17 +56,28 @@ func load_and_run_simulation(angle: float, N: int, weighted=true):
     var filepath_ee = "res://output-data/" + filename_ee + ".txt"
     var filepath_cont = "res://output-data/" + filename_cont + ".txt"
 
-    print("Logging")
-    # makes empty files? how to run in loop?
-    sim.logger.log_data_ee(filepath_ee)
-    sim.logger.log_data_cont(filepath_cont)
-
-    # timeout and quit cleanly?
+    # Set up a timeout timer to log and quit if simulation takes too long
+    var timeout_seconds = 2  # adjust as needed
+    var timer = Timer.new()
+    timer.wait_time = timeout_seconds
+    timer.one_shot = true
+    timer.autostart = true
+    root.add_child(timer)
+    timer.connect("timeout", func():
+        print("Simulation timeout reached, logging and quitting.")
+        sim.logger.log_data_ee(filepath_ee)
+        sim.logger.log_data_cont(filepath_cont)
+        #sim.connect("simulation_completed", Callable(sim.logger, "log_data_ee").bind(filepath_ee))
+        #sim.connect("simulation_completed", Callable(sim.logger, "log_data_cont").bind(filepath_cont))
+        quit()
+    )
 
 func _init():
-    parse_command_line_args()
-    var angle := 40.0
-    var N := 5
-    var weighted = true
-    load_and_run_simulation(angle, N, weighted)
-    quit()
+    #parse_command_line_args() # not working, need to compile / export?
+
+    # TODO figure out how to spawn in separate threads
+    for w in [true, false]:
+        for N in range(5,20,5):
+            for angle in range(30, 40, 5):
+                load_and_run_simulation(angle, N, w)
+                #quit()

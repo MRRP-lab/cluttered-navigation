@@ -7,7 +7,8 @@ class_name Swarm_Sim
 @export var obstacle_width := 4  ## Number of obstacles along the y-axis of the field. If triangular, the width of the base
 @export var obstacle_depth := 4  ## Number of obstacles along the x-axis of the field. If triangular, this is ignored
 @export var obstacle_spacing := 60  ## Spacing in pixels between obstacles
-@export_range(0, 100, 1, "suffix:%") var obstacle_randomization: float  ## Maximum randomization offset, where 100% is the maximum range between obstacles without collisions
+#@export_range(0, 100, 1, "suffix:%") var obstacle_randomization: float  ## Maximum randomization offset, where 100% is the maximum range between obstacles without collisions
+@export var obstacle_randomization := 50
 @export var obstacle_scale := 1.0  ## Scale of the obstacle image and collision circle
 
 @export_group("Drone Properties")
