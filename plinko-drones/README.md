@@ -83,8 +83,28 @@ The `sampleOutput/` directory contains example output data files and directory s
 
 ### Usage
 
-1. **Run Experiments:** Use the simulator and logger to generate entry/exit and motionpath data files, or use `generateFakeData.py` to create test data in the correct structure.
-2. **Analyze Data:** Run `analytics.py` to process the data, compute statistics, and generate plots. All results and statistics are printed to the CLI and shown as visualizations.
-3. **Interpret Results:** Use the generated plots and printed statistics to compare navigation strategies, understand performance trends, and identify areas for improvement.
+1. **Run Experiments:** Use the simulator and logger to generate entry/exit and motionpath data files, or use `generateFakeData.py` to create test data in the correct structure. Ensure that your makespan and spatial data files are headerless and formatted correctly, with values separated by commas. Refer to the `sampleOutput/` directory for examples of the expected structure.
+2. **Analyze Data:** Run `analytics.py` to process the data, compute statistics, and generate plots. All results and statistics are printed to the CLI and shown as visualizations. Before running, ensure the configurable constants in `analytics.py` are set correctly:
+   - **`ROOT_FOLDER`**: Path to the root directory containing experiment data.
+   - **`MAKESPAN_DIR`**: Subdirectory name for makespan experiment data.
+   - **`SPATIAL_DIR`**: Subdirectory name for spatial experiment data.
+   - **`STRATEGIES`**: List of strategies to analyze (e.g., `['centralized', 'decentralized']`).
+   - **`FOLDER_TYPES`**: Types of experiments (e.g., `['bothFixed', 'angleFixed', 'countFixed']`).
+   - **`PLOT_COLORS`**: Colors for different plot elements:
+     - `[0]`: Data points in scatter plots, box color in boxplots.
+     - `[1]`: Best-fit line in scatter plots, median line in boxplots.
+     - `[2]`: Whiskers and caps in boxplots.
+     - `[3]`: Outlier (flier) points in boxplots.
+   - **`FIGURE_SIZE`**: Dimensions of the generated plots (width, height).
+   - **`BOX_WIDTH`**: Width of boxplots.
+   - **`FONT_SIZE`**: Font size for plot titles and labels.
+   - **`BEST_FIT_DEGREE`**: Degree of the best-fit line for scatter plots (e.g., `1` for linear).
+   - **`BEST_FIT_LABEL`**: Labels for best-fit lines based on degree (e.g., `Linear Best Fit`, `Quadratic Best Fit`).
+   - **`CONFIDENCE_LEVEL`**: Confidence level for margin of error calculations (e.g., `0.95`).
+   - **`SHOW_MEANS`**: Whether to show means in boxplots.
+   - **`SHOW_LEGEND`**: Whether to display legends in plots.
+3. **Interpret Results:** Use the generated plots and printed statistics to compare navigation strategies, understand performance trends, and identify areas for improvement. For example:
+   - Boxplots show the distribution of makespan, traversal time, and Wasserstein EMD for each strategy.
+   - Scatter plots visualize trends across drone count or angle, with best-fit lines for clarity.
 
 For more details, see the docstrings and comments within each script. All code is modular, robust, and designed for easy extension and reproducibility.

@@ -8,6 +8,54 @@ from scipy.spatial.distance import cdist
 from scipy.optimize import linear_sum_assignment
 import scipy.stats
 
+# === USER-CONFIGURABLE CONSTANTS ===
+
+# Directory paths
+ROOT_FOLDER = 'F:/files/school/wwu/research/robotics/simulationSwarm/cluttered-navigation/plinko-drones/analytics/sampleOutput/root'
+MAKESPAN_DIR = 'makespan'
+SPATIAL_DIR = 'spatial'
+STRATEGIES = ['centralized', 'decentralized']
+FOLDER_TYPES = ['bothFixed', 'angleFixed', 'countFixed']
+
+# Plotting options
+PLOT_COLORS = [
+    "#6060ff", # [0]: data points in scatter plots, box color in boxplots
+    "#ff2020", # [1]: best-fit line in scatter plots, median line in boxplots
+    "#000000", # [2]: whiskers and caps in boxplots
+    "#ffff60"  # [3]: outlier (flier) points in boxplots
+]
+FIGURE_SIZE = (7, 6)
+BOX_WIDTH = 0.5
+FONT_SIZE = 12
+
+# Best-fit line degree (1=linear, 2=quadratic, 3=cubic, etc.)
+BEST_FIT_DEGREE = 1
+BEST_FIT_LABEL = {1: 'Linear Best Fit', 2: 'Quadratic Best Fit', 3: 'Cubic Best Fit'}
+
+# Margin of error/confidence interval
+CONFIDENCE_LEVEL = 0.95
+
+# Title templates for all graphs (customize as needed)
+TITLE_BARCHART_MAKESPAN_STRATEGY = 'Makespan by Strategy (Angle & Count Fixed)'
+TITLE_BARCHART_TRAVERSAL_STRATEGY = 'Average Traversal Time by Strategy (Angle & Count Fixed)'
+TITLE_BARCHART_EMD_STRATEGY = 'EMD by Strategy (Angle & Count Fixed)'
+TITLE_MAKESPAN_DRONECOUNT_CENTRALIZED = 'Makespan vs. Drone Count for Centralized Strategy'
+TITLE_TRAVERSAL_DRONECOUNT_CENTRALIZED = 'Average Traversal Time vs. Drone Count for Centralized Strategy'
+TITLE_EMD_DRONECOUNT_CENTRALIZED = 'EMD vs. Drone Count for Centralized Strategy'
+TITLE_MAKESPAN_DRONECOUNT_DECENTRALIZED = 'Makespan vs. Drone Count for Decentralized Strategy'
+TITLE_TRAVERSAL_DRONECOUNT_DECENTRALIZED = 'Average Traversal Time vs. Drone Count for Decentralized Strategy'
+TITLE_EMD_DRONECOUNT_DECENTRALIZED = 'EMD vs. Drone Count for Decentralized Strategy'
+TITLE_MAKESPAN_ANGLE_CENTRALIZED = 'Makespan vs. Angle for Centralized Strategy'
+TITLE_TRAVERSAL_ANGLE_CENTRALIZED = 'Average Traversal Time vs. Angle for Centralized Strategy'
+TITLE_EMD_ANGLE_CENTRALIZED = 'EMD vs. Angle for Centralized Strategy'
+TITLE_MAKESPAN_ANGLE_DECENTRALIZED = 'Makespan vs. Angle for Decentralized Strategy'
+TITLE_TRAVERSAL_ANGLE_DECENTRALIZED = 'Average Traversal Time vs. Angle for Decentralized Strategy'
+TITLE_EMD_ANGLE_DECENTRALIZED = 'EMD vs. Angle for Decentralized Strategy'
+
+# Other settings
+SHOW_MEANS = True
+SHOW_LEGEND = True
+
 # --- Utility Functions ---
 
 def readFirstLineValue(filePath, xAxis):
@@ -151,42 +199,49 @@ def plotScatter(data, title, xLabel, yLabel, xIntTicks=False):
     xValues, yValues = zip(*data)
     # Print stats for y-values (dependent variable)
     printDescriptiveStats(title, {yLabel: yValues})
-    plt.scatter(xValues, yValues, label='Data Points')
-    # Add linear best-fit line if more than one point
+    plt.figure(figsize=FIGURE_SIZE)
+    plt.scatter(xValues, yValues, label='Data Points', color=PLOT_COLORS[0])  # Data points (same as box color)
+    # Add best-fit line if more than one point
     if len(xValues) > 1:
-        coeffs = np.polyfit(xValues, yValues, 1)
+        coeffs = np.polyfit(xValues, yValues, BEST_FIT_DEGREE)
         poly = np.poly1d(coeffs)
         xFit = np.linspace(min(xValues), max(xValues), 100)
-        plt.plot(xFit, poly(xFit), color='red', label='Linear Best Fit')
-    plt.title(title)
-    plt.xlabel(xLabel)
-    plt.ylabel(yLabel)
+        plt.plot(xFit, poly(xFit), color=PLOT_COLORS[1], label=BEST_FIT_LABEL.get(BEST_FIT_DEGREE, 'Best Fit'))  # Best-fit line (same as median)
+    plt.title(title, fontsize=FONT_SIZE)
+    plt.xlabel(xLabel, fontsize=FONT_SIZE)
+    plt.ylabel(yLabel, fontsize=FONT_SIZE)
     # Set x-axis ticks for integer-based axes
     if xIntTicks:
         xMin, xMax = int(min(xValues)), int(max(xValues))
-        if xLabel.lower().startswith('drone count'):
+        if xLabel.startswith('Drone Count'):
             plt.xticks(np.arange(0, xMax+1, 5))
         else:
             step = 5 if xMax - xMin > 6 else 1
             plt.xticks(np.arange(xMin, xMax+1, step))
-    plt.legend()
+    if SHOW_LEGEND:
+        plt.legend()
     plt.show()
 
 def plotBox(samplesDict, title, yLabel):
     """Reusable boxplot with descriptive stats for each group (e.g., strategy)."""
-    # Print stats for each group shown in the boxplot
     printDescriptiveStats(title, samplesDict)
-    strategies = list(samplesDict.keys())
-    data = [samplesDict[s] for s in strategies]
-    plt.figure(figsize=(7, 6))  # Make the plot larger for readability
-    # Show boxplot with means and wider boxes
-    plt.boxplot(data, tick_labels=strategies, patch_artist=True, showmeans=True,
-                meanprops={"marker":"o","markerfacecolor":"white","markeredgecolor":"black"},
-                widths=0.5)
-    plt.title(title)
-    plt.ylabel(yLabel)
-    plt.xlabel('Strategy')
-    plt.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.figure(figsize=FIGURE_SIZE)
+    plt.boxplot(
+        [samplesDict['centralized'], samplesDict['decentralized']],
+        tick_labels=['Centralized', 'Decentralized'],
+        patch_artist=True,
+        showmeans=SHOW_MEANS,
+        meanprops={"marker":"o","markerfacecolor":"white","markeredgecolor":"black"},
+        widths=BOX_WIDTH,
+        boxprops=dict(color=PLOT_COLORS[0], facecolor=PLOT_COLORS[0]), # Box color (same as scatter data points)
+        medianprops=dict(color=PLOT_COLORS[1]), # Median line (same as best-fit line)
+        whiskerprops=dict(color=PLOT_COLORS[2]), # Whiskers
+        capprops=dict(color=PLOT_COLORS[2]), # Caps
+        flierprops=dict(markerfacecolor=PLOT_COLORS[3], marker='o') # Outliers
+    )
+    plt.title(title, fontsize=FONT_SIZE)
+    plt.ylabel(yLabel, fontsize=FONT_SIZE)
+    plt.xlabel('Strategy', fontsize=FONT_SIZE)
     plt.show()
 
 # --- Analysis Functions ---
@@ -272,8 +327,8 @@ def getStrategySamples(folderPath, sampleFunc):
         samples.extend(sampleFunc(filePath))
     return samples
 
-def marginOfError(samples, confidence=0.95):
-    """Calculate the margin of error for a list of samples at the given confidence level."""
+def marginOfError(samples, confidence=CONFIDENCE_LEVEL):
+    """Calculate the margin of error for a list of samples at the given confidence level (user-configurable)."""
     n = len(samples)
     if n < 2:
         return 0.0
@@ -284,15 +339,13 @@ def marginOfError(samples, confidence=0.95):
 
 def main():
     """Main function to run all analyses and plots for the experiment data."""
-    rootFolder = 'F:\\files\\school\\wwu\\research\\robotics\\simulationSwarm\\cluttered-navigation\\plinko-drones\\analytics\\sampleOutput\\root' # Update this path as needed
-    if not os.path.isdir(rootFolder):
-        print(f"Warning: root folder '{rootFolder}' does not exist. Please update the path."); return
-    strategies = ['Centralized', 'Decentralized']
+    if not os.path.isdir(ROOT_FOLDER):
+        print(f"Warning: root folder '{ROOT_FOLDER}' does not exist. Please update the path."); return
     # Both Fixed
     makespanSamplesDict, traversalSamplesDict, emdSamplesDict = {}, {}, {}
-    for strategy in strategies:
-        pathMakespan = os.path.join(rootFolder, 'Makespan', strategy, 'BothFixed')
-        pathSpatial = os.path.join(rootFolder, 'Spatial', strategy, 'BothFixed')
+    for strategy in STRATEGIES:
+        pathMakespan = os.path.join(ROOT_FOLDER, MAKESPAN_DIR, strategy, FOLDER_TYPES[0])
+        pathSpatial = os.path.join(ROOT_FOLDER, SPATIAL_DIR, strategy, FOLDER_TYPES[0])
         if os.path.isdir(pathMakespan):
             makespanSamples = getStrategySamples(pathMakespan, extractMakespanSamples)
             traversalSamples = getStrategySamples(pathMakespan, extractTraversalSamples)
@@ -301,18 +354,18 @@ def main():
         if os.path.isdir(pathSpatial):
             emdSamples = getStrategySamples(pathSpatial, extractEmdSamples)
             emdSamplesDict[strategy] = emdSamples
-    plotBox(makespanSamplesDict, 'Makespan by Strategy (Angle & Count Fixed)', 'Makespan (ms)')
-    plotBox(traversalSamplesDict, 'Average Traversal Time by Strategy (Angle & Count Fixed)', 'Average Traversal Time (ms)')
-    plotBox(emdSamplesDict, 'EMD by Strategy (Angle & Count Fixed)', 'Wasserstein EMD')
+    plotBox(makespanSamplesDict, TITLE_BARCHART_MAKESPAN_STRATEGY, 'Makespan (ms)')
+    plotBox(traversalSamplesDict, TITLE_BARCHART_TRAVERSAL_STRATEGY, 'Average Traversal Time (ms)')
+    plotBox(emdSamplesDict, TITLE_BARCHART_EMD_STRATEGY, 'Wasserstein EMD')
     # Angle Fixed
     analyzeFixed(
-        'angleFixed', rootFolder, strategies, 'droneCount',
+        FOLDER_TYPES[1], ROOT_FOLDER, STRATEGIES, 'droneCount',
         [extractMakespan, extractTraversal],
         [plotScatter, plotScatter, plotScatter],
         [
-            'Makespan vs. Drone Count for {} (Angle Fixed at 40°)',
-            'Average Traversal Time vs. Drone Count for {} (Angle Fixed at 40°)',
-            'EMD vs. Drone Count for {} (Angle Fixed at 40°)'
+            TITLE_MAKESPAN_ANGLE_CENTRALIZED,
+            TITLE_TRAVERSAL_ANGLE_CENTRALIZED,
+            TITLE_EMD_ANGLE_CENTRALIZED
         ],
         'Drone Count',
         ['Makespan (ms)', 'Average Traversal Time (ms)', 'Wasserstein EMD'],
@@ -320,13 +373,13 @@ def main():
     )
     # Count Fixed
     analyzeFixed(
-        'countFixed', rootFolder, strategies, 'angle',
+        FOLDER_TYPES[2], ROOT_FOLDER, STRATEGIES, 'angle',
         [extractMakespan, extractTraversal],
         [plotScatter, plotScatter, plotScatter],
         [
-            'Makespan vs. Angle for {} (Drone Count Fixed at 10)',
-            'Average Traversal Time vs. Angle for {} (Drone Count Fixed at 10)',
-            'EMD vs. Angle for {} (Drone Count Fixed at 10)'
+            TITLE_MAKESPAN_ANGLE_DECENTRALIZED,
+            TITLE_TRAVERSAL_ANGLE_DECENTRALIZED,
+            TITLE_EMD_ANGLE_DECENTRALIZED
         ],
         'Angle (Degrees)',
         ['Makespan (ms)', 'Average Traversal Time (ms)', 'Wasserstein EMD'],
