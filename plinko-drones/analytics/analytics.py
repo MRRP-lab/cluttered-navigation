@@ -143,7 +143,6 @@ def printDescriptiveStats(title, dataDict):
         for k, v in stats.items():
             print(f"  {k:>6}: {v:>10.3f}" if isinstance(v, float) else f"  {k:>6}: {v}")
 
-
 def plotScatter(data, title, xLabel, yLabel, xIntTicks=False):
     """Reusable scatter plot with best-fit line and descriptive stats."""
     # Early exit if no data
@@ -172,7 +171,6 @@ def plotScatter(data, title, xLabel, yLabel, xIntTicks=False):
             plt.xticks(np.arange(xMin, xMax+1, step))
     plt.legend()
     plt.show()
-
 
 def plotBox(samplesDict, title, yLabel):
     """Reusable boxplot with descriptive stats for each group (e.g., strategy)."""
