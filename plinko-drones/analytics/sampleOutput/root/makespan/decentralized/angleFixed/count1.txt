@@ -1,1 +1,1 @@
-decentralizedWeighted,1,40.0,1001,0,946,12591
+decentralizedWeighted,1,40.0,1001,0,1093,14047

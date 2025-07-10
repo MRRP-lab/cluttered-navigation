@@ -1,6 +1,6 @@
-decentralizedWeighted,6,40.0,1001,0,918,14799
-decentralizedWeighted,6,40.0,1002,1,1087,11129
-decentralizedWeighted,6,40.0,1003,2,1016,10406
-decentralizedWeighted,6,40.0,1004,3,1098,11793
-decentralizedWeighted,6,40.0,1005,4,1012,11887
-decentralizedWeighted,6,40.0,1006,5,921,14386
+decentralizedWeighted,6,40.0,1001,0,1079,10445
+decentralizedWeighted,6,40.0,1002,1,1007,11486
+decentralizedWeighted,6,40.0,1003,2,1039,14312
+decentralizedWeighted,6,40.0,1004,3,1023,13002
+decentralizedWeighted,6,40.0,1005,4,912,11629
+decentralizedWeighted,6,40.0,1006,5,944,12253
