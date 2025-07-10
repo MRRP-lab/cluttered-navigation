@@ -49,15 +49,17 @@ func load_and_run_simulation(angle: float, N: int, weighted=true):
     # SET LOGS
     ###
     # set logging filename based on variable values in this sim
-    var filename_ee = "sample-N"+str(sim.droneNum)+"-"+w+"-ee"
-    var filename_cont = "sample-N"+str(sim.droneNum)+"-"+w+"-cont"
+    var filename_base = "data-"+w+"-N"+str(sim.droneNum)+"-A"+str(int(sim.Maximum_Angle))
+    var filename_ee = filename_base+"-ee"
+    var filename_cont = filename_base+"-cont"
     sim.filename_ee = filename_ee # idk anymore
     sim.filename_cont = filename_cont
     var filepath_ee = "res://output-data/" + filename_ee + ".txt"
     var filepath_cont = "res://output-data/" + filename_cont + ".txt"
 
+    # TODO figure out how to end simulation based on fraction of bots at global_position
     # Set up a timeout timer to log and quit if simulation takes too long
-    var timeout_seconds = 2  # adjust as needed
+    var timeout_seconds = 20  # adjust as needed
     var timer = Timer.new()
     timer.wait_time = timeout_seconds
     timer.one_shot = true
@@ -77,7 +79,7 @@ func _init():
 
     # TODO figure out how to spawn in separate threads
     for w in [true, false]:
-        for N in range(5,20,5):
-            for angle in range(30, 40, 5):
+        for N in range(5,21,5):
+            for angle in range(30, 41, 5):
                 load_and_run_simulation(angle, N, w)
                 #quit()
