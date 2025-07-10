@@ -20,7 +20,7 @@ def readFirstLineValue(filePath, xAxis):
             return int(vals[1]) if xAxis == 'droneCount' else float(vals[2])
     except Exception:
         return None
-
+    
 def parseSpatialFile(filePath):
     """Parse a spatial log file into a dict: timeStamp -> list of (x, y) positions."""
     positionsByTime = {}
@@ -119,33 +119,42 @@ def folderStats(folderPath, xAxis, statFunc):
 
 # --- Plotting Functions ---
 
-def barChart(data, errors, title, yLabel):
-    """Plot a bar chart with error bars and annotate each bar with its integer value centered in the bar."""
-    strategies = ['centralized', 'decentralized']
-    yValues = [next((val for strat, val in data if strat == s), None) for s in strategies]
-    yErrs = [errors.get(s, 0.0) for s in strategies]
-    if any(v is None for v in yValues):
-        print(f"Warning: Missing data for one or more strategies in '{title}'. Skipping plot.")
-        return
-    bars = plt.bar(strategies, yValues, yerr=yErrs, capsize=8)
-    plt.title(title)
-    plt.ylabel(yLabel)
-    plt.xlabel('Strategy')
-    # Center annotation vertically in the bar
-    for bar, y in zip(bars, yValues):
-        height = bar.get_height()
-        plt.text(bar.get_x() + bar.get_width() / 2, height / 2, str(int(round(y))),
-                 ha='center', va='center', fontsize=10, fontweight='bold', color='white')
-    plt.show()
+def printDescriptiveStats(title, dataDict):
+    """Print descriptive statistics for each group in a pretty way with a title."""
+    # Print a formatted table of stats for each group (e.g., strategy)
+    print(f"\n=== {title} ===")
+    for group, values in dataDict.items():
+        arr = np.array(values)
+        if arr.size == 0:
+            print(f"{group}: No data.")
+            continue
+        # Compute and print common descriptive statistics
+        stats = {
+            'Count': len(arr),
+            'Mean': np.mean(arr),
+            'Std': np.std(arr, ddof=1) if len(arr) > 1 else 0.0,
+            'Min': np.min(arr),
+            '25%': np.percentile(arr, 25),
+            'Median': np.median(arr),
+            '75%': np.percentile(arr, 75),
+            'Max': np.max(arr)
+        }
+        print(f"{group}:")
+        for k, v in stats.items():
+            print(f"  {k:>6}: {v:>10.3f}" if isinstance(v, float) else f"  {k:>6}: {v}")
 
-def scatterPlot(data, title, xLabel, yLabel, xIntTicks=False):
-    """Plot a scatter plot with least squares linear best-fit line for numeric x/y data."""
+
+def plotScatter(data, title, xLabel, yLabel, xIntTicks=False):
+    """Reusable scatter plot with best-fit line and descriptive stats."""
+    # Early exit if no data
     if not data:
         print(f"No data for {title}"); return
     xValues, yValues = zip(*data)
+    # Print stats for y-values (dependent variable)
+    printDescriptiveStats(title, {yLabel: yValues})
     plt.scatter(xValues, yValues, label='Data Points')
+    # Add linear best-fit line if more than one point
     if len(xValues) > 1:
-        # Linear least squares fit
         coeffs = np.polyfit(xValues, yValues, 1)
         poly = np.poly1d(coeffs)
         xFit = np.linspace(min(xValues), max(xValues), 100)
@@ -153,6 +162,7 @@ def scatterPlot(data, title, xLabel, yLabel, xIntTicks=False):
     plt.title(title)
     plt.xlabel(xLabel)
     plt.ylabel(yLabel)
+    # Set x-axis ticks for integer-based axes
     if xIntTicks:
         xMin, xMax = int(min(xValues)), int(max(xValues))
         if xLabel.lower().startswith('drone count'):
@@ -163,14 +173,18 @@ def scatterPlot(data, title, xLabel, yLabel, xIntTicks=False):
     plt.legend()
     plt.show()
 
-def boxPlot(samplesDict, title, yLabel):
-    """Plot a boxplot for each strategy's sample distribution, with wider boxes."""
+
+def plotBox(samplesDict, title, yLabel):
+    """Reusable boxplot with descriptive stats for each group (e.g., strategy)."""
+    # Print stats for each group shown in the boxplot
+    printDescriptiveStats(title, samplesDict)
     strategies = list(samplesDict.keys())
     data = [samplesDict[s] for s in strategies]
-    plt.figure(figsize=(7, 6))  # Make the plot larger
-    plt.boxplot(data, labels=strategies, patch_artist=True, showmeans=True,
+    plt.figure(figsize=(7, 6))  # Make the plot larger for readability
+    # Show boxplot with means and wider boxes
+    plt.boxplot(data, tick_labels=strategies, patch_artist=True, showmeans=True,
                 meanprops={"marker":"o","markerfacecolor":"white","markeredgecolor":"black"},
-                widths=0.5)  # Make boxes wider
+                widths=0.5)
     plt.title(title)
     plt.ylabel(yLabel)
     plt.xlabel('Strategy')
@@ -180,20 +194,22 @@ def boxPlot(samplesDict, title, yLabel):
 # --- Analysis Functions ---
 
 def analyzeFixed(folderType, rootFolder, strategies, xAxis, statFuncs, plotFuncs, plotTitles, xLabel, yLabels, xIntTicks=False):
-    """Generalized analysis for bothFixed, angleFixed, and countFixed folders."""
+    """Generalized analysis for bothFixed, angleFixed, and countFixed folders.
+    For each strategy, computes and plots stats for makespan, traversal, and EMD.
+    """
     for strategy in strategies:
-        # Build paths for makespan and spatial data
-        pathMakespan = os.path.join(rootFolder, 'makespan', strategy, folderType)
-        pathSpatial = os.path.join(rootFolder, 'spatial', strategy, folderType)
-        # For makespan and traversal
+        # Build paths for makespan and spatial data for this strategy and folder type
+        pathMakespan = os.path.join(rootFolder, 'Makespan', strategy, folderType)
+        pathSpatial = os.path.join(rootFolder, 'Spatial', strategy, folderType)
+        # For makespan and traversal, plot for each stat function
         if os.path.isdir(pathMakespan):
             for statFunc, plotFunc, plotTitle, yLabel in zip(statFuncs, plotFuncs, plotTitles, yLabels):
                 data = folderStats(pathMakespan, xAxis, statFunc)
                 plotFunc(data, plotTitle.format(strategy), xLabel, yLabel, xIntTicks)
-        # For EMD
+        # For EMD, plot EMD vs. x-axis
         if os.path.isdir(pathSpatial):
             emdData = folderStats(pathSpatial, xAxis, extractEmd)
-            scatterPlot(emdData, plotTitles[-1].format(strategy), xLabel, yLabels[-1], xIntTicks)
+            plotScatter(emdData, plotTitles[-1].format(strategy), xLabel, yLabels[-1], xIntTicks)
 
 def extractMakespanSamples(filePath):
     """Return a list of exit times for all drones in the file (for margin of error calculation)."""
@@ -273,12 +289,12 @@ def main():
     rootFolder = 'F:\\files\\school\\wwu\\research\\robotics\\simulationSwarm\\cluttered-navigation\\plinko-drones\\analytics\\sampleOutput\\root' # Update this path as needed
     if not os.path.isdir(rootFolder):
         print(f"Warning: root folder '{rootFolder}' does not exist. Please update the path."); return
-    strategies = ['centralized', 'decentralized']
+    strategies = ['Centralized', 'Decentralized']
     # Both Fixed
     makespanSamplesDict, traversalSamplesDict, emdSamplesDict = {}, {}, {}
     for strategy in strategies:
-        pathMakespan = os.path.join(rootFolder, 'makespan', strategy, 'bothFixed')
-        pathSpatial = os.path.join(rootFolder, 'spatial', strategy, 'bothFixed')
+        pathMakespan = os.path.join(rootFolder, 'Makespan', strategy, 'BothFixed')
+        pathSpatial = os.path.join(rootFolder, 'Spatial', strategy, 'BothFixed')
         if os.path.isdir(pathMakespan):
             makespanSamples = getStrategySamples(pathMakespan, extractMakespanSamples)
             traversalSamples = getStrategySamples(pathMakespan, extractTraversalSamples)
@@ -287,14 +303,14 @@ def main():
         if os.path.isdir(pathSpatial):
             emdSamples = getStrategySamples(pathSpatial, extractEmdSamples)
             emdSamplesDict[strategy] = emdSamples
-    boxPlot(makespanSamplesDict, 'Makespan by Strategy (Angle & Count Fixed)', 'Makespan (ms)')
-    boxPlot(traversalSamplesDict, 'Average Traversal Time by Strategy (Angle & Count Fixed)', 'Average Traversal Time (ms)')
-    boxPlot(emdSamplesDict, 'EMD by Strategy (Angle & Count Fixed)', 'Wasserstein EMD')
+    plotBox(makespanSamplesDict, 'Makespan by Strategy (Angle & Count Fixed)', 'Makespan (ms)')
+    plotBox(traversalSamplesDict, 'Average Traversal Time by Strategy (Angle & Count Fixed)', 'Average Traversal Time (ms)')
+    plotBox(emdSamplesDict, 'EMD by Strategy (Angle & Count Fixed)', 'Wasserstein EMD')
     # Angle Fixed
     analyzeFixed(
         'angleFixed', rootFolder, strategies, 'droneCount',
         [extractMakespan, extractTraversal],
-        [scatterPlot, scatterPlot, scatterPlot],
+        [plotScatter, plotScatter, plotScatter],
         [
             'Makespan vs. Drone Count for {} (Angle Fixed at 40°)',
             'Average Traversal Time vs. Drone Count for {} (Angle Fixed at 40°)',
@@ -308,13 +324,13 @@ def main():
     analyzeFixed(
         'countFixed', rootFolder, strategies, 'angle',
         [extractMakespan, extractTraversal],
-        [scatterPlot, scatterPlot, scatterPlot],
+        [plotScatter, plotScatter, plotScatter],
         [
             'Makespan vs. Angle for {} (Drone Count Fixed at 10)',
             'Average Traversal Time vs. Angle for {} (Drone Count Fixed at 10)',
             'EMD vs. Angle for {} (Drone Count Fixed at 10)'
         ],
-        'Angle (degrees)',
+        'Angle (Degrees)',
         ['Makespan (ms)', 'Average Traversal Time (ms)', 'Wasserstein EMD'],
         xIntTicks=True
     )
