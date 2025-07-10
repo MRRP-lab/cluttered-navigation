@@ -1,4 +1,3 @@
-strategy,droneCount,maxAngle,droneID,entryTime,exitTime
 decentralizedWeighted,10,45.0,31927043512,1791,14625
 decentralizedWeighted,10,45.0,32111592899,2742,12909
 decentralizedWeighted,10,45.0,32296142286,2241,13092
