@@ -11,11 +11,11 @@ import scipy.stats
 # === USER-CONFIGURABLE CONSTANTS ===
 
 # Directory paths
-ROOT_FOLDER = 'F:/files/school/wwu/research/robotics/simulationSwarm/cluttered-navigation/plinko-drones/analytics/sampleOutput/root'
-MAKESPAN_DIR = 'makespan'
-SPATIAL_DIR = 'spatial'
-STRATEGIES = ['centralized', 'decentralized']
-FOLDER_TYPES = ['bothFixed', 'angleFixed', 'countFixed']
+ROOT_FOLDER = '/mnt/files/files/school/wwu/research/robotics/simulationSwarm/cluttered-navigation/plinko-drones/output-data/root'
+MAKESPAN_DIR = 'Makespan'
+SPATIAL_DIR = 'Spatial'
+STRATEGIES = ['Centralized', 'Decentralized']
+FOLDER_TYPES = ['BothFixed', 'AngleFixed', 'CountFixed']
 
 # Plotting options
 PLOT_COLORS = [
@@ -225,9 +225,20 @@ def plotScatter(data, title, xLabel, yLabel, xIntTicks=False):
 def plotBox(samplesDict, title, yLabel):
     """Reusable boxplot with descriptive stats for each group (e.g., strategy)."""
     printDescriptiveStats(title, samplesDict)
+    
+    # Check if both strategies have data
+    if 'Centralized' not in samplesDict or 'Decentralized' not in samplesDict:
+        print(f"Skipping plot '{title}': Missing data for one or both strategies.\n")
+        return
+    
+    # Check if both strategies have non-empty data
+    if len(samplesDict['Centralized']) == 0 or len(samplesDict['Decentralized']) == 0:
+        print(f"Skipping plot '{title}': One or both strategies have no data points.\n")
+        return
+    
     plt.figure(figsize=FIGURE_SIZE)
     plt.boxplot(
-        [samplesDict['centralized'], samplesDict['decentralized']],
+        [samplesDict['Centralized'], samplesDict['Decentralized']],
         tick_labels=['Centralized', 'Decentralized'],
         patch_artist=True,
         showmeans=SHOW_MEANS,
@@ -256,13 +267,13 @@ def analyzeFixed(folderType, rootFolder, strategies, xAxis, statFuncs, plotFuncs
         pathSpatial = os.path.join(rootFolder, 'Spatial', strategy, folderType)
         # For makespan and traversal, plot for each stat function
         if os.path.isdir(pathMakespan):
-            for statFunc, plotFunc, plotTitle, yLabel in zip(statFuncs, plotFuncs, plotTitles, yLabels):
+            for statFunc, plotFunc, plotTitle, yLabel in zip(statFuncs, plotFuncs, plotTitles[strategy], yLabels):
                 data = folderStats(pathMakespan, xAxis, statFunc)
-                plotFunc(data, plotTitle.format(strategy), xLabel, yLabel, xIntTicks)
+                plotFunc(data, plotTitle, xLabel, yLabel, xIntTicks)
         # For EMD, plot EMD vs. x-axis
         if os.path.isdir(pathSpatial):
             emdData = folderStats(pathSpatial, xAxis, extractEmd)
-            plotScatter(emdData, plotTitles[-1].format(strategy), xLabel, yLabels[-1], xIntTicks)
+            plotScatter(emdData, plotTitles[strategy][-1], xLabel, yLabels[-1], xIntTicks)
 
 def extractMakespanSamples(filePath):
     """Return a list of exit times for all drones in the file (for margin of error calculation)."""
@@ -362,11 +373,18 @@ def main():
         FOLDER_TYPES[1], ROOT_FOLDER, STRATEGIES, 'droneCount',
         [extractMakespan, extractTraversal],
         [plotScatter, plotScatter, plotScatter],
-        [
-            TITLE_MAKESPAN_ANGLE_CENTRALIZED,
-            TITLE_TRAVERSAL_ANGLE_CENTRALIZED,
-            TITLE_EMD_ANGLE_CENTRALIZED
-        ],
+        {
+            'Centralized': [
+                TITLE_MAKESPAN_DRONECOUNT_CENTRALIZED,
+                TITLE_TRAVERSAL_DRONECOUNT_CENTRALIZED,
+                TITLE_EMD_DRONECOUNT_CENTRALIZED
+            ],
+            'Decentralized': [
+                TITLE_MAKESPAN_DRONECOUNT_DECENTRALIZED,
+                TITLE_TRAVERSAL_DRONECOUNT_DECENTRALIZED,
+                TITLE_EMD_DRONECOUNT_DECENTRALIZED
+            ]
+        },
         'Drone Count',
         ['Makespan (ms)', 'Average Traversal Time (ms)', 'Wasserstein EMD'],
         xIntTicks=True
@@ -376,11 +394,18 @@ def main():
         FOLDER_TYPES[2], ROOT_FOLDER, STRATEGIES, 'angle',
         [extractMakespan, extractTraversal],
         [plotScatter, plotScatter, plotScatter],
-        [
-            TITLE_MAKESPAN_ANGLE_DECENTRALIZED,
-            TITLE_TRAVERSAL_ANGLE_DECENTRALIZED,
-            TITLE_EMD_ANGLE_DECENTRALIZED
-        ],
+        {
+            'Centralized': [
+                TITLE_MAKESPAN_ANGLE_CENTRALIZED,
+                TITLE_TRAVERSAL_ANGLE_CENTRALIZED,
+                TITLE_EMD_ANGLE_CENTRALIZED
+            ],
+            'Decentralized': [
+                TITLE_MAKESPAN_ANGLE_DECENTRALIZED,
+                TITLE_TRAVERSAL_ANGLE_DECENTRALIZED,
+                TITLE_EMD_ANGLE_DECENTRALIZED
+            ]
+        },
         'Angle (Degrees)',
         ['Makespan (ms)', 'Average Traversal Time (ms)', 'Wasserstein EMD'],
         xIntTicks=True
