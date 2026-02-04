@@ -1,0 +1,95 @@
+import numpy as np
+import random
+
+import utils
+import environment
+
+class Robots():
+    def __init__(self, N, vel, ss, gridnum):
+
+        # load basics
+        self.env = environment.Environment(ss, gridnum)
+        self.num = N
+        self.ss = ss
+        self.v = vel
+        # set up coordinates
+        rng = np.random.default_rng()
+        coords = rng.choice(np.arange(self.ss),size=self.num*2)
+        coords = np.reshape(coords,(self.num,2))
+        self.coords = np.array(coords, dtype=float)
+        self.disp_coords = np.array(coords, dtype=int)
+        self.v = np.full(self.num, self.v)
+        self.angles = np.random.random(self.num)*2*np.pi
+
+    def update_movement(self, r):
+        c = self.coords[r]
+        # cap value
+        if(self.v[r]>4):
+            self.v[r]=4.0
+        elif(self.v[r]<0):
+            self.v[r]=0.0
+        xnew = c[0] + self.v[r]*np.cos(self.angles[r])
+        ynew = c[1] + self.v[r]*np.sin(self.angles[r])
+
+        # update coords, respects torus
+        # TODO: update to do something else for robots that go off the side
+        self.coords[r] = np.array(utils.wrap_pt([xnew, ynew], self.ss, self.ss, offset=(0,0)))
+        self.disp_coords[r] = self.coords[r].astype(int)
+
+    def distance_calc(self, diff, r, lim_distance):
+        distances = np.linalg.norm(diff,axis=1)
+        distances[r] = lim_distance
+        valid_dist_ind = np.where(distances<lim_distance)
+        # the value for the current robot doesn't matter
+        # it is multiplied by 0 in the next steps
+        distances[distances>lim_distance] = lim_distance
+        # invert 
+        with np.errstate(divide='ignore'):
+            inv_distances = 1-np.square(distances/lim_distance)
+
+        inv_distances[inv_distances>1] = 1
+        return inv_distances, valid_dist_ind[0], distances
+
+    # assume polygon obstacles do not have holes
+    def check_collision(self, r, obstacles, prev_c):
+        c = self.coords[r]
+        loc_wrapped = utils.wrap_pt(c, self.ss, self.ss) # just in case? obstacle checking assumes we're in (0,ss)x(0,ss)
+
+        # shoot ray back the way agent moved in last time step to both:
+        # 1. check if we're inside obstacle
+        # 2. and find which edge we collide with in case of collision
+        ray_out = prev_c - c
+        theta = np.arctan2(ray_out[1], ray_out[0])
+        for o in obstacles: # list of CCW points
+            inpoly = False
+            # shoot one ray for each obstacle, then check edges individually if inside
+            try:
+                inpoly, data = utils.IsInPolyNoHoles(loc_wrapped, o, theta)
+            except:
+                # will raise exception if ray is parallel to polygon edge
+                # TODO handle gracefully
+                raise(ValueError, "in poly check not working")
+
+            # if collision found, do billiard bounce
+            if inpoly:
+                closest_edge = data[0][1:]
+                dist = 100000000
+                # following check for closest edge not really necessary for our purposes
+                # but ray may intersect multiple edges if obstacle nonconvex
+                for pt, v1, v2 in data:
+                    if np.linalg.norm(pt-c) < dist:
+                        dist = np.linalg.norm(pt-c)
+                        closest_edge = (v1, v2)
+                        # reorient according to elastic collision law
+                        theta = utils.bounce(closest_edge, prev_c, c)
+                # move to previous location and rotate in place
+                self.angles[r] = theta
+                self.coords[r] = prev_c
+                MADE_CHANGE = True
+                break # assumes obstacles do not overlap
+            else:
+                pass
+
+        return MADE_CHANGE
+
+
