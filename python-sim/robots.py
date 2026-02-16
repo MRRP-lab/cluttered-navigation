@@ -18,7 +18,6 @@ class Robots():
         self.coords = np.array(coords, dtype=float)
         self.disp_coords = np.array(coords, dtype=int)
         self.v = np.full(self.num, vel)
-        self.angles = np.full(self.num, 0)
 
     def update_movement(self, r):
         c = self.coords[r]
@@ -27,11 +26,10 @@ class Robots():
             self.v[r] = 4.0
         elif (self.v[r] < 0):
             self.v[r] = 0.0
-        xnew = c[0] + self.v[r]*np.cos(self.angles[r])
-        ynew = c[1] + self.v[r]*np.sin(self.angles[r])
+        xnew = c[0] + self.v[r]
+        ynew = c[1] + self.v[r]
 
         # update coords, no screen wrapping
-        # TODO: update to do something else for robots that go off the side
         self.coords[r] = np.array([xnew, ynew])
         self.disp_coords[r] = self.coords[r].astype(int)
 
@@ -49,8 +47,13 @@ class Robots():
         inv_distances[inv_distances > 1] = 1
         return inv_distances, valid_dist_ind[0], distances
 
+    def check_collision_occupancy(self, r, obstacles, prev_c):
+        
+        pass
+
+
     # assume polygon obstacles do not have holes
-    def check_collision(self, r, obstacles, prev_c):
+    def check_collision_polygons(self, r, obstacles, prev_c):
         c = self.coords[r]
         loc_wrapped = utils.wrap_pt(c, self.ss, self.ss) # just in case? obstacle checking assumes we're in (0,ss)x(0,ss)
 

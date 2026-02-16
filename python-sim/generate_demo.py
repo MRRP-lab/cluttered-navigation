@@ -38,8 +38,6 @@ group_list = [np.zeros(robots.num)]
 
 for t in range(sim_time):
 
-    big_coords, big_angles = utils.setup_big_arrays(robots)
-
     for r in range(robots.num):
         c = robots.coords[r].copy() # save previous position in case of collision
         # update robot positions
@@ -49,10 +47,10 @@ for t in range(sim_time):
         # and moves robot back to original position and reorients
 
 
-    sim_data.append([robots.coords[:,0].copy(), robots.coords[:,1].copy(), robots.angles.copy()])
+    sim_data.append([robots.coords[:,0].copy(), robots.coords[:,1].copy()])
 
 
-data = pd.DataFrame(data = sim_data, columns = ["x","y","theta"])
+data = pd.DataFrame(data = sim_data, columns = ["x","y"])
 
 outdat = os.path.join(datadir, "demo.csv")
 

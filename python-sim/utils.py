@@ -10,7 +10,7 @@ DEBUG = False
 
 # wraps an xy point as if it were on a torus
 # potentially with an offset if there are other surfaces on the screen
-def wrap_pt(pt, w, h, offset = (0,0)):
+def wrap_pt(pt, w, h, offset=(0, 0)):
     x, y = pt
     x0, y0 = offset
 
@@ -23,6 +23,7 @@ def wrap_pt(pt, w, h, offset = (0,0)):
         ynew = y0 + ((y-y0) % h)
 
     return [xnew, ynew]
+
 
 # returns the new heading for an agent that has hit a wall
 # assumes bot r has moved through edge segment to the wrong side

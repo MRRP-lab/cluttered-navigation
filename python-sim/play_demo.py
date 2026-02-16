@@ -62,7 +62,6 @@ theta_list = []
 for i in range(sim_data['x'].shape[0]):
     x_list.append(list(map(float,sim_data['x'][i][1:-1].replace(" \n", "").split())))
     y_list.append(list(map(float,sim_data['y'][i][1:-1].replace(" \n", "").split())))
-    theta_list.append(list(map(float,sim_data['theta'][i][1:-1].replace(" \n", "").split())))
 
 
 ########################## MAIN  ###########################################3
@@ -71,7 +70,6 @@ for i in range(sim_data['x'].shape[0]):
 robots = Robots(N, v, ss, gridnum)
 
 robots.coords = np.array([x_list,y_list]).T
-robots.angles = np.array(theta_list)
 
 running = True
 
@@ -105,14 +103,6 @@ for time in range(sim_time):
             pygame.draw.line(screen, (255, 0, 0), (pt, 0), (pt, env.ss), width=1)
             pygame.draw.line(screen, (255, 0, 0), (0, pt), (env.ss, pt), width=1)
 
-            for points2 in range(env.grid_num):
-                corner = int(cornerNum + (inter/interval))
-                pygame.draw.circle(screen, (255, 0, 0), (pt, inter), 3)
-
-                img = font.render(str((points2*env.grid_num)+points), True, (255, 0, 0))
-                screen.blit(img, (pt +5 , inter +5))
-                cornerNum += 1
-                inter += interval
             #extra row on the far right
             pygame.draw.circle(screen, (255, 0, 0), (env.ss, pt), 3)
     ############################################################################
@@ -126,9 +116,6 @@ for time in range(sim_time):
 
         # draw a solid blue circle in the center
         pygame.draw.circle(screen, (0,0,1), np.ceil(c), 5)
-
-        # draw a line to show orientation
-        pygame.draw.line(screen, (0,0,1), np.ceil(c), np.ceil(c+15*np.array([np.cos(robots.angles[time,r]),np.sin(robots.angles[time,r])])), 3)
 
 
     clock.tick(60)
