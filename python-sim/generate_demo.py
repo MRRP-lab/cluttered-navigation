@@ -24,7 +24,7 @@ sim_time = time_seconds*FPS
 ss = 500  # screen size
 N = 10
 v = 1  # velocity
-gridnum = 10
+gridnum = 100
 
 ############################### MAIN ##############################################
 

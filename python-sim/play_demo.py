@@ -77,10 +77,6 @@ running = True
 
 # sim loop
 framenum = 0
-env.initRobotsPer()
-env.initPrevRobotsPer()
-env.initPrevShade()
-env.initFading()
 
 for time in range(sim_time):
     if(not running):
@@ -95,28 +91,6 @@ for time in range(sim_time):
 
     for r in range(robots.num):
         c = robots.coords[r,time]
-        env.robotUpdates(c)
-
-    for cell in env.robotsPer.keys():
-            fade = 10
-
-            concentration = env.robotsPer[cell]
-            shade = 255 - (5*concentration)
-            if shade < 0:
-                shade = 0
-
-            # find way to make it stop fading, if robot enters again
-
-            interval = env.ss/env.grid_num
-
-            boxes = env.grid_num**2
-            xHold = boxes%env.grid_num
-            yHold = boxes//env.grid_num
-
-            x = xHold*interval
-            y = yHold*interval
-
-            pygame.draw.rect(screen, (255, shade, 255), (x,y,interval,interval), 0)
 
     # Draws all of the lines needed to make the grid, prints the box numbers (starting at 1)
     # and draws small dots at all of the intersections of the gridlines

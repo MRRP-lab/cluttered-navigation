@@ -1,8 +1,8 @@
 import numpy as np
-import random
 
 import utils
 import environment
+
 
 class Robots():
     def __init__(self, N, vel, ss, gridnum):
@@ -13,8 +13,8 @@ class Robots():
         self.ss = ss
         # set up coordinates
         rng = np.random.default_rng()
-        coords = rng.choice(np.arange(self.ss),size=self.num*2)
-        coords = np.reshape(coords,(self.num,2))
+        coords = rng.choice(np.arange(self.ss), size=self.num*2)
+        coords = np.reshape(coords, (self.num, 2))
         self.coords = np.array(coords, dtype=float)
         self.disp_coords = np.array(coords, dtype=int)
         self.v = np.full(self.num, vel)
@@ -23,10 +23,10 @@ class Robots():
     def update_movement(self, r):
         c = self.coords[r]
         # cap value
-        if(self.v[r]>4):
-            self.v[r]=4.0
-        elif(self.v[r]<0):
-            self.v[r]=0.0
+        if (self.v[r] > 4):
+            self.v[r] = 4.0
+        elif (self.v[r] < 0):
+            self.v[r] = 0.0
         xnew = c[0] + self.v[r]*np.cos(self.angles[r])
         ynew = c[1] + self.v[r]*np.sin(self.angles[r])
 
@@ -36,17 +36,17 @@ class Robots():
         self.disp_coords[r] = self.coords[r].astype(int)
 
     def distance_calc(self, diff, r, lim_distance):
-        distances = np.linalg.norm(diff,axis=1)
+        distances = np.linalg.norm(diff, axis=1)
         distances[r] = lim_distance
-        valid_dist_ind = np.where(distances<lim_distance)
+        valid_dist_ind = np.where(distances < lim_distance)
         # the value for the current robot doesn't matter
         # it is multiplied by 0 in the next steps
-        distances[distances>lim_distance] = lim_distance
+        distances[distances > lim_distance] = lim_distance
         # invert
         with np.errstate(divide='ignore'):
             inv_distances = 1-np.square(distances/lim_distance)
 
-        inv_distances[inv_distances>1] = 1
+        inv_distances[inv_distances > 1] = 1
         return inv_distances, valid_dist_ind[0], distances
 
     # assume polygon obstacles do not have holes
@@ -67,7 +67,7 @@ class Robots():
             except:
                 # will raise exception if ray is parallel to polygon edge
                 # TODO handle gracefully
-                raise(ValueError, "in poly check not working")
+                raise (ValueError, "in poly check not working")
 
             # if collision found, do billiard bounce
             if inpoly:
@@ -90,5 +90,3 @@ class Robots():
                 pass
 
         return MADE_CHANGE
-
-
