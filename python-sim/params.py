@@ -1,6 +1,6 @@
 class Params:
     FPS = 55
-    time_seconds = 20
+    time_seconds = 10
     sim_time = time_seconds*FPS
     gridnum = 50 # num of grid cells along one side of the window
     cell_size = 10 # Size of a grid cell in px

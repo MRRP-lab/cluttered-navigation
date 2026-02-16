@@ -13,9 +13,9 @@ class Robots():
         self.ss = ss
         # set up coordinates
         rng = np.random.default_rng()
-        coords = rng.choice(np.arange(self.ss), size=self.num*2)
+        coords = rng.choice(np.arange(gridnum), size=self.num*2)
         coords = np.reshape(coords, (self.num, 2))
-        self.coords = np.array(coords, dtype=float)
+        self.coords = np.array(coords, dtype=int)
         self.disp_coords = np.array(coords, dtype=int)
         self.v = np.full(self.num, vel)
 
@@ -23,12 +23,14 @@ class Robots():
         c = self.coords[r]
         # cap value
         if (self.v[r] > 4):
-            self.v[r] = 4.0
+            self.v[r] = 4
         elif (self.v[r] < 0):
-            self.v[r] = 0.0
-        # TODO make this movement cell-based, and possibly implement a wait period for each movement
+            self.v[r] = 0
+
+        # TODO implement some movement policy.
         xnew = c[0] + self.v[r]
-        ynew = c[1] + self.v[r]
+        ynew = c[1]
+        # ynew = c[1] + self.v[r]
 
         # update coords, no screen wrapping
         self.coords[r] = np.array([xnew, ynew])

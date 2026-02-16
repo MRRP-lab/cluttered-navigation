@@ -104,17 +104,16 @@ for time in range(sim_time):
     ############################################################################
 
 
-
+    centering_offset = np.array([Params.cell_size / 2, Params.cell_size / 2])
     # update robot positions
     for r in range(robots.num):
 
-        c = robots.coords[r,time]
-
+        c = robots.coords[r,time] * Params.cell_size
         # draw a solid blue circle in the center
-        pygame.draw.circle(screen, (0,0,1), np.ceil(c), 5)
+        pygame.draw.circle(screen, (0,0,1), np.ceil(c) + centering_offset, 5)
 
 
-    clock.tick(60)
+    clock.tick(10)
 
     # save frame to disk
     if SAVE_VID:
