@@ -26,6 +26,7 @@ class Robots():
             self.v[r] = 4.0
         elif (self.v[r] < 0):
             self.v[r] = 0.0
+        # TODO make this movement cell-based, and possibly implement a wait period for each movement
         xnew = c[0] + self.v[r]
         ynew = c[1] + self.v[r]
 

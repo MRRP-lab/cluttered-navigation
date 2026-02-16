@@ -1,12 +1,11 @@
 import numpy as np
-import random
 import pandas as pd
-import time
 import os
 
 # custom imports
-import utils
-from robots import *
+from robots import Robots
+from params import Params
+
 
 ########################## PARAMETERS ###########################################
 
@@ -17,14 +16,13 @@ if not os.path.exists(datadir):
     os.mkdir(datadir)
 
 # TODO: convert the below to be command-line arguments
-FPS = 55
-sim_time = 20
-time_seconds = 20
+FPS = Params.FPS
+time_seconds = Params.time_seconds
 sim_time = time_seconds*FPS
-ss = 500  # screen size
-N = 10
-v = 1  # velocity
-gridnum = 100
+ss = Params.ss  # screen size
+N = Params.N
+v = Params.v  # velocity
+gridnum = Params.gridnum
 
 ############################### MAIN ##############################################
 

@@ -1,12 +1,10 @@
 from multiprocessing import connection
 import numpy as np
 import pygame
-import random
 import pandas as pd
 import os
 import glob
 
-import utils
 from robots import *
 from environment import *
 
@@ -23,7 +21,7 @@ viddir = './videos'
 time_seconds = 20
 sim_time = time_seconds*FPS
 ss = 500 # screen size
-N = 10
+N = 10 # num of robots
 v = 1
 gridnum = 10 # grid cells on each side
 
@@ -103,8 +101,6 @@ for time in range(sim_time):
             pygame.draw.line(screen, (255, 0, 0), (pt, 0), (pt, env.ss), width=1)
             pygame.draw.line(screen, (255, 0, 0), (0, pt), (env.ss, pt), width=1)
 
-            #extra row on the far right
-            pygame.draw.circle(screen, (255, 0, 0), (env.ss, pt), 3)
     ############################################################################
 
 
