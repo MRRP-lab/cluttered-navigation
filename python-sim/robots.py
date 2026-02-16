@@ -11,15 +11,14 @@ class Robots():
         self.env = environment.Environment(ss, gridnum)
         self.num = N
         self.ss = ss
-        self.v = vel
         # set up coordinates
         rng = np.random.default_rng()
         coords = rng.choice(np.arange(self.ss),size=self.num*2)
         coords = np.reshape(coords,(self.num,2))
         self.coords = np.array(coords, dtype=float)
         self.disp_coords = np.array(coords, dtype=int)
-        self.v = np.full(self.num, self.v)
-        self.angles = np.random.random(self.num)*2*np.pi
+        self.v = np.full(self.num, vel)
+        self.angles = np.full(self.num, 0)
 
     def update_movement(self, r):
         c = self.coords[r]
@@ -31,9 +30,9 @@ class Robots():
         xnew = c[0] + self.v[r]*np.cos(self.angles[r])
         ynew = c[1] + self.v[r]*np.sin(self.angles[r])
 
-        # update coords, respects torus
+        # update coords, no screen wrapping
         # TODO: update to do something else for robots that go off the side
-        self.coords[r] = np.array(utils.wrap_pt([xnew, ynew], self.ss, self.ss, offset=(0,0)))
+        self.coords[r] = np.array([xnew, ynew])
         self.disp_coords[r] = self.coords[r].astype(int)
 
     def distance_calc(self, diff, r, lim_distance):
@@ -43,7 +42,7 @@ class Robots():
         # the value for the current robot doesn't matter
         # it is multiplied by 0 in the next steps
         distances[distances>lim_distance] = lim_distance
-        # invert 
+        # invert
         with np.errstate(divide='ignore'):
             inv_distances = 1-np.square(distances/lim_distance)
 
