@@ -5,8 +5,9 @@ import pandas as pd
 import os
 import glob
 
-from robots import *
-from environment import *
+from params import Params
+from robots import Robots
+from environment import Environment
 
 ########################## PARAMETERS ###########################################
 
@@ -18,13 +19,12 @@ tag = "" # replace with informative parameters
 viddir = './videos'
 
 # TODO: convert the below to be command-line arguments
-time_seconds = 20
-sim_time = time_seconds*FPS
-ss = 500 # screen size
-N = 10 # num of robots
-v = 1
-gridnum = 10 # grid cells on each side
-
+time_seconds = Params.time_seconds
+sim_time = Params.sim_time
+ss = Params.ss # screen size
+N = Params.N # num of robots
+v = Params.v
+gridnum = Params.gridnum
 # import the data from generate_demo
 sim_data = pd.read_csv("data/demo.csv",dtype=object)
 
