@@ -3,12 +3,11 @@ import numpy as np
 import utils
 import environment
 
-
 class Robots():
-    def __init__(self, N, vel, ss, gridnum):
+    def __init__(self, N, vel, ss, gridnum, seed):
 
         # load basics
-        self.env = environment.Environment(ss, gridnum)
+        self.env = environment.Environment(ss, gridnum, seed)
         self.num = N
         self.ss = ss
         # set up coordinates
@@ -30,7 +29,6 @@ class Robots():
         # TODO implement some movement policy.
         xnew = c[0] + self.v[r]
         ynew = c[1]
-        # ynew = c[1] + self.v[r]
 
         # update coords, no screen wrapping
         self.coords[r] = np.array([xnew, ynew])

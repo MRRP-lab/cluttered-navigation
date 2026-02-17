@@ -25,11 +25,14 @@ ss = Params.ss # screen size
 N = Params.N # num of robots
 v = Params.v
 gridnum = Params.gridnum
+seed = Params.seed
+
 # import the data from generate_demo
 sim_data = pd.read_csv("data/demo.csv",dtype=object)
 
 # set up environment
-env = Environment(ss, gridnum)
+# TODO but Robots already creates an environment??
+env = Environment(ss, gridnum, seed)
 
 
 ########################## SETUP ##########################
@@ -65,7 +68,7 @@ for i in range(sim_data['x'].shape[0]):
 ########################## MAIN  ###########################################3
 
 # init robots
-robots = Robots(N, v, ss, gridnum)
+robots = Robots(N, v, ss, gridnum, seed)
 
 robots.coords = np.array([x_list,y_list]).T
 
@@ -87,6 +90,13 @@ for time in range(sim_time):
 
     for r in range(robots.num):
         c = robots.coords[r,time]
+
+    for row in range(gridnum):
+        for square in range(gridnum):
+            if env.obstacles[row,square] == 1:
+                rect = pygame.Rect(square * Params.cell_size, row * Params.cell_size, 
+                                   Params.cell_size, Params.cell_size)
+                pygame.draw.rect(screen, (0, 0, 0), rect)
 
     # Draws all of the lines needed to make the grid, prints the box numbers (starting at 1)
     # and draws small dots at all of the intersections of the gridlines

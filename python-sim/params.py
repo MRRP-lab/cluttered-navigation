@@ -7,4 +7,4 @@ class Params:
     ss = gridnum * cell_size  # screen size (px)
     N = 10
     v = 1  # velocity
-
+    seed = 1

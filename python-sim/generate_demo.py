@@ -23,12 +23,12 @@ ss = Params.ss  # screen size
 N = Params.N
 v = Params.v  # velocity
 gridnum = Params.gridnum
-
+seed = Params.seed
 ############################### MAIN ##############################################
 
 ### Load Configs
 
-robots = Robots(N, v, ss, gridnum)
+robots = Robots(N, v, ss, gridnum, seed)
 
 group_list = [np.zeros(robots.num)]
 
