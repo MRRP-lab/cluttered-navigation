@@ -119,8 +119,7 @@ for time in range(sim_time):
     for r in range(robots.num):
 
         c = robots.coords[r,time] * Params.cell_size
-        # draw a solid blue circle in the center
-        pygame.draw.circle(screen, (0,0,1), np.ceil(c) + centering_offset, 5)
+        pygame.draw.circle(screen, (0,0,255), np.ceil(c) + centering_offset, max(Params.cell_size/2 - 1, 2))
 
 
     clock.tick(10)
