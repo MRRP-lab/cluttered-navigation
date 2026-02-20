@@ -39,7 +39,7 @@ for t in range(sim_time):
     for r in range(robots.num):
         c = robots.coords[r].copy() # save previous position in case of collision
         # update robot positions
-        robots.update_movement(r)
+        robots.plinko_movement_policy(r)
 
         # returns true if there was a collision
         # and moves robot back to original position and reorients

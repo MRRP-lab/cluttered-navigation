@@ -11,8 +11,8 @@ class Robots():
         self.num = N
         self.ss = ss
         # set up coordinates
-        rng = np.random.default_rng()
-        coords = rng.choice(np.arange(gridnum), size=self.num*2)
+        self.rng = np.random.default_rng(seed)
+        coords = self.rng.choice(np.arange(gridnum), size=self.num*2)
         coords = np.reshape(coords, (self.num, 2))
         self.coords = np.array(coords, dtype=int)
         self.disp_coords = np.array(coords, dtype=int)
@@ -33,6 +33,36 @@ class Robots():
         # update coords, no screen wrapping
         self.coords[r] = np.array([xnew, ynew])
         self.disp_coords[r] = self.coords[r].astype(int)
+
+    # Move right. At an obstacle, randomly choose either up or down.
+    def plinko_movement_policy(self, r):
+        c = self.coords[r]
+
+        right = self.env.is_obstacle(c[0]+1, c[1])
+        up = self.env.is_obstacle(c[0], c[1]-1)
+        down = self.env.is_obstacle(c[0], c[1]+1)
+
+        xnew = c[0]
+        ynew = c[1]
+        if right == 0:
+            xnew += 1
+        elif (up == 0 and down == 0):
+            print(c[0]+1)
+            if (self.rng.random() < 0.5):
+                ynew += 1
+            else:
+                ynew -= 1
+        else:
+            if (up == 0):
+                ynew -= 1
+            elif (down == 0):
+                ynew += 1
+
+        # update coords, no screen wrapping
+        self.coords[r] = np.array([xnew, ynew])
+        self.disp_coords[r] = self.coords[r].astype(int)
+
+        pass
 
     def distance_calc(self, diff, r, lim_distance):
         distances = np.linalg.norm(diff, axis=1)
