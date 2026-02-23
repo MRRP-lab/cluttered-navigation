@@ -9,14 +9,14 @@ class Environment():
         self.grid_num = grid_num
         self.x_coords = np.arange(0, self.grid_num, dtype=float)
         self.seed = seed
+        self.rng = np.random.default_rng(seed)
         self.obstacles = self.generate_plinko_grid(5, 1, 2, 0)
         # self.obstacles = self.generate_random_obstacles(0.1)
 
     def generate_random_obstacles(self, density):
-        rng = np.random.default_rng(self.seed)
         obstacles = np.full(self.grid_num**2, 0)
         for i in range(len(obstacles)):
-            if rng.random() < density:
+            if self.rng.random() < density:
                 obstacles[i] = 1
         return np.reshape(obstacles, (self.grid_num, self.grid_num))
 
