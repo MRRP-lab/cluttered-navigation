@@ -47,7 +47,6 @@ class Robots():
         if right == 0:
             xnew += 1
         elif (up == 0 and down == 0):
-            print(c[0]+1)
             if (self.rng.random() < 0.5):
                 ynew += 1
             else:
