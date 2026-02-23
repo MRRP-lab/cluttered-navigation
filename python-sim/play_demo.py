@@ -122,7 +122,7 @@ for time in range(sim_time):
         pygame.draw.circle(screen, (0,0,255), np.ceil(c) + centering_offset, max(Params.cell_size/2 - 1, 2))
 
 
-    clock.tick(10)
+    clock.tick(Params.FPS)
 
     # save frame to disk
     if SAVE_VID:

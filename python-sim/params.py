@@ -1,5 +1,5 @@
 class Params:
-    FPS = 55
+    FPS = 10
     time_seconds = 10
     sim_time = time_seconds*FPS
     gridnum = 75 # num of grid cells along one side of the window

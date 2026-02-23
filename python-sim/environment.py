@@ -10,7 +10,7 @@ class Environment():
         self.x_coords = np.arange(0, self.grid_num, dtype=float)
         self.seed = seed
         self.rng = np.random.default_rng(seed)
-        self.obstacles = self.generate_plinko_grid(5, 3, 2, 1)
+        self.obstacles = self.generate_plinko_grid(5, 5, 2, 1)
         # self.obstacles = self.generate_random_obstacles(0.1)
 
     def generate_random_obstacles(self, density):

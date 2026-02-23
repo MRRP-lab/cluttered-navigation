@@ -18,7 +18,7 @@ if not os.path.exists(datadir):
 # TODO: convert the below to be command-line arguments
 FPS = Params.FPS
 time_seconds = Params.time_seconds
-sim_time = time_seconds*FPS
+sim_time = Params.sim_time
 ss = Params.ss  # screen size
 N = Params.N
 v = Params.v  # velocity
