@@ -27,7 +27,6 @@ class Robots():
         elif (self.v[r] < 0):
             self.v[r] = 0
 
-        # TODO implement some movement policy.
         xnew = c[0] + self.v[r]
         ynew = c[1]
 

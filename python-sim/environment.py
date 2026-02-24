@@ -11,8 +11,8 @@ class Environment():
         self.x_coords = np.arange(0, self.grid_num, dtype=float)
         self.seed = seed
         self.rng = np.random.default_rng(seed)
-        self.obstacles = self.generate_plinko_grid(500, 5, 2, 1)
-        self.add_reflecting_boundary(self.obstacles, math.pi / 8)
+        self.obstacles = self.generate_plinko_grid(5, 5, 1, 1)
+        self.add_reflecting_boundary(self.obstacles, math.pi / 8, 20)
 
         # self.obstacles = self.generate_random_obstacles(0.1)
 
@@ -49,11 +49,11 @@ class Environment():
             offset = (offset + 1) % (pin_gap + 1)
         return obstacles
 
-    def add_reflecting_boundary(self, obstacles, angle):
-        line_length = 20
-        x0 = obstacles.shape[0] - 1
+    def add_reflecting_boundary(self, obstacles, angle, x_offset):
+        line_length = 200
+        x0 = obstacles.shape[0] + x_offset
         y0 = round(obstacles.shape[1] / 2)
-        x1 = round(x0 - line_length * math.cos(angle))
+        x1 = round(x0 - line_length * math.cos(angle)) + x_offset
         y1_neg = round(y0 - line_length * math.sin(angle))
         y1_pos = round(y0 + line_length * math.sin(angle))
 
@@ -77,7 +77,7 @@ class Environment():
             D = (2 * dy) - dx
             y = y0
             for x in range(x0, x1):
-                obstacles[y, x] = 1
+                self.set_obstacle(obstacles, x, y, 1)
                 if D > 0:
                     y += yi
                     D += 2 * (dy - dx)
@@ -94,7 +94,7 @@ class Environment():
             D = (2 * dx) - dy
             x = x0
             for y in range(y0, y1):
-                obstacles[y, x] = 1
+                self.set_obstacle(obstacles, x, y, 1)
                 if D > 0:
                     x += xi
                     D += 2 * (dx - dy)
@@ -119,3 +119,8 @@ class Environment():
             return 1
         return self.obstacles[y, x]
 
+    # Set obstacles using this function which ensures safety.
+    def set_obstacle(self, obstacles, x, y, value):
+        if (x < obstacles.shape[0] and x >= 0
+           and (y < obstacles.shape[1] and y >= 0)):
+            obstacles[y, x] = value
