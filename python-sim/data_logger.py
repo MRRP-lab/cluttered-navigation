@@ -8,5 +8,5 @@ class DataLogger():
         line = str(droneID) + "," + str(timestep) + "," + str(xPos) + "," + str(yPos)
         self.data.append(line)
     
-    def export_data():
-        pass
+    def export_data(self):
+        print(self.data)
