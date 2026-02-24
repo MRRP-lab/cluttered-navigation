@@ -5,7 +5,7 @@ import math
 
 
 class Environment():
-    def __init__(self, ss, grid_num, seed):
+    def __init__(self, ss, grid_num, seed, startLine, finishLine):
         self.ss = ss
         self.grid_num = grid_num
         self.x_coords = np.arange(0, self.grid_num, dtype=float)
@@ -15,6 +15,9 @@ class Environment():
         self.add_reflecting_boundary(self.obstacles, math.pi / 8, 20)
 
         # self.obstacles = self.generate_random_obstacles(0.1)
+
+        self.startLine = startLine
+        self.finishLine = finishLine
 
     def generate_random_obstacles(self, density):
         obstacles = np.full(self.grid_num**2, 0)
@@ -124,3 +127,9 @@ class Environment():
         if (x < obstacles.shape[0] and x >= 0
            and (y < obstacles.shape[1] and y >= 0)):
             obstacles[y, x] = value
+
+    def is_startLine(self, x, y):
+        return (x == self.startLine)
+    
+    def is_finishLine(self, x, y):
+        return (x == self.finishLine)

@@ -24,11 +24,14 @@ N = Params.N
 v = Params.v  # velocity
 gridnum = Params.gridnum
 seed = Params.seed
+
+startLine = Params.startLine
+finishLine = Params.finishLine
 ############################### MAIN ##############################################
 
 ### Load Configs
 
-robots = Robots(N, v, ss, gridnum, seed)
+robots = Robots(N, v, ss, gridnum, seed, startLine, finishLine)
 
 group_list = [np.zeros(robots.num)]
 

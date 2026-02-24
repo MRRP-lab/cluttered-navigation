@@ -12,9 +12,10 @@ class PlinkoState(Enum):
     TRAPPED = 3
 
 class Robots():
-    def __init__(self, N, vel, ss, gridnum, seed):
+    def __init__(self, N, vel, ss, gridnum, seed, startLine, finishLine):
 
-        self.env = environment.Environment(ss, gridnum, seed)
+        # load basics
+        self.env = environment.Environment(ss, gridnum, seed, startLine, finishLine)
         self.num = N
         self.ss = ss
         self.rng = np.random.default_rng(seed)
