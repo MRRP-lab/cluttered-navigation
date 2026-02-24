@@ -4,12 +4,15 @@ import numpy as np
 
 class Environment():
 
-    def __init__(self, ss, grid_num, seed):
+    def __init__(self, ss, grid_num, seed, startLine, finishLine):
         self.ss = ss
         self.grid_num = grid_num
         self.x_coords = np.arange(0, self.grid_num, dtype=float)
         self.seed = seed
         self.obstacles = self.generate_random_obstacles(0.1)
+
+        self.startLine = startLine
+        self.finishLine = finishLine
 
     def generate_random_obstacles(self, density):
         rng = np.random.default_rng(self.seed)
@@ -25,3 +28,9 @@ class Environment():
         if (y >= self.obstacles.shape[1] or y < 0):
             return 0
         return self.obstacles[y, x]
+    
+    def is_startLine(self, x, y):
+        return (x == self.startLine)
+    
+    def is_finishLine(self, x, y):
+        return (x == self.finishLine)

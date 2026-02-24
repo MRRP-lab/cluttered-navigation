@@ -27,12 +27,14 @@ v = Params.v
 gridnum = Params.gridnum
 seed = Params.seed
 
+startLine = Params.startLine
+finishLine = Params.finishLine
 # import the data from generate_demo
 sim_data = pd.read_csv("data/demo.csv",dtype=object)
 
 # set up environment
 # TODO but Robots already creates an environment??
-env = Environment(ss, gridnum, seed)
+env = Environment(ss, gridnum, seed, startLine, finishLine)
 
 
 ########################## SETUP ##########################
@@ -68,7 +70,7 @@ for i in range(sim_data['x'].shape[0]):
 ########################## MAIN  ###########################################3
 
 # init robots
-robots = Robots(N, v, ss, gridnum, seed)
+robots = Robots(N, v, ss, gridnum, seed, startLine, finishLine)
 
 robots.coords = np.array([x_list,y_list]).T
 
@@ -91,6 +93,20 @@ for time in range(sim_time):
     for r in range(robots.num):
         c = robots.coords[r,time]
 
+    # Draw the start and finish Lines:
+    for row in range(gridnum):
+        for square in range(gridnum):
+            if env.is_startLine(square, row):
+                rect = pygame.Rect(square * Params.cell_size, row * Params.cell_size, 
+                                   Params.cell_size, Params.cell_size)
+                pygame.draw.rect(screen, (255, 255, 0), rect)
+            elif env.is_finishLine(square, row):
+                rect = pygame.Rect(square * Params.cell_size, row * Params.cell_size, 
+                                   Params.cell_size, Params.cell_size)
+                pygame.draw.rect(screen, (0, 255, 0), rect)
+                
+
+    # Draw obstacles:
     for row in range(gridnum):
         for square in range(gridnum):
             if env.obstacles[row,square] == 1:

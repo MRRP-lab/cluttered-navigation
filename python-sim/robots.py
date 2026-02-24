@@ -4,10 +4,10 @@ import utils
 import environment
 
 class Robots():
-    def __init__(self, N, vel, ss, gridnum, seed):
+    def __init__(self, N, vel, ss, gridnum, seed, startLine, finishLine):
 
         # load basics
-        self.env = environment.Environment(ss, gridnum, seed)
+        self.env = environment.Environment(ss, gridnum, seed, startLine, finishLine)
         self.num = N
         self.ss = ss
         # set up coordinates

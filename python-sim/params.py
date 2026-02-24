@@ -8,3 +8,6 @@ class Params:
     N = 1
     v = 1  # velocity
     seed = 1
+
+    startLine = 1
+    finishLine = 23
