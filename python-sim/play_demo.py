@@ -104,8 +104,7 @@ for time in range(sim_time):
                 rect = pygame.Rect(square * Params.cell_size, row * Params.cell_size, 
                                    Params.cell_size, Params.cell_size)
                 pygame.draw.rect(screen, (0, 255, 0), rect)
-                
-
+    
     # Draw obstacles:
     for row in range(gridnum):
         for square in range(gridnum):
