@@ -5,7 +5,7 @@ import os
 # custom imports
 from robots import Robots
 from params import Params
-
+from data_logger import DataLogger
 
 ########################## PARAMETERS ###########################################
 
@@ -27,6 +27,9 @@ seed = Params.seed
 
 startLine = Params.startLine
 finishLine = Params.finishLine
+
+# TODO: Change filepath based on params
+logger = DataLogger("EXAMPLE_FILEPATH")
 ############################### MAIN ##############################################
 
 ### Load Configs
@@ -39,7 +42,11 @@ group_list = [np.zeros(robots.num)]
 
 for t in range(sim_time):
     robots.update_movement()
+    # We're already recording robot positions inside sim_data. Also, c was deleted.
+    #logger.log_line(r, t, c[0], c[1])
+
     sim_data.append([robots.coords[:,0].copy(), robots.coords[:,1].copy()])
+    logger.export_data()
 
 
 data = pd.DataFrame(data = sim_data, columns = ["x","y"])
