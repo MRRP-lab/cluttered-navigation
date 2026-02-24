@@ -10,12 +10,13 @@ class Robots():
         self.env = environment.Environment(ss, gridnum, seed)
         self.num = N
         self.ss = ss
+
         # set up coordinates
         self.rng = np.random.default_rng(seed)
         coords = self.rng.choice(np.arange(gridnum), size=self.num*2)
         coords = np.reshape(coords, (self.num, 2))
+
         self.coords = np.array(coords, dtype=int)
-        self.disp_coords = np.array(coords, dtype=int)
         self.v = np.full(self.num, vel)
 
     def update_movement(self, r):
@@ -32,7 +33,6 @@ class Robots():
 
         # update coords, no screen wrapping
         self.coords[r] = np.array([xnew, ynew])
-        self.disp_coords[r] = self.coords[r].astype(int)
 
     # Move right. At an obstacle, randomly choose either up or down.
     def plinko_movement_policy(self, r):
@@ -59,9 +59,6 @@ class Robots():
 
         # update coords, no screen wrapping
         self.coords[r] = np.array([xnew, ynew])
-        self.disp_coords[r] = self.coords[r].astype(int)
-
-        pass
 
     def distance_calc(self, diff, r, lim_distance):
         distances = np.linalg.norm(diff, axis=1)
@@ -76,11 +73,6 @@ class Robots():
 
         inv_distances[inv_distances > 1] = 1
         return inv_distances, valid_dist_ind[0], distances
-
-    def check_collision_occupancy(self, r, obstacles, prev_c):
-        
-        pass
-
 
     # assume polygon obstacles do not have holes
     def check_collision_polygons(self, r, obstacles, prev_c):
