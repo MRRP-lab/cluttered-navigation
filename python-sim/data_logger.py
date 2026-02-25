@@ -20,7 +20,7 @@ class DataLogger():
         print("LOGGER: Working filepath to which data will be saved: " + self.workingFilepath)
     
     def log_line_spatial(self, droneID: int, timestep: int, xPos: int, yPos: int):
-        line = [Params.strategy, str(Params.N), str(0), str(droneID), str(timestep), str(xPos), str(yPos)]
+        line = [Params.strategy, str(Params.N), str(Params.reflectingBoundaryAngle), str(droneID), str(timestep), str(xPos), str(yPos)]
         self.data.append(line)
     
     def export_data(self):

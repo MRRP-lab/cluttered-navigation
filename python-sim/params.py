@@ -1,3 +1,5 @@
+import math
+
 class Params:
     FPS = 55
     time_seconds = 10
@@ -8,6 +10,9 @@ class Params:
     N = 1
     v = 1  # velocity
     seed = 1
+
+    # TODO: Add reflecting boundary angle here:
+    reflectingBoundaryAngle = math.pi / 8
 
     startLine = 1
     finishLine = 23
