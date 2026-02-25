@@ -20,4 +20,4 @@ class Params:
     # so spelling & capitalization are important.
     strategy = "Decentralized"   # "Centralized" or "Decentralized"
     experimentType = "BothFixed" # "AngleFixed", "CountFixed", or "BothFixed"
-
+    filename = "ExampleFileName" # TODO: determine what this is to be.   

@@ -8,13 +8,27 @@ class DataLogger():
         self.data = []
 
         # Generate filepath from the directory this file is in:
-        self.rootFilePath = os.path.dirname(__file__)
-        self.workingFilepath = os.path.join(self.rootFilePath, "data", self.logType, Params.strategy, Params.experimentType)
-        print(self.workingFilepath)
+        # Isolate the relative path from the current working directory to the python-sim directory:
+        absolutecwd = os.getcwd()
+        absoluteFilepath = os.path.dirname(__file__)
+        relativeFilepath = "." + absoluteFilepath[len(absolutecwd):]
+
+        # set the filepath of the output data:
+        self.workingFilepath = os.path.join(relativeFilepath, "data", self.logType, Params.strategy, Params.experimentType)
+        self.filename = Params.filename + ".txt"
+
+        print("LOGGER: Working filepath to which data will be saved: " + self.workingFilepath)
     
     def log_line_spatial(self, droneID: int, timestep: int, xPos: int, yPos: int):
-        line = [Params.strategy, str(droneID), str(timestep), str(xPos), str(yPos)]
+        line = [Params.strategy, str(Params.N), str(0), str(droneID), str(timestep), str(xPos), str(yPos)]
         self.data.append(line)
     
     def export_data(self):
-        print("example data example data.")
+
+        if not os.path.exists(self.workingFilepath):
+            os.makedirs(self.workingFilepath)
+
+        with open(os.path.join(self.workingFilepath, self.filename), "w") as file:
+            for line in self.data:
+                file.write(",".join(line) + "\n")
+        
