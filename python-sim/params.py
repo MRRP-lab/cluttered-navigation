@@ -11,3 +11,13 @@ class Params:
 
     startLine = 1
     finishLine = 23
+
+    # Variables need to be set for logging purposes because
+    # AngleFixed/CountFixed or Centralized/Decentralized cannot be
+    # inferred from the sim parameters as they pertain to multiple simulations.
+
+    # These values will be converted directly to the filepaths
+    # so spelling & capitalization are important.
+    strategy = "Decentralized"   # "Centralized" or "Decentralized"
+    experimentType = "BothFixed" # "AngleFixed", "CountFixed", or "BothFixed"
+
