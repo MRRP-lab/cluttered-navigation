@@ -1,8 +1,8 @@
-## Analysis
+# Analysis
 
 The `analytics` folder contains scripts and tools for analyzing and visualizing the results of drone navigation experiments. These scripts process the data collected by the logger to provide detailed statistical and graphical comparisons of different navigation strategies.
 
-### Analysis Scripts
+## Analysis Scripts
 
 - **`analytics.py`**
   - Main entry point for all analysis and visualization tasks.
@@ -21,7 +21,7 @@ The `analytics` folder contains scripts and tools for analyzing and visualizing 
   - Supports both makespan and spatial experiment types, with data that varies by drone count and angle.
   - Useful for testing the analysis pipeline, demos, or development without running full simulations.
 
-### Example Data: `sampleOutput/`
+## Example Data: `sampleOutput/`
 
 The `sampleOutput/` directory contains example output data files and directory structure for makespan and spatial experiments, including both centralized and decentralized strategies. This folder is structured to match the expected input for the analysis scripts.
 
@@ -36,9 +36,16 @@ The `sampleOutput/` directory contains example output data files and directory s
             - `AngleFixed/`: Contains data files where the angle is fixed and drone count varies.
             - `CountFixed/`: Contains data files where the drone count is fixed and angle varies.
           - Each experiment subfolder contains one or more `.txt` data files, each representing a single experiment run or configuration. These files are headerless and formatted for direct use with the analysis script.
+        - Makespan and spatial data are recorded as follows:
+            - Makespan
+                - Format: `strategy,droneCount,maxAngle,droneID,entryTime,exitTime`
+                - Example: `decentralizedWeighted,20,45.0,31927043512,1630,17899`
+            - Spatial
+                - Format: `strategy,droneCount,maxAngle,droneID,timeStamp,x,y`
+                - Example: `decentralizedWeighted,20,45.0,31927043512,815,-216.715698242188,-0.94903558492661`
   - All data files are structured for compatibility with the analysis pipeline and are organized to allow easy comparison between strategies and experiment types.
 
-### Usage
+## Usage
 
 1. **Run Experiments:** Use the simulator and logger to generate entry/exit and motionpath data files, or use `generateFakeData.py` to create test data in the correct structure. Ensure that your makespan and spatial data files are headerless and formatted correctly, with values separated by commas. Refer to the `sampleOutput/` directory for examples of the expected structure.
 2. **Analyze Data:** Run `analytics.py` to process the data, compute statistics, and generate plots. All results and statistics are printed to the CLI and shown as visualizations. Before running, ensure the configurable constants in `analytics.py` are set correctly:
