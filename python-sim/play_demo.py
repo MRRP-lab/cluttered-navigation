@@ -13,7 +13,7 @@ from environment import Environment
 
 SAVE_VID = True
 VIZGRID = True
-FPS = 55
+FPS = Params.FPS
 vid_name = "test.mp4"
 tag = "" # replace with informative parameters
 viddir = './videos'
@@ -29,10 +29,6 @@ seed = Params.seed
 
 # import the data from generate_demo
 sim_data = pd.read_csv("data/demo.csv",dtype=object)
-
-# set up environment
-# TODO but Robots already creates an environment??
-env = Environment(ss, gridnum, seed)
 
 
 ########################## SETUP ##########################
@@ -69,6 +65,7 @@ for i in range(sim_data['x'].shape[0]):
 
 # init robots
 robots = Robots(N, v, ss, gridnum, seed)
+env = robots.env
 
 robots.coords = np.array([x_list,y_list]).T
 
@@ -122,7 +119,7 @@ for time in range(sim_time):
         pygame.draw.circle(screen, (0,0,255), np.ceil(c) + centering_offset, max(Params.cell_size/2 - 1, 2))
 
 
-    clock.tick(Params.FPS)
+    clock.tick(FPS)
 
     # save frame to disk
     if SAVE_VID:
