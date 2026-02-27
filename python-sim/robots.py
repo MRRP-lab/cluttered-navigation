@@ -32,7 +32,7 @@ class Robots():
 
         # For crowd compression reasons, keep robots such that
         # we can update the rightmost ones first.
-        # self.re_sort_rightmost()
+        self.re_sort_rightmost()
 
     # Spawn robots in a circular manner around a point such that no robots are overlapping.
     def spawn_robots_around_point(self, x, y, density):
@@ -72,7 +72,6 @@ class Robots():
             r += 1
             # While the heap is not empty and the min element is within the current ring,
             # pop it and place a robot there. Stop when no more bots to place.
-        pass
 
     def re_sort_rightmost(self):
         self.rightmost_sorted_robots = sorted(range(self.num), reverse=True,
@@ -81,13 +80,13 @@ class Robots():
     # Drives movement updates for robots in their environment.
     # Update robots from the right to left side of the screen.
     def update_movement(self):
-        #for k in range(self.num):
-        #    r = self.rightmost_sorted_robots[k]
-        #    self.plinko_movement_policy(r)
-
-        #self.resort_rightmost()
-        for r in range(self.num):
+        for k in range(self.num):
+            r = self.rightmost_sorted_robots[k]
             self.plinko_movement_policy(r)
+
+        self.re_sort_rightmost()
+        #for r in range(self.num):
+        #    self.plinko_movement_policy(r)
 
     # Move right. At an obstacle, randomly choose either up or down.
     # TODO: Separate navigation strategy logic out of Robots.

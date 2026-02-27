@@ -5,6 +5,6 @@ class Params:
     gridnum = 50 # num of grid cells along one side of the window
     cell_size = 10 # Size of a grid cell in px
     ss = gridnum * cell_size  # screen size (px)
-    N = 90
+    N = 900
     v = 1  # velocity
     seed = 1
