@@ -5,7 +5,6 @@ import os
 # custom imports
 from robots import Robots
 from params import Params
-from data_logger import DataLogger
 
 ########################## PARAMETERS ###########################################
 
@@ -28,8 +27,10 @@ seed = Params.seed
 startLine = Params.startLine
 finishLine = Params.finishLine
 
-# TODO: Change filepath based on params
-logger = DataLogger("Spatial")
+
+droneEntryTimes = {} # Create a dictionary to store drone's entry times.
+                     # That way we can store drone's entry & exit times on one line.
+
 ############################### MAIN ##############################################
 
 ### Load Configs
@@ -43,7 +44,7 @@ group_list = [np.zeros(robots.num)]
 for t in range(sim_time):
     robots.update_movement()
     # We're already recording robot positions inside sim_data. Also, c was deleted.
-    #logger.log_line_spatial(r, t, c[0], c[1])
+
 
     sim_data.append([robots.coords[:,0].copy(), robots.coords[:,1].copy()])
 
@@ -53,5 +54,4 @@ outdat = os.path.join(datadir, "demo.csv")
 
 data.to_csv(outdat, lineterminator = "")
 
-# DataLogger data -Madden :
-logger.export_data()
+robots.export_data()
