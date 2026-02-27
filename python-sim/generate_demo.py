@@ -33,9 +33,9 @@ arg_dict = {
 #for each arg passed, overwrite the default
 for arg in args:
     if (arg[0] in arg_dict.keys()):
-        print("got here with" + arg[0])
+        #print("got here with" + arg[0])
         arg_dict[arg[0]] = int(arg[1])
-        print("now " + arg[0] + " = " + str(arg_dict[arg[0]]))
+        #print("now " + arg[0] + " = " + str(arg_dict[arg[0]]))
 
 print(arg_dict["FPS"])
 FPS = arg_dict["FPS"] 

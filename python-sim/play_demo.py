@@ -4,6 +4,7 @@ import pygame
 import pandas as pd
 import os
 import glob
+import sys
 
 from params import Params
 from robots import Robots
@@ -18,14 +19,36 @@ vid_name = "test.mp4"
 tag = "" # replace with informative parameters
 viddir = './videos'
 
-# TODO: convert the below to be command-line arguments
-time_seconds = Params.time_seconds
-sim_time = Params.sim_time
-ss = Params.ss # screen size
-N = Params.N # num of robots
-v = Params.v
-gridnum = Params.gridnum
-seed = Params.seed
+args = sys.argv[1:]
+args = list(map(lambda x: x.split("="), args))
+print(args)
+
+arg_dict = {
+    "FPS" : Params.FPS,
+    "time_seconds" : Params.time_seconds,
+    "ss" : Params.ss,  # screen size 
+    "N" : Params.N, #num drones
+    "v" : Params.v,  # velocity 
+    "gridnum" : Params.gridnum,
+    "seed" : Params.seed 
+}
+
+#for each arg passed, overwrite the default
+for arg in args:
+    if (arg[0] in arg_dict.keys()):
+        #print("got here with" + arg[0])
+        arg_dict[arg[0]] = int(arg[1])
+        #print("now " + arg[0] + " = " + str(arg_dict[arg[0]]))
+
+FPS = arg_dict["FPS"] 
+time_seconds = arg_dict["time_seconds"]
+sim_time = time_seconds*FPS
+gridnum = arg_dict["gridnum"]
+ss = Params.cell_size * gridnum 
+N = arg_dict["N"]
+v = arg_dict["v"]
+seed = arg_dict["seed"]
+
 
 # import the data from generate_demo
 sim_data = pd.read_csv("data/demo.csv",dtype=object)
