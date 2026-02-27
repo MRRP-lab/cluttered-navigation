@@ -35,16 +35,7 @@ group_list = [np.zeros(robots.num)]
 ### Simulation Loop
 
 for t in range(sim_time):
-
-    for r in range(robots.num):
-        c = robots.coords[r].copy() # save previous position in case of collision
-        # update robot positions
-        robots.plinko_movement_policy(r)
-
-        # returns true if there was a collision
-        # and moves robot back to original position and reorients
-
-
+    robots.update_movement()
     sim_data.append([robots.coords[:,0].copy(), robots.coords[:,1].copy()])
 
 
