@@ -1,7 +1,14 @@
 import numpy as np
+from enum import Enum
 
 import utils
 import environment
+
+class PlinkoState(Enum):
+    RIGHT = 0
+    UP = 1
+    DOWN = 2
+    TRAPPED = 3
 
 class Robots():
     def __init__(self, N, vel, ss, gridnum, seed):
@@ -18,6 +25,10 @@ class Robots():
 
         self.coords = np.array(coords, dtype=int)
         self.v = np.full(self.num, vel)
+        
+        # TODO: Separate navigation logic for each different strategy
+        # to a different place.
+        self.plinko_state = np.full(self.num, PlinkoState.RIGHT)
 
     def update_movement(self, r):
         c = self.coords[r]
@@ -34,29 +45,48 @@ class Robots():
         self.coords[r] = np.array([xnew, ynew])
 
     # Move right. At an obstacle, randomly choose either up or down.
+    # TODO: Separate navigation strategy logic out of Robots.
     def plinko_movement_policy(self, r):
         c = self.coords[r]
+        xnew = c[0]
+        ynew = c[1]
 
         right = self.env.is_obstacle(c[0]+1, c[1])
         up = self.env.is_obstacle(c[0], c[1]-1)
         down = self.env.is_obstacle(c[0], c[1]+1)
 
-        xnew = c[0]
-        ynew = c[1]
-        if right == 0:
-            xnew += 1
-        elif (up == 0 and down == 0):
-            if (self.rng.random() < 0.5):
-                ynew += 1
-            else:
-                ynew -= 1
-        else:
-            if (up == 0):
-                ynew -= 1
-            elif (down == 0):
-                ynew += 1
+        state = self.plinko_state[r]
+        new_state = None
 
-        # update coords, no screen wrapping
+        if right == 0:
+            new_state = PlinkoState.RIGHT
+        elif (up == 0 and down == 0):
+            if (state == PlinkoState.RIGHT):
+                if (self.rng.random() < 0.5):
+                    new_state = PlinkoState.DOWN
+                else:
+                    new_state = PlinkoState.UP
+            else:
+                new_state = state
+        elif (up == 0):
+            new_state = PlinkoState.UP
+        elif (down == 0):
+            new_state = PlinkoState.DOWN
+        else:
+            new_state = PlinkoState.TRAPPED
+
+        self.plinko_state[r] = new_state
+
+        match self.plinko_state[r]:
+            case PlinkoState.RIGHT:
+                xnew += 1
+            case PlinkoState.UP:
+                ynew -= 1
+            case PlinkoState.DOWN:
+                ynew += 1
+            case PlinkoState.TRAPPED:
+                pass
+
         self.coords[r] = np.array([xnew, ynew])
 
     def distance_calc(self, diff, r, lim_distance):
