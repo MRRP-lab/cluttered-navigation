@@ -28,8 +28,13 @@ seed = Params.seed
 startLine = Params.startLine
 finishLine = Params.finishLine
 
-# TODO: Change filepath based on params
-logger = DataLogger("Spatial")
+# Loggers:
+loggerSp = DataLogger("Spatial")
+loggerMs = DataLogger("Makespan")
+
+droneEntryTimes = {} # Create a dictionary to store drone's entry times.
+                     # That way we can store drone's entry & exit times on one line.
+
 ############################### MAIN ##############################################
 
 ### Load Configs
@@ -51,7 +56,16 @@ for t in range(sim_time):
         # and moves robot back to original position and reorients
 
         # Log data to the data logger.        
-        logger.log_line_spatial(r, t, c[0], c[1])
+        loggerSp.log_spatial(r, t, c[0], c[1])
+
+        if c[0] == Params.startLine:
+            droneEntryTimes.update({r: t})
+        elif c[0] == Params.finishLine:
+            entryTime = droneEntryTimes.get(r, -1) # Return negative 1 if the drone
+            exitTime = t                           # did not cross the start line.
+            #print("Entry time for drone " + str(r) + ": " + str(entryTime) + ". Exit time: " + str(exitTime))
+            loggerMs.log_makespan(r, entryTime, exitTime)
+
 
 
     sim_data.append([robots.coords[:,0].copy(), robots.coords[:,1].copy()])
@@ -63,4 +77,5 @@ outdat = os.path.join(datadir, "demo.csv")
 data.to_csv(outdat, lineterminator = "")
 
 # DataLogger data -Madden :
-logger.export_data()
+loggerSp.export_data()
+loggerMs.export_data()

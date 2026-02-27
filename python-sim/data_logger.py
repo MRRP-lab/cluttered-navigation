@@ -19,10 +19,14 @@ class DataLogger():
 
         print("LOGGER: Working filepath to which data will be saved: " + self.workingFilepath)
     
-    def log_line_spatial(self, droneID: int, timestep: int, xPos: int, yPos: int):
+    def log_spatial(self, droneID: int, timestep: int, xPos: int, yPos: int):
         line = [Params.strategy, str(Params.N), str(Params.reflectingBoundaryAngle), str(droneID), str(timestep), str(xPos), str(yPos)]
         self.data.append(line)
     
+    def log_makespan(self, droneID, entryTime, exitTime):
+        line = [Params.strategy, str(Params.N), str(Params.reflectingBoundaryAngle), str(droneID), str(entryTime), str(exitTime)]
+        self.data.append(line)
+
     def export_data(self):
 
         if not os.path.exists(self.workingFilepath):
