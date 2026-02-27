@@ -80,13 +80,13 @@ class Robots():
     # Drives movement updates for robots in their environment.
     # Update robots from the right to left side of the screen.
     def update_movement(self):
-        for k in range(self.num):
-            r = self.rightmost_sorted_robots[k]
-            self.plinko_movement_policy(r)
-
-        self.re_sort_rightmost()
-        #for r in range(self.num):
+        #for k in range(self.num):
+        #    r = self.rightmost_sorted_robots[k]
         #    self.plinko_movement_policy(r)
+
+        #self.re_sort_rightmost()
+        for r in range(self.num):
+            self.plinko_movement_policy(r)
 
     # Move right. At an obstacle, randomly choose either up or down.
     # TODO: Separate navigation strategy logic out of Robots.
