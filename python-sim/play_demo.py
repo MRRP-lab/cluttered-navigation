@@ -49,7 +49,7 @@ height = ss # for vid
 
 # set up env
 pygame.init()
-screen = pygame.display.set_mode([ss,ss])
+screen = pygame.display.set_mode([ss,ss], pygame.SRCALPHA)
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("Arial", 18)
 
@@ -100,10 +100,7 @@ for time in range(sim_time):
     if VIZGRID:
         for points in range(env.grid_num):
             interval = env.ss/env.grid_num
-            inter = 0
-            cornerNum = 1
             pt = float(points*interval)
-            font = pygame.font.SysFont(None, 15)
 
             pygame.draw.line(screen, (255, 0, 0), (pt, 0), (pt, env.ss), width=1)
             pygame.draw.line(screen, (255, 0, 0), (0, pt), (env.ss, pt), width=1)
@@ -111,7 +108,7 @@ for time in range(sim_time):
     ############################################################################
 
 
-    centering_offset = np.array([Params.cell_size / 2, Params.cell_size / 2])
+    centering_offset = np.array([Params.cell_size / 2, Params.cell_size / 2]) + np.array([1, 1])
     # update robot positions
     for r in range(robots.num):
 
