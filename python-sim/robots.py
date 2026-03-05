@@ -4,7 +4,6 @@ import heapq
 import itertools
 
 import environment
-from data_logger import DataLogger
 
 class PlinkoState(Enum):
     RIGHT = 0
@@ -15,15 +14,6 @@ class PlinkoState(Enum):
 class Robots():
     def __init__(self, N, vel, ss, gridnum, seed, startLine, finishLine):
         
-        # TODO: Find a better solution. I don't think we should do time this way.
-        # I moved these in here to fix merge history bugs.
-        self.logger_sp = DataLogger("Spatial")
-        self.logger_ms = DataLogger("Makespan")
-        self.t = 0
-        self.drone_entry_times = {}
-        self.start_line = startLine
-        self.finish_line = finishLine
-
         self.env = environment.Environment(ss, gridnum, seed, startLine, finishLine)
         self.num = N
         self.ss = ss
@@ -97,7 +87,6 @@ class Robots():
         #self.re_sort_rightmost()
         for r in range(self.num):
             self.plinko_movement_policy(r)
-        self.t += 1
 
     # Move right. At an obstacle, randomly choose either up or down.
     # TODO: Separate navigation strategy logic out of Robots.
@@ -149,14 +138,6 @@ class Robots():
 
         self.coords[r] = np.array([xnew, ynew])
 
-        self.logger_sp.log_spatial(r, self.t, xnew, ynew)
-
-        if xnew == self.start_line:
-            self.drone_entry_times.update({r: self.t})
-        elif c[0] == self.finish_line:
-            entryTime = self.drone_entry_times.get(r, -1) # Return negative 1 if the drone
-            exitTime = self.t                           # did not cross the start line.
-            self.logger_ms.log_makespan(r, entryTime, exitTime)
 
     # TODO better representation of robot coordinates could make this quicker
     # Returns true if there's a robot at this position
@@ -165,8 +146,3 @@ class Robots():
             if (x == pos[0] and y == pos[1]):
                 return 1
         return 0
-    
-    def export_data(self):
-        self.logger_sp.export_data()
-        self.logger_ms.export_data()
-
