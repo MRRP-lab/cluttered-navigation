@@ -28,9 +28,12 @@ seed = Params.seed
 startLine = Params.startLine
 finishLine = Params.finishLine
 
+strategy = Params.strategy
+reflectingBoundaryAngle = Params.reflectingBoundaryAngle
+
 # Loggers:
-loggerSp = DataLogger("Spatial")
-loggerMs = DataLogger("Makespan")
+loggerSp = DataLogger("Spatial", strategy, reflectingBoundaryAngle, N)
+loggerMs = DataLogger("Makespan", strategy, reflectingBoundaryAngle, N)
 
 droneEntryTimes = {} # Create a dictionary to store drone's entry times.
                      # That way we can store drone's entry & exit times on one line.
