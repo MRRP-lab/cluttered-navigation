@@ -1,4 +1,5 @@
 import os
+import math
 from params import Params
 
 class DataLogger():
@@ -6,7 +7,7 @@ class DataLogger():
     def __init__(self, logType, strategy, angle, N):
         self.logType = logType
         self.strategy = strategy
-        self.angle = str(angle)
+        self.angle = str(math.degrees(angle))
         self.N = str(N)
         self.data = []
 
