@@ -6,6 +6,7 @@ import sys
 # custom imports
 from robots import Robots
 from params import Params
+from demo_parser import parse_args
 
 
 ########################## PARAMETERS ###########################################
@@ -16,36 +17,19 @@ datadir = './data'
 if not os.path.exists(datadir):
     os.mkdir(datadir)
 
-args = sys.argv[1:]
-args = list(map(lambda x: x.split("="), args))
-print(args)
+#parse arguments
+args = parse_args(sys.argv)
 
-arg_dict = {
-    "FPS" : Params.FPS,
-    "time_seconds" : Params.time_seconds,
-    "ss" : Params.ss,  # screen size 
-    "N" : Params.N, #num drones
-    "v" : Params.v,  # velocity 
-    "gridnum" : Params.gridnum,
-    "seed" : Params.seed 
-}
-
-#for each arg passed, overwrite the default
-for arg in args:
-    if (arg[0] in arg_dict.keys()):
-        #print("got here with" + arg[0])
-        arg_dict[arg[0]] = int(arg[1])
-        #print("now " + arg[0] + " = " + str(arg_dict[arg[0]]))
-
-print(arg_dict["FPS"])
-FPS = arg_dict["FPS"] 
-time_seconds = arg_dict["time_seconds"]
-sim_time = time_seconds*FPS
-gridnum = arg_dict["gridnum"]
-ss = Params.cell_size * gridnum 
-N = arg_dict["N"]
-v = arg_dict["v"]
-seed = arg_dict["seed"]
+#assign variables from arguments
+FPS = args.FPS
+time_seconds = args.time_seconds
+sim_time = time_seconds*FPS 
+gridnum = args.time_seconds
+ss = args.cell_size * gridnum 
+N = args.N
+v = args.v
+seed = args.seed
+strategy = args.strategy
 
 ############################### MAIN ##############################################
 
