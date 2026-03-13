@@ -18,7 +18,6 @@ gridnum = args.gridnum
 cell_size = args.cell_size
 ss = args.cell_size * gridnum
 N = args.N
-v = args.v
 seed = args.seed
 strategy = args.strategy
 
@@ -68,7 +67,7 @@ for i in range(sim_data['x'].shape[0]):
 ########################## MAIN  ###########################################3
 
 # init robots
-robots = Robots(N, v, gridnum, seed, start_line, finish_line)
+robots = Robots(N, gridnum, seed, start_line, finish_line)
 env = robots.env
 
 robots.coords = np.array([x_list,y_list]).T

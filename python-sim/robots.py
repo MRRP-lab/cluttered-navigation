@@ -12,7 +12,7 @@ class PlinkoState(Enum):
     TRAPPED = 3
 
 class Robots():
-    def __init__(self, N, vel, gridnum, seed, startLine, finishLine):
+    def __init__(self, N, gridnum, seed, startLine, finishLine):
         
         self.env = environment.Environment(gridnum, seed, startLine, finishLine)
         self.num = N
@@ -22,8 +22,6 @@ class Robots():
         self.coords = np.reshape(coords, (self.num, 2))
 
         self.spawn_robots_around_point(10, 10, 0.5)
-
-        self.v = np.full(self.num, vel)
 
         # TODO: Separate navigation logic for each different strategy
         # to a different place.

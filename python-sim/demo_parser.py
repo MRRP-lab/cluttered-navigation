@@ -25,10 +25,6 @@ return: a namespace with parsed arguments'''
                         help="number of drones in simulation", 
                         type=int, default=Params.N)
 
-    parser.add_argument("-v", 
-                        help="drone speed (velocity)", 
-                        type=int, default=Params.v)
-
     parser.add_argument("-s", "--strategy", 
                         help="choose decentralized or centralized strategy", 
                         choices=["centralized", "decentralized"],

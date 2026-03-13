@@ -26,7 +26,6 @@ time_seconds = sim_args.time_seconds
 sim_time = time_seconds*FPS
 gridnum = sim_args.gridnum
 N = sim_args.N
-v = sim_args.v
 seed = sim_args.seed
 strategy = sim_args.strategy
 
@@ -46,7 +45,7 @@ drone_entry_times = {} # Create a dictionary to store drone's entry times.
 
 ### Load Configs
 
-robots = Robots(N, v, gridnum, seed, start_line, finish_line)
+robots = Robots(N, gridnum, seed, start_line, finish_line)
 
 group_list = [np.zeros(robots.num)]
 

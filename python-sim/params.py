@@ -9,7 +9,6 @@ class Params:
     cell_size = 10 # Size of a grid cell in px
     ss = gridnum * cell_size  # screen size (px)
     N = 1
-    v = 1  # velocity
     seed = 1
     strategy = "decentralized"
 
