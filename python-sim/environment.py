@@ -51,10 +51,11 @@ class Environment():
         return obstacles
 
     def add_reflecting_boundary(self, obstacles, angle, x_offset):
+        print(x_offset)
         line_length = 200
-        x0 = obstacles.shape[0] + x_offset
+        x0 = x_offset
         y0 = round(obstacles.shape[1] / 2)
-        x1 = round(x0 - line_length * math.cos(angle)) + x_offset
+        x1 = round(x0 + line_length * math.cos(angle)) + x_offset
         y1_neg = round(y0 - line_length * math.sin(angle))
         y1_pos = round(y0 + line_length * math.sin(angle))
 
