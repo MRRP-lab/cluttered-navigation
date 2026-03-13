@@ -12,4 +12,10 @@ class Params:
     seed = 1
     strategy = "decentralized"
 
+    X = 0
+    Y = math.floor(gridnum / 2)
+    density = 1
+    
+    boundary = False
     boundary_angle = math.pi / 8
+    boundary_offset = -10

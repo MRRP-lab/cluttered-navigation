@@ -12,16 +12,16 @@ class PlinkoState(Enum):
     TRAPPED = 3
 
 class Robots():
-    def __init__(self, N, gridnum, seed, startLine, finishLine):
-        
-        self.env = environment.Environment(gridnum, seed, startLine, finishLine)
+    def __init__(self, N, spawn, density, gridnum, seed, startLine, finishLine, boundary, boundary_angle, boundary_offset):
+        #TODO separate env from robot, set env separately. Make boundary a function call to add it.
+        self.env = environment.Environment(gridnum, seed, startLine, finishLine, boundary, boundary_angle, boundary_offset)
         self.num = N
         self.rng = np.random.default_rng(seed)
         
         coords = np.full(self.num * 2, 0)
         self.coords = np.reshape(coords, (self.num, 2))
 
-        self.spawn_robots_around_point(10, 10, 0.5)
+        self.spawn_robots_around_point(spawn, density)
 
         # TODO: Separate navigation logic for each different strategy
         # to a different place.
@@ -32,8 +32,8 @@ class Robots():
         #self.re_sort_rightmost()
 
     # Spawn robots in a circular manner around a point such that no robots are overlapping.
-    def spawn_robots_around_point(self, x, y, density):
-        target_point = np.array([x, y])
+    def spawn_robots_around_point(self, spawn, density):
+        target_point = np.array(spawn)
         
         tiebreaker = itertools.count()
 
@@ -126,7 +126,6 @@ class Robots():
             case PlinkoState.DOWN:
                 ynew += 1
             case PlinkoState.TRAPPED:
-                print(str(r) + " trapped")
                 pass
 
         self.coords[r] = np.array([xnew, ynew])

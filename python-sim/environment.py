@@ -5,13 +5,14 @@ import math
 
 
 class Environment():
-    def __init__(self, grid_num, seed, startLine, finishLine):
+    def __init__(self, grid_num, seed, startLine, finishLine, boundary, boundary_angle, boundary_offset):
         self.grid_num = grid_num
         self.x_coords = np.arange(0, self.grid_num, dtype=float)
         self.seed = seed
         self.rng = np.random.default_rng(seed)
         self.obstacles = self.generate_plinko_grid(5, 5, 1, 1)
-        #self.add_reflecting_boundary(self.obstacles, math.pi / 8, 20)
+        if boundary:
+            self.add_reflecting_boundary(self.obstacles, boundary_angle, boundary_offset)
 
         self.startLine = startLine
         self.finishLine = finishLine

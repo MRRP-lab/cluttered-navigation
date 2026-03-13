@@ -29,10 +29,16 @@ N = sim_args.N
 seed = sim_args.seed
 strategy = sim_args.strategy
 
+spawnpoint = (sim_args.X, sim_args.Y)
+spawn_density = sim_args.density
+
+boundary = sim_args.boundary
+boundary_angle = sim_args.boundary_angle
+boundary_offset = sim_args.boundary_offset
+
 start_line = 1
 finish_line = gridnum-1
 
-boundary_angle = sim_args.angle
 
 # Loggers:
 logger_sp = DataLogger(sim_args)
@@ -45,7 +51,7 @@ drone_entry_times = {} # Create a dictionary to store drone's entry times.
 
 ### Load Configs
 
-robots = Robots(N, gridnum, seed, start_line, finish_line)
+robots = Robots(N, spawnpoint, spawn_density, gridnum, seed, start_line, finish_line, boundary, boundary_angle, boundary_offset)
 
 group_list = [np.zeros(robots.num)]
 

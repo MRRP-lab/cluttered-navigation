@@ -5,7 +5,7 @@ class DataLogger():
 
     def __init__(self, sim_args):
         self.sim_args = sim_args
-        self.angle_deg = math.degrees(sim_args.angle)
+        self.angle_deg = math.degrees(sim_args.boundary_angle)
         self.data = []
 
         # Generate filepath from the directory this file is in:

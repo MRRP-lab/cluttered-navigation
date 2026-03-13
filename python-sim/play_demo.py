@@ -9,17 +9,22 @@ from robots import Robots
 from demo_parser import parse_args
 
 ########################## PARAMETERS ###########################################
-args = parse_args(sys.argv)
+sim_args = parse_args(sys.argv)
 
-FPS = args.FPS
-time_seconds = args.time_seconds
+FPS = sim_args.FPS
+time_seconds = sim_args.time_seconds
 sim_time = time_seconds * FPS
-gridnum = args.gridnum
-cell_size = args.cell_size
-ss = args.cell_size * gridnum
-N = args.N
-seed = args.seed
-strategy = args.strategy
+gridnum = sim_args.gridnum
+cell_size = sim_args.cell_size
+ss = sim_args.cell_size * gridnum
+N = sim_args.N
+seed = sim_args.seed
+strategy = sim_args.strategy
+
+boundary = sim_args.boundary
+boundary_angle = sim_args.boundary_angle
+boundary_offset = sim_args.boundary_offset
+
 
 SAVE_VID = True
 VIZGRID = True
@@ -28,7 +33,7 @@ tag = "" # replace with informative parameters
 viddir = './videos'
 
 #parse arguments
-args = parse_args(sys.argv)
+sim_args = parse_args(sys.argv)
 
 start_line = 1
 finish_line = gridnum-1
@@ -67,7 +72,7 @@ for i in range(sim_data['x'].shape[0]):
 ########################## MAIN  ###########################################3
 
 # init robots
-robots = Robots(N, gridnum, seed, start_line, finish_line)
+robots = Robots(N, (sim_args.X, sim_args.Y), sim_args.density, gridnum, seed, start_line, finish_line, boundary, boundary_angle, boundary_offset)
 env = robots.env
 
 robots.coords = np.array([x_list,y_list]).T

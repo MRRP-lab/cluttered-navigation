@@ -38,9 +38,31 @@ return: a namespace with parsed arguments'''
                         help="seed for randomized drone and obstacle placement.", 
                         type=int, default=Params.seed)
 
-    parser.add_argument("-a", "--angle", 
+    parser.add_argument("-B", "--boundary",
+                        help="Include to add a reflecting boundary.",
+                        default=Params.boundary, action="store_true")
+
+    parser.add_argument("-a", "--boundary_angle", 
                         help="Positive and negative reflecting boundary angle in degrees", 
                         type=int, default=Params.boundary_angle)
+
+    parser.add_argument("--boundary-offset",
+                        help="X offset for the reflecting boundary.",
+                        type=int, default=Params.boundary_offset)
+
+    parser.add_argument("-d", "-D", "--density", 
+                        help="Density of robot group spawn. 0-1, 1 represents perfect compression.",
+                        type=float, default=Params.density)
+
+    parser.add_argument("-X", "-x",
+                        help="X-coordinate of robot group spawn",
+                        type=int, default=Params.X)
+
+    parser.add_argument("-Y", "-y",
+                        help="Y-coordinate of robot group spawn",
+                        type=int, default=Params.Y)
+    
+    
 
     #parse arguments 
     #and return namespace with arguments
