@@ -1,4 +1,3 @@
-from multiprocessing import connection
 import numpy as np
 import pygame
 import pandas as pd
@@ -6,24 +5,22 @@ import os
 import glob
 import sys
 
-from params import Params
 from robots import Robots
-from environment import Environment
 from demo_parser import parse_args
 
 ########################## PARAMETERS ###########################################
 args = parse_args(sys.argv)
- 
+
 FPS = args.FPS
 time_seconds = args.time_seconds
-sim_time = time_seconds * FPS 
-gridnum = args.time_seconds
-ss = args.cell_size * gridnum  
+sim_time = time_seconds * FPS
+gridnum = args.gridnum
+cell_size = args.cell_size
+ss = args.cell_size * gridnum
 N = args.N
 v = args.v
 seed = args.seed
 strategy = args.strategy
-
 
 SAVE_VID = True
 VIZGRID = True
@@ -34,25 +31,10 @@ viddir = './videos'
 #parse arguments
 args = parse_args(sys.argv)
 
-#assign variables from arguments
-FPS = args.FPS
-time_seconds = args.time_seconds
-sim_time = time_seconds*FPS
-gridnum = args.time_seconds
-ss = args.cell_size * gridnum
-N = args.N
-v = args.v
-seed = args.seed
-strategy = args.strategy
-
+start_line = 1
+finish_line = gridnum-1
 # import the data from generate_demo
 sim_data = pd.read_csv("data/demo.csv",dtype=object)
-
-# set up environment
-# TODO but Robots already creates an environment??
-env = Environment(ss, gridnum, seed)
-
-
 ########################## SETUP ##########################
 
 if not os.path.exists(viddir):
@@ -71,7 +53,7 @@ height = ss # for vid
 
 # set up env
 pygame.init()
-screen = pygame.display.set_mode([ss,ss])
+screen = pygame.display.set_mode([ss,ss], pygame.SRCALPHA)
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("Arial", 18)
 
@@ -86,7 +68,8 @@ for i in range(sim_data['x'].shape[0]):
 ########################## MAIN  ###########################################3
 
 # init robots
-robots = Robots(N, v, ss, gridnum, seed)
+robots = Robots(N, v, gridnum, seed, start_line, finish_line)
+env = robots.env
 
 robots.coords = np.array([x_list,y_list]).T
 
@@ -109,38 +92,48 @@ for time in range(sim_time):
     for r in range(robots.num):
         c = robots.coords[r,time]
 
+    # Draw the start and finish Lines:
+    for row in range(gridnum):
+        for square in range(gridnum):
+            if env.is_startLine(square, row):
+                rect = pygame.Rect(square * cell_size, row * cell_size, 
+                                   cell_size, cell_size)
+                pygame.draw.rect(screen, (255, 255, 0), rect)
+            elif env.is_finishLine(square, row):
+                rect = pygame.Rect(square * cell_size, row * cell_size, 
+                                   cell_size, cell_size)
+                pygame.draw.rect(screen, (0, 255, 0), rect)
+    
+    # Draw obstacles:
     for row in range(gridnum):
         for square in range(gridnum):
             if env.obstacles[row,square] == 1:
-                rect = pygame.Rect(square * Params.cell_size, row * Params.cell_size, 
-                                   Params.cell_size, Params.cell_size)
+                rect = pygame.Rect(square * cell_size, row * cell_size, 
+                                   cell_size, cell_size)
                 pygame.draw.rect(screen, (0, 0, 0), rect)
 
     # Draws all of the lines needed to make the grid, prints the box numbers (starting at 1)
     # and draws small dots at all of the intersections of the gridlines
     if VIZGRID:
         for points in range(env.grid_num):
-            interval = env.ss/env.grid_num
-            inter = 0
-            cornerNum = 1
+            interval = ss/env.grid_num
             pt = float(points*interval)
-            font = pygame.font.SysFont(None, 15)
 
-            pygame.draw.line(screen, (255, 0, 0), (pt, 0), (pt, env.ss), width=1)
-            pygame.draw.line(screen, (255, 0, 0), (0, pt), (env.ss, pt), width=1)
+            pygame.draw.line(screen, (255, 0, 0), (pt, 0), (pt, ss), width=1)
+            pygame.draw.line(screen, (255, 0, 0), (0, pt), (ss, pt), width=1)
 
     ############################################################################
 
 
-    centering_offset = np.array([Params.cell_size / 2, Params.cell_size / 2])
+    centering_offset = np.array([cell_size / 2, cell_size / 2]) + np.array([1, 1])
     # update robot positions
     for r in range(robots.num):
 
-        c = robots.coords[r,time] * Params.cell_size
-        pygame.draw.circle(screen, (0,0,255), np.ceil(c) + centering_offset, max(Params.cell_size/2 - 1, 2))
+        c = robots.coords[r,time] * cell_size
+        pygame.draw.circle(screen, (0,0,255), np.ceil(c) + centering_offset, max(cell_size/2 - 1, 2))
 
 
-    clock.tick(10)
+    clock.tick(FPS)
 
     # save frame to disk
     if SAVE_VID:

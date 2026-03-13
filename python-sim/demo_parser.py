@@ -42,6 +42,10 @@ return: a namespace with parsed arguments'''
                         help="seed for randomized drone and obstacle placement.", 
                         type=int, default=Params.seed)
 
+    parser.add_argument("-a", "--angle", 
+                        help="Positive and negative reflecting boundary angle in degrees", 
+                        type=int, default=Params.boundary_angle)
+
     #parse arguments 
     #and return namespace with arguments
     args = parser.parse_args(raw_args[1:])
