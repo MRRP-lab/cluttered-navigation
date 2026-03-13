@@ -47,7 +47,6 @@ class Robots():
         if right == 0:
             xnew += 1
         elif (up == 0 and down == 0):
-            print(c[0]+1)
             if (self.rng.random() < 0.5):
                 ynew += 1
             else:
@@ -61,7 +60,6 @@ class Robots():
         # update coords, no screen wrapping
         self.coords[r] = np.array([xnew, ynew])
         self.disp_coords[r] = self.coords[r].astype(int)
-
         pass
 
     def distance_calc(self, diff, r, lim_distance):
