@@ -5,6 +5,7 @@ import sys
 
 # custom imports
 from robots import Robots
+from environment import Environment
 from demo_parser import parse_args
 
 from data_logger import DataLogger
@@ -50,8 +51,9 @@ drone_entry_times = {} # Create a dictionary to store drone's entry times.
 ############################### MAIN ##############################################
 
 ### Load Configs
-
-robots = Robots(N, spawnpoint, spawn_density, gridnum, seed, start_line, finish_line, boundary, boundary_angle, boundary_offset)
+env = Environment(gridnum, seed, start_line, finish_line, boundary, boundary_angle, boundary_offset)
+robots = Robots(N, spawnpoint, spawn_density, seed)
+robots.set_environment(env)
 
 group_list = [np.zeros(robots.num)]
 

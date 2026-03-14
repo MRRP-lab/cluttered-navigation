@@ -4,7 +4,7 @@ import pandas as pd
 import os
 import glob
 import sys
-
+from environment import Environment
 from robots import Robots
 from demo_parser import parse_args
 
@@ -72,8 +72,9 @@ for i in range(sim_data['x'].shape[0]):
 ########################## MAIN  ###########################################3
 
 # init robots
-robots = Robots(N, (sim_args.X, sim_args.Y), sim_args.density, gridnum, seed, start_line, finish_line, boundary, boundary_angle, boundary_offset)
-env = robots.env
+env = Environment(gridnum, seed, start_line, finish_line, boundary, boundary_angle, boundary_offset)
+robots = Robots(N, (sim_args.X, sim_args.Y), sim_args.density, seed)
+robots.set_environment(env)
 
 robots.coords = np.array([x_list,y_list]).T
 

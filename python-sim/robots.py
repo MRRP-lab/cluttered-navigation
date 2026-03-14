@@ -3,8 +3,6 @@ from enum import Enum
 import heapq
 import itertools
 
-import environment
-
 class PlinkoState(Enum):
     RIGHT = 0
     UP = 1
@@ -12,12 +10,11 @@ class PlinkoState(Enum):
     TRAPPED = 3
 
 class Robots():
-    def __init__(self, N, spawn, density, gridnum, seed, startLine, finishLine, boundary, boundary_angle, boundary_offset):
+    def __init__(self, N, spawn, density, seed):
         #TODO separate env from robot, set env separately. Make boundary a function call to add it.
-        self.env = environment.Environment(gridnum, seed, startLine, finishLine, boundary, boundary_angle, boundary_offset)
+        self.env = None
         self.num = N
         self.rng = np.random.default_rng(seed)
-        
         coords = np.full(self.num * 2, 0)
         self.coords = np.reshape(coords, (self.num, 2))
 
@@ -30,6 +27,10 @@ class Robots():
         # For crowd compression reasons, keep robots such that
         # we can update the rightmost ones first.
         #self.re_sort_rightmost()
+
+    # it gets a function in case there are special things we need to do
+    def set_environment(self, env):
+        self.env = env
 
     # Spawn robots in a circular manner around a point such that no robots are overlapping.
     def spawn_robots_around_point(self, spawn, density):
