@@ -5,7 +5,7 @@ import os
 import glob
 import sys
 from environment import Environment
-from demo_parser import parse_args
+from arg_parser import parse_args
 
 ########################## PARAMETERS ###########################################
 sim_args = parse_args(sys.argv)
