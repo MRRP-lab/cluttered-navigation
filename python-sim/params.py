@@ -8,7 +8,7 @@ class Params:
     gridnum = 50 # num of grid cells along one side of the window
     cell_size = 10 # Size of a grid cell in px
     ss = gridnum * cell_size  # screen size (px)
-    N = 1
+    N = 100
     seed = 1
     strategy = "decentralized"
 

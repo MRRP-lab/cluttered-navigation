@@ -5,7 +5,6 @@ import os
 import glob
 import sys
 from environment import Environment
-from robots import Robots
 from demo_parser import parse_args
 
 ########################## PARAMETERS ###########################################
@@ -73,10 +72,8 @@ for i in range(sim_data['x'].shape[0]):
 
 # init robots
 env = Environment(gridnum, seed, start_line, finish_line, boundary, boundary_angle, boundary_offset)
-robots = Robots(N, (sim_args.X, sim_args.Y), sim_args.density, seed)
-robots.set_environment(env)
 
-robots.coords = np.array([x_list,y_list]).T
+coords = np.array([x_list,y_list]).T
 
 running = True
 
@@ -94,21 +91,16 @@ for time in range(sim_time):
     # fill the background with white
     screen.fill((255,255,255))
 
-    for r in range(robots.num):
-        c = robots.coords[r,time]
+    for r in range(N):
+        c = coords[r,time]
 
     # Draw the start and finish Lines:
-    for row in range(gridnum):
-        for square in range(gridnum):
-            if env.is_startLine(square, row):
-                rect = pygame.Rect(square * cell_size, row * cell_size, 
-                                   cell_size, cell_size)
-                pygame.draw.rect(screen, (255, 255, 0), rect)
-            elif env.is_finishLine(square, row):
-                rect = pygame.Rect(square * cell_size, row * cell_size, 
-                                   cell_size, cell_size)
-                pygame.draw.rect(screen, (0, 255, 0), rect)
-    
+    pygame.draw.rect(screen, (255, 255, 0), 
+                     pygame.Rect(cell_size * start_line, 0, cell_size, ss))
+
+    pygame.draw.rect(screen, (0, 255, 0), 
+                     pygame.Rect(cell_size * (finish_line-1), 0, cell_size, ss))
+
     # Draw obstacles:
     for row in range(gridnum):
         for square in range(gridnum):
@@ -132,9 +124,9 @@ for time in range(sim_time):
 
     centering_offset = np.array([cell_size / 2, cell_size / 2]) + np.array([1, 1])
     # update robot positions
-    for r in range(robots.num):
+    for r in range(N):
 
-        c = robots.coords[r,time] * cell_size
+        c = coords[r,time] * cell_size
         pygame.draw.circle(screen, (0,0,255), np.ceil(c) + centering_offset, max(cell_size/2 - 1, 2))
 
 
