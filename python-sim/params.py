@@ -16,6 +16,7 @@ class Params:
     boundary_offset = -10
 
     # Params mainly for playback
+    # TODO Separate from playback params
     FPS = 10
     time_seconds = 10
     sim_time = time_seconds*FPS

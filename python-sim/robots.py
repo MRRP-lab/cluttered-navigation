@@ -26,7 +26,7 @@ class Robots():
 
         # For crowd compression reasons, keep robots such that
         # we can update the rightmost ones first.
-        #self.re_sort_rightmost()
+        self.re_sort_rightmost()
 
     # it gets a function in case there are special things we need to do
     def set_environment(self, env):

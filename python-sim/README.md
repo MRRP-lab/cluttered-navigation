@@ -2,10 +2,10 @@
 
 ## Dependencies
 
-- yaml
+- pyyaml
 - pygame ([docs here](https://www.pygame.org/docs/))
 - numpy
-- pylab
+- matplotlib (pylab)
 - pandas
 
 
@@ -22,7 +22,13 @@ time while also solving for the physics and interactions involved. This also
 allows us to always log simulation information for replay later, useful for
 computing new statistics on old runs of the simulator.
 
-## Design Choices
+## Data file organization
 
-We've included trails to see where robots have been and a pointer to show robot
-orientation.
+Data files are stored in uniquely named directories per-simulation, containing a few different files:
+1. Playback data
+2. Analytics data
+3. Parameters used
+
+Of course, with a structure like this it'd be hard to locate the data you're most interested in. Because of this, we include a python script used to index all of the experiments into one manifest so that they can be filtered by parameters for easy experiment aggregation.
+
+To run simulations, there's an included bash script which can run parameter sweeps. To use it, set the sweep parameters and optionally set an experiment name to tag the data generated.

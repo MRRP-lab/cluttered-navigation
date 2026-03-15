@@ -1,5 +1,3 @@
-import numpy as np
-import pandas as pd
 import os
 import sys
 
@@ -42,11 +40,8 @@ finish_line = gridnum-1
 
 
 # Loggers:
-logger_sp = DataLogger(sim_args)
-logger_ms = DataLogger(sim_args)
-
-drone_entry_times = {} # Create a dictionary to store drone's entry times.
-                     # That way we can store drone's entry & exit times on one line.
+# TODO add experiment name parameter
+playback_log = DataLogger(sim_args)
 
 ############################### MAIN ##############################################
 
@@ -55,36 +50,10 @@ env = Environment(gridnum, seed, start_line, finish_line, boundary, boundary_ang
 robots = Robots(N, spawnpoint, spawn_density, seed)
 robots.set_environment(env)
 
-group_list = [np.zeros(robots.num)]
-
 ### Simulation Loop
 
 for t in range(sim_time):
     robots.update_movement()
+    playback_log.add_data([robots.coords[:,0].copy(), robots.coords[:,1].copy()])
 
-    sim_data.append([robots.coords[:,0].copy(), robots.coords[:,1].copy()])
-    
-    # not ideal to do low-level logic in high level logic like this.
-    # better to handle the logic inside a handler within the logger after passing it all the
-    # relevant robot data.
-    for r in range(len(robots.coords)):
-        x = robots.coords[r,0]
-        y = robots.coords[r,1]
-        logger_sp.log_spatial(r, t, x, y)
-
-        if x == start_line:
-            drone_entry_times.update({r: t})
-        elif x == finish_line:
-            entryTime = drone_entry_times.get(r, -1) # Return negative 1 if the drone
-            exitTime = t                           # did not cross the start line.
-            logger_ms.log_makespan(r, entryTime, exitTime)
-
-data = pd.DataFrame(data = sim_data, columns = ["x","y"])
-
-outdat = os.path.join(datadir, "demo.csv")
-
-data.to_csv(outdat, lineterminator = "")
-
-logger_sp.export_data()
-logger_ms.export_data()
-
+playback_log.export_data()
