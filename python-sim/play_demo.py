@@ -10,11 +10,7 @@ from arg_parser import parse_args
 ########################## PARAMETERS ###########################################
 sim_args = parse_args(sys.argv)
 
-sim_time = sim_args.time_seconds * sim_args.FPS
 ss = sim_args.cell_size * sim_args.gridnum
-
-start_line = 1
-finish_line = sim_args.gridnum-1
 
 # Either provide file, or specify parameters. If param not specified, use defaults.
 # Search for the recorded simulation that matches exactly.
@@ -84,7 +80,6 @@ for i in range(replay_data['x'].shape[0]):
 
 # init robots
 env = Environment(sim_args.gridnum, sim_args.seed,
-                  start_line, finish_line,
                   sim_args.boundary, sim_args.boundary_angle, sim_args.boundary_offset)
 
 coords = np.array([x_list,y_list]).T
@@ -109,11 +104,11 @@ for time in range(len(replay_data)):
         c = coords[r,time]
 
     # Draw the start and finish Lines:
-    pygame.draw.rect(screen, (255, 255, 0), 
-                     pygame.Rect(sim_args.cell_size * start_line, 0, sim_args.cell_size, ss))
+    pygame.draw.rect(screen, (255, 255, 0),
+                     pygame.Rect(sim_args.cell_size * env.start_line, 0, sim_args.cell_size, ss))
 
-    pygame.draw.rect(screen, (0, 255, 0), 
-                     pygame.Rect(sim_args.cell_size * (finish_line-1), 0, sim_args.cell_size, ss))
+    pygame.draw.rect(screen, (0, 255, 0),
+                     pygame.Rect(sim_args.cell_size * (env.finish_line - 1), 0, sim_args.cell_size, ss))
 
     # Draw obstacles:
     for row in range(sim_args.gridnum):

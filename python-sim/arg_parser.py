@@ -13,10 +13,6 @@ return: a namespace with parsed arguments'''
                         help="frames per second", 
                         type=int, default=Params.FPS)
 
-    parser.add_argument("-t", "--time-seconds", 
-                        help="simulation runtime in seconds", 
-                        type=int, default=Params.time_seconds)
-
     parser.add_argument("-g", "--gridnum", 
                         help="number of grid cells along one side of the window.", 
                         type=int, default=Params.gridnum)
