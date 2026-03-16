@@ -12,13 +12,12 @@ class Params:
     density = 1
 
     boundary = False
-    boundary_angle = math.pi / 8
+    boundary_angle = 22.5
     boundary_offset = -10
 
     # Params mainly for playback
     # TODO Separate from playback params
     FPS = 10
     time_seconds = 10
-    sim_time = time_seconds*FPS
     cell_size = 10 # Size of a grid cell in px
     ss = gridnum * cell_size  # screen size (px)

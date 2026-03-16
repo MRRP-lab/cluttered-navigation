@@ -12,7 +12,7 @@ class Environment():
         self.rng = np.random.default_rng(seed)
         self.obstacles = self.generate_plinko_grid(5, 5, 1, 1)
         if boundary:
-            self.add_reflecting_boundary(self.obstacles, boundary_angle, boundary_offset)
+            self.add_reflecting_boundary(self.obstacles, math.radians(boundary_angle), boundary_offset)
 
         self.startLine = startLine
         self.finishLine = finishLine

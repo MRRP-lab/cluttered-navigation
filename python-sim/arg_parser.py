@@ -44,7 +44,7 @@ return: a namespace with parsed arguments'''
 
     parser.add_argument("-a", "--boundary_angle", 
                         help="Positive and negative reflecting boundary angle in degrees", 
-                        type=int, default=Params.boundary_angle)
+                        type=float, default=Params.boundary_angle)
 
     parser.add_argument("--boundary-offset",
                         help="X offset for the reflecting boundary.",

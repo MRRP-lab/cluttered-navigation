@@ -1,5 +1,4 @@
 import os
-import math
 import yaml
 import pandas as pd
 
@@ -10,11 +9,10 @@ from datetime import datetime
 class DataLogger():
 
     def __init__(self, sim_args):
-        self.sim_args = sim_args
-        print(sim_args)
-
+        self.sim_args = vars(sim_args)
         # set the filepath of the output data, coming up with an identifier by hashing the params.
         self.simulation_id = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
+        self.sim_args["simulation_id"] = self.simulation_id
         self.data = []
 
         # Generate filepath from the directory this file is in:
@@ -26,7 +24,7 @@ class DataLogger():
 
         parameter_path = os.path.join(self.directory, "params.yaml")
         with open(parameter_path, "w") as f:
-            yaml.safe_dump(vars(self.sim_args), f)
+            yaml.safe_dump(self.sim_args, f)
 
     def add_data(self, data):
         self.data.append(data)

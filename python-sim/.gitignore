@@ -1,8 +1,9 @@
 .python-version
 _frames/
-data/
 my-venv/
+data/runs/
+data/index.csv
 venv
 videos/
-test.sh
+
 
