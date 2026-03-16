@@ -54,15 +54,6 @@ return: a namespace with parsed arguments'''
                         help="Density of robot group spawn. 0-1, 1 represents perfect compression.",
                         type=float, default=Params.density)
 
-    parser.add_argument("-X", "-x",
-                        help="X-coordinate of robot group spawn",
-                        type=int, default=Params.X)
-
-    parser.add_argument("-Y", "-y",
-                        help="Y-coordinate of robot group spawn",
-                        type=int, default=Params.Y)
-    
-    
 
     #parse arguments 
     #and return namespace with arguments

@@ -11,7 +11,7 @@ class PlinkoState(Enum):
     TRAPPED = 3
 
 class Robots():
-    def __init__(self, N, spawn, density, seed):
+    def __init__(self, N, density, seed):
         #TODO separate env from robot, set env separately. Make boundary a function call to add it.
         self.env = None
         self.num = N
@@ -20,6 +20,7 @@ class Robots():
         self.coords = np.reshape(coords, (self.num, 2))
 
         # We can't give our robots an actual location until we know where the start line is.
+        # Always spawn them behind the start line.
         self.spawn_radius, self.offsets = self.generate_circular_spawn_offsets(density)
         # TODO: Separate navigation logic for each different strategy
         # to a different place.
@@ -27,7 +28,7 @@ class Robots():
 
         # For crowd compression reasons, keep robots such that
         # we can update the rightmost ones first.
-        self.re_sort_rightmost()
+        #self.re_sort_rightmost()
 
     # it gets a function in case there are special things we need to do
     def set_environment(self, env):

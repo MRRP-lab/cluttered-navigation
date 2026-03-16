@@ -28,7 +28,6 @@ N = sim_args.N
 seed = sim_args.seed
 strategy = sim_args.strategy
 
-spawnpoint = (sim_args.X, sim_args.Y)
 spawn_density = sim_args.density
 
 boundary = sim_args.boundary
@@ -47,7 +46,7 @@ playback_log = DataLogger(sim_args)
 
 ### Load Configs
 env = Environment(gridnum, seed, start_line, finish_line, boundary, boundary_angle, boundary_offset)
-robots = Robots(N, spawnpoint, spawn_density, seed)
+robots = Robots(N, spawn_density, seed)
 robots.set_environment(env)
 
 ### Simulation Loop
