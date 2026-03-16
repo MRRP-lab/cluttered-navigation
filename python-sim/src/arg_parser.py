@@ -6,7 +6,7 @@ def parse_args(raw_args):
 pre: raw_args is a string array
 return: a namespace with parsed arguments'''
     parser = argparse.ArgumentParser(
-            description="""Set parameters for cluttered-navigation python drone simulation. Override default values by passing arguments.  Arguments can be given in the following syntax (using FPS as an example): -f 60 --fps 60 -f=60 --fps=60.  In the case of --FPS and -N, they can also be written in all capitals.  In the case of -N, there is no long-form counterpart.  """,
+            description="""Set parameters for cluttered-navigation python drone simulation. Override default values by passing arguments. Arguments can be given in the following syntax (using FPS as an example): -f 60 --fps 60 -f=60 --fps=60. In the case of --FPS and -N, they can also be written in all capitals.""",
             prog=raw_args[0])
 
     parser.add_argument("-f", "--FPS", "--fps", 
@@ -17,9 +17,9 @@ return: a namespace with parsed arguments'''
                         help="number of grid cells along one side of the window.", 
                         type=int, default=Params.gridnum)
 
-    parser.add_argument("-N", "-n", 
+    parser.add_argument("-N", "-n", "--num",
                         help="number of drones in simulation", 
-                        type=int, default=Params.N)
+                        type=int, default=Params.num)
 
     parser.add_argument("-s", "--strategy", 
                         help="choose decentralized or centralized strategy", 

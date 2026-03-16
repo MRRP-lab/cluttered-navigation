@@ -18,7 +18,7 @@ playback_log = DataLogger(sim_args)
 ### Load Configs
 env = Environment(sim_args.gridnum, sim_args.seed,
                   sim_args.boundary, sim_args.boundary_angle, sim_args.boundary_offset)
-robots = Robots(sim_args.N, sim_args.density, sim_args.seed)
+robots = Robots(sim_args.num, sim_args.density, sim_args.seed)
 robots.set_environment(env)
 
 ### Simulation Loop

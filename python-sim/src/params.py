@@ -1,7 +1,7 @@
 class Params:
     # Params mainly for sim generation
     gridnum = 50 # num of grid cells along one side of the window
-    N = 100
+    num = 100
     seed = 1
     strategy = "decentralized"
 

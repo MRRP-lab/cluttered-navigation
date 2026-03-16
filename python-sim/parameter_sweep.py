@@ -4,19 +4,19 @@ import subprocess
 import itertools
 from concurrent.futures import ProcessPoolExecutor
 
-
+# All keys will have a double hyphen appended. Ensure these use the same form as the long argument name.
 params = {
-        "N": [50, 100],
-        "boundary": [False, True],
-        "boundary_angle": [22.5, 20, 15],
-        "experiment_name": "test 1"
+        "num": [50, 100],
+        "boundary-angle": [22.5, 15],
+        "experiment-name": "test 2"
         }
 
 simulator = "./generate_demo.py"
+indexer = "./data/index_gen.py"
 
 # If we don't do this, itertools.product will treat strings as a list of characters.
 normalized = {
-        k: [v] if isinstance(v, str) or v is None else v
+        k: [v] if isinstance(v, str, int, float) or v is None else v
         for k, v in params.items()
         }
 
@@ -41,7 +41,8 @@ def run_single_sim(params):
         return {
                 "exit_code": result.returncode,
                 "stderr": result.stderr if result.returncode != 0 else "",
-                "status": "SUCCESS" if result.returncode == 0 else "FAILED"
+                "status": "SUCCESS" if result.returncode == 0 else "FAILED",
+                "cmd": args
                 }
     except Exception as e:
         return {**params, "status": "CRASHED", "err": str(e)}
@@ -51,3 +52,35 @@ def run_sweep(all_combinations):
         results = list(executor.map(run_single_sim, all_combinations))
 
     return results
+
+print("Running parameter sweep now.")
+results = run_sweep(combinations)
+
+full_success = True
+for result in results:
+    # Advanced debug
+    #for k, v in result.items():
+    #    print(f"{k}:", v)
+    match(result["status"]):
+        case "CRASHED":
+            full_success = False
+            print("Simulation crashed with err:")
+            print(result["err"])
+        case "FAILED":
+            full_success = False
+            print(f"Simulation failed with code {result["exit_code"]}:")
+            print(result["stderr"])
+
+if (full_success):
+    print("All simulations successful!")
+
+indexing_result = subprocess.run([sys.executable, indexer],
+                                 capture_output=True,
+                                 text=True,
+                                 check=False
+                                 )
+if (indexing_result.returncode == 0):
+    print("Simulation re-indexing successful.")
+else:
+    print(f"Simulation re-indexing unsuccessful. Exit code: {indexing_result.returncode}")
+
