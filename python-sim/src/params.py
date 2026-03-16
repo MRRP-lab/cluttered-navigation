@@ -15,4 +15,4 @@ class Params:
     FPS = 10
     cell_size = 10 # Size of a grid cell in px
 
-    experiment_name = "None"
+    experiment_name = "Default"

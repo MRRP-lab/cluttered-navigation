@@ -1,11 +1,11 @@
 import sys
 
 # custom imports
-from robots import Robots
-from environment import Environment
-from arg_parser import parse_args
+from src.robots import Robots
+from src.environment import Environment
+from src.arg_parser import parse_args
 
-from data_logger import DataLogger
+from src.data_logger import DataLogger
 
 ########################## PARAMETERS ###########################################
 sim_args = parse_args(sys.argv)

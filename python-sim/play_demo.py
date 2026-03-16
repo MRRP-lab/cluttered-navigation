@@ -4,8 +4,8 @@ import pandas as pd
 import os
 import glob
 import sys
-from environment import Environment
-from arg_parser import parse_args
+from src.environment import Environment
+from src.arg_parser import parse_args
 
 ########################## PARAMETERS ###########################################
 sim_args = parse_args(sys.argv)
@@ -18,9 +18,9 @@ def find_simulation(params):
     if not os.path.exists("./data/index.csv"):
         raise FileNotFoundError("Index not found.")
     index = pd.read_csv("./data/index.csv")
-
+    print(index)
     query = vars(params)
-
+    print(query)
     cols = [key for key in query if key in index.columns]
     mask = (index[list(cols)] == pd.Series(query)[cols]).all(axis=1)
     result = index[mask]

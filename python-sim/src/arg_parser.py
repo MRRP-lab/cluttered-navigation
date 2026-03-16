@@ -1,5 +1,5 @@
 import argparse
-from params import Params
+from src.params import Params
 
 def parse_args(raw_args):
     '''Desc: parses arguments for the play_demo.py and generate_demo.py files.
