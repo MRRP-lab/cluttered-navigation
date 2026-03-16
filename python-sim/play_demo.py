@@ -100,7 +100,7 @@ for time in range(len(replay_data)):
     # fill the background with white
     screen.fill((255,255,255))
 
-    for r in range(sim_args.N):
+    for r in range(sim_args.num):
         c = coords[r,time]
 
     # Draw the start and finish Lines:
@@ -133,7 +133,7 @@ for time in range(len(replay_data)):
 
     centering_offset = np.array([sim_args.cell_size / 2, sim_args.cell_size / 2]) + np.array([1, 1])
     # update robot positions
-    for r in range(sim_args.N):
+    for r in range(sim_args.num):
 
         c = coords[r,time] * sim_args.cell_size
         pygame.draw.circle(screen, (0,0,255), np.ceil(c) + centering_offset, max(sim_args.cell_size/2 - 1, 2))
