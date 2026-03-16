@@ -10,6 +10,7 @@ class DataLogger():
 
     def __init__(self, sim_args):
         self.sim_args = vars(sim_args)
+
         # set the filepath of the output data, coming up with an identifier by hashing the params.
         self.simulation_id = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
         self.sim_args["simulation_id"] = self.simulation_id

@@ -14,8 +14,8 @@ class Environment():
         if boundary:
             self.add_reflecting_boundary(self.obstacles, math.radians(boundary_angle), boundary_offset)
 
-        self.startLine = startLine
-        self.finishLine = finishLine
+        self.start_line = startLine
+        self.finish_line = finishLine
 
     def generate_random_obstacles(self, density):
         obstacles = np.full(self.grid_num**2, 0)
@@ -127,7 +127,7 @@ class Environment():
             obstacles[y, x] = value
 
     def is_startLine(self, x, y):
-        return (x == self.startLine)
+        return (x == self.start_line)
     
     def is_finishLine(self, x, y):
         return (x == self.finishLine)

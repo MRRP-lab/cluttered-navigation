@@ -24,7 +24,7 @@ def find_simulation(params):
     index = pd.read_csv("./data/index.csv")
 
     query = vars(params)
-    
+
     cols = [key for key in query if key in index.columns]
     print("QUERY")
     print(query)
@@ -37,7 +37,9 @@ def find_simulation(params):
     if (match_count == 0):
         raise FileNotFoundError("A simulation with the supplied parameters is not indexed.")
     elif (match_count > 1):
-        raise 
+        # TODO shouldn't be a generic exception. couldnt be asked to deal with figuring it out.
+        # we should make the user specify which one.
+        raise Exception("Ambiguous parameter set, could be a few different simulations")
     else:
         return result.iloc[0]
 
