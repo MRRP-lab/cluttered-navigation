@@ -10,7 +10,7 @@ class Environment():
         self.x_coords = np.arange(0, self.grid_num, dtype=float)
         self.seed = seed
         self.rng = np.random.default_rng(seed)
-        self.obstacles = self.generate_plinko_grid(4, 2, 1, 0)
+        self.obstacles = self.generate_plinko_grid(1, 2, 1, 0)
         if boundary:
             self.add_reflecting_boundary(self.obstacles, math.radians(boundary_angle), boundary_offset)
 

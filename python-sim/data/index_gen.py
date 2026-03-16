@@ -4,7 +4,7 @@ import pandas as pd
 import yaml
 
 # TODO: Centralize the names somewhere so we can do this programmatically instead. Parameters are very fragile this way.
-indexed_columns = ["simulation_id",
+indexed_columns = ["simulation_id", "experiment_name",
                    "N", "seed", "strategy",
                    "density",
                    "boundary", "boundary_angle", "boundary_offset"]

@@ -6,7 +6,7 @@ def parse_args(raw_args):
 pre: raw_args is a string array
 return: a namespace with parsed arguments'''
     parser = argparse.ArgumentParser(
-            description="""Set parameters for cluttered-navigation python drone simulation. Override default values by passing arguments.  Arguments can be given in the following syntax (using FPS as an example): -f 60 --fps 60 -f=60 --fps=60.  In the case of --FPS and -N, they can also be written in all capitals.  In the case of -N and -v, they do NOT have long-form counterparts.  """,
+            description="""Set parameters for cluttered-navigation python drone simulation. Override default values by passing arguments.  Arguments can be given in the following syntax (using FPS as an example): -f 60 --fps 60 -f=60 --fps=60.  In the case of --FPS and -N, they can also be written in all capitals.  In the case of -N, there is no long-form counterpart.  """,
             prog=raw_args[0])
 
     parser.add_argument("-f", "--FPS", "--fps", 
@@ -38,7 +38,7 @@ return: a namespace with parsed arguments'''
                         help="Include to add a reflecting boundary.",
                         default=Params.boundary, action="store_true")
 
-    parser.add_argument("-a", "--boundary_angle", 
+    parser.add_argument("-a", "--boundary-angle", 
                         help="Positive and negative reflecting boundary angle in degrees", 
                         type=float, default=Params.boundary_angle)
 
@@ -49,6 +49,10 @@ return: a namespace with parsed arguments'''
     parser.add_argument("-d", "-D", "--density", 
                         help="Density of robot group spawn. 0-1, 1 represents perfect compression.",
                         type=float, default=Params.density)
+
+    parser.add_argument("--experiment-name",
+                        help="Name an experiment for easier filtering during analysis.",
+                        type=str, default=Params.experiment_name)
 
 
     #parse arguments 
