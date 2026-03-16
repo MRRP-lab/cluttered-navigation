@@ -16,8 +16,5 @@ class Params:
     boundary_offset = -10
 
     # Params mainly for playback
-    # TODO Separate from playback params
     FPS = 10
-    time_seconds = 10
     cell_size = 10 # Size of a grid cell in px
-    ss = gridnum * cell_size  # screen size (px)

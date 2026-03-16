@@ -28,7 +28,7 @@ class Robots():
 
         # For crowd compression reasons, keep robots such that
         # we can update the rightmost ones first.
-        #self.re_sort_rightmost()
+        self.re_sort_rightmost()
 
     # it gets a function in case there are special things we need to do
     def set_environment(self, env):
@@ -93,16 +93,25 @@ class Robots():
 
     # Drives movement updates for robots in their environment.
     # Update robots from the right to left side of the screen.
+    # Returns true if any robot has made progress towards the goal.
     def update_movement(self):
-        for r in range(self.num):
-            self.plinko_movement_policy(r)
+        progress = False
+        for k in range(self.num):
+            r = self.rightmost_sorted_robots[k]
+            progress |= self.plinko_movement_policy(r)
+
+        # TODO really slow? With or without this, there is artifacting in robot dispersion.
+        self.re_sort_rightmost()
+        return progress
 
     # Move right. At an obstacle, randomly choose either up or down.
     # TODO: Separate navigation strategy logic out of Robots.
+    # Returns True if made progress and hasn't passed the finish line.
     def plinko_movement_policy(self, r):
         c = self.coords[r]
         xnew = c[0]
         ynew = c[1]
+        progress = False
 
         right = self.env.is_obstacle(c[0]+1, c[1]) +\
             self.is_robot(c[0]+1, c[1])
@@ -137,6 +146,8 @@ class Robots():
 
         match new_state:
             case PlinkoState.RIGHT:
+                if xnew < self.env.finish_line:
+                    progress = True
                 xnew += 1
             case PlinkoState.UP:
                 ynew -= 1
@@ -146,6 +157,8 @@ class Robots():
                 pass
 
         self.coords[r] = np.array([xnew, ynew])
+
+        return progress
 
 
     # TODO better representation of robot coordinates could make this quicker

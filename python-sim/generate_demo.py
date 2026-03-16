@@ -51,8 +51,13 @@ robots.set_environment(env)
 
 ### Simulation Loop
 
-for t in range(sim_time):
-    robots.update_movement()
+no_progress = 0
+while no_progress < 10:
+    progress = robots.update_movement()
+    if (not progress):
+        no_progress += 1
+    else:
+        no_progress = 0
     playback_log.add_data([robots.coords[:,0].copy(), robots.coords[:,1].copy()])
 
 playback_log.export_data()

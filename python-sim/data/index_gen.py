@@ -6,7 +6,7 @@ import yaml
 # TODO: Centralize the names somewhere so we can do this programmatically instead. Parameters are very fragile this way.
 indexed_columns = ["simulation_id",
                    "N", "seed", "strategy",
-                   "X", "Y", "density",
+                   "density",
                    "boundary", "boundary_angle", "boundary_offset"]
 
 path = os.path.dirname(__file__)

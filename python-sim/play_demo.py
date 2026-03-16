@@ -26,11 +26,7 @@ def find_simulation(params):
     query = vars(params)
 
     cols = [key for key in query if key in index.columns]
-    print("QUERY")
-    print(query)
     mask = (index[list(cols)] == pd.Series(query)[cols]).all(axis=1)
-    print("RESULT")
-    print(index[mask])
     result = index[mask]
 
     match_count = len(result)
@@ -98,7 +94,7 @@ running = True
 # sim loop
 framenum = 0
 
-for time in range(sim_time):
+for time in range(len(replay_data)):
     if(not running):
         break
     # did the user click the close button?
