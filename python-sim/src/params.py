@@ -13,6 +13,6 @@ class Params:
 
     # Params mainly for playback
     FPS = 10
-    cell_size = 10 # Size of a grid cell in px
+    cell_size = 5 # Size of a grid cell in px
 
     experiment_name = "Default"

@@ -15,6 +15,9 @@ ss = sim_args.cell_size * sim_args.gridnum
 # Either provide file, or specify parameters. If param not specified, use defaults.
 # Search for the recorded simulation that matches exactly.
 def find_simulation(params):
+    # Ignore experiment name when searching
+    del params.experiment_name
+
     if not os.path.exists("./data/index.csv"):
         raise FileNotFoundError("Index not found.")
     index = pd.read_csv("./data/index.csv")
@@ -24,7 +27,7 @@ def find_simulation(params):
     cols = [key for key in query if key in index.columns]
     mask = (index[list(cols)] == pd.Series(query)[cols]).all(axis=1)
     result = index[mask]
-
+    print(result)
     match_count = len(result)
     if (match_count == 0):
         raise FileNotFoundError("A simulation with the supplied parameters is not indexed.")

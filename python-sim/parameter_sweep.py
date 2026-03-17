@@ -1,4 +1,3 @@
-import os
 import sys
 import subprocess
 import itertools
@@ -6,9 +5,11 @@ from concurrent.futures import ProcessPoolExecutor
 
 # All keys will have a double hyphen appended. Ensure these use the same form as the long argument name.
 params = {
-        "num": [50, 100],
-        "boundary-angle": [22.5, 15],
-        "experiment-name": "test 2"
+        "num": [n*50 for n in range(1, 10)],
+        "gridnum": 300,
+        "boundary": True,
+        "boundary-angle": 22.5,
+        "experiment-name": "angle fixed 22.5"
         }
 
 simulator = "./generate_demo.py"
@@ -16,7 +17,7 @@ indexer = "./data/index_gen.py"
 
 # If we don't do this, itertools.product will treat strings as a list of characters.
 normalized = {
-        k: [v] if isinstance(v, str, int, float) or v is None else v
+        k: [v] if isinstance(v, (str, int, float)) or v is None else v
         for k, v in params.items()
         }
 
@@ -29,7 +30,13 @@ print(combinations)
 def run_single_sim(params):
     args = [sys.executable, simulator]
     for k, v in params.items():
-        args.extend([f"--{k}", str(v)])
+
+        if isinstance(v, bool):
+            if v:
+                args.extend([f"--{k}"])
+        else:
+            args.extend([f"--{k}", str(v)])
+
     try:
         result = subprocess.run(
                 args,
@@ -48,6 +55,7 @@ def run_single_sim(params):
         return {**params, "status": "CRASHED", "err": str(e)}
 
 def run_sweep(all_combinations):
+    # TODO: Add progress counter
     with ProcessPoolExecutor() as executor:
         results = list(executor.map(run_single_sim, all_combinations))
 
