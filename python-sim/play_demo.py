@@ -6,7 +6,7 @@ import glob
 import sys
 from src.environment import Environment
 from src.arg_parser import parse_args
-
+from src.spawn_layout import SpawnLayout
 ########################## PARAMETERS ###########################################
 sim_args = parse_args(sys.argv)
 
@@ -80,10 +80,13 @@ for i in range(replay_data['x'].shape[0]):
 
 
 ########################## MAIN  ###########################################3
+start_line = 0
+spawn_layout = SpawnLayout(sim_args.seed, sim_args.num, sim_args.density,
+                           sim_args.gridnum, start_line
+                           )
 
-# init robots
 env = Environment(sim_args.gridnum, sim_args.seed,
-                  sim_args.boundary, sim_args.boundary_angle, sim_args.boundary_offset)
+                  sim_args.boundary, sim_args.boundary_angle, spawn_layout.boundary_line_y_offset)
 
 coords = np.array([x_list,y_list]).T
 

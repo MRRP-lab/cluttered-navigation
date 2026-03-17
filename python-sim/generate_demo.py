@@ -4,6 +4,7 @@ import sys
 from src.robots import Robots
 from src.environment import Environment
 from src.arg_parser import parse_args
+from src.spawn_layout import SpawnLayout
 
 from src.data_logger import DataLogger
 
@@ -15,10 +16,16 @@ playback_log = DataLogger(sim_args)
 
 ############################### MAIN ##############################################
 
-### Load Configs
+### Initialize things
+start_line = 0
+
+spawn_layout = SpawnLayout(sim_args.seed, sim_args.num, sim_args.density,
+                           sim_args.gridnum, start_line
+                           )
 env = Environment(sim_args.gridnum, sim_args.seed,
-                  sim_args.boundary, sim_args.boundary_angle, sim_args.boundary_offset)
-robots = Robots(sim_args.num, sim_args.density, sim_args.seed)
+                  sim_args.boundary, sim_args.boundary_angle, spawn_layout.boundary_line_y_offset
+                  )
+robots = Robots(sim_args.num, sim_args.seed, spawn_layout.offsets)
 robots.set_environment(env)
 
 ### Simulation Loop

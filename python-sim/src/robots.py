@@ -1,8 +1,5 @@
 import numpy as np
 from enum import Enum
-import math
-import heapq
-import itertools
 
 class PlinkoState(Enum):
     RIGHT = 0
@@ -11,17 +8,12 @@ class PlinkoState(Enum):
     TRAPPED = 3
 
 class Robots():
-    def __init__(self, N, density, seed):
-        #TODO separate env from robot, set env separately. Make boundary a function call to add it.
+    def __init__(self, N, seed, spawns):
         self.env = None
         self.num = N
         self.rng = np.random.default_rng(seed)
-        coords = np.full(self.num * 2, 0)
-        self.coords = np.reshape(coords, (self.num, 2))
+        self.coords = spawns
 
-        # We can't give our robots an actual location until we know where the start line is.
-        # Always spawn them behind the start line.
-        self.spawn_radius, self.offsets = self.generate_circular_spawn_offsets(density)
         # TODO: Separate navigation logic for each different strategy
         # to a different place.
         self.plinko_state = np.full(self.num, PlinkoState.RIGHT)
@@ -33,59 +25,7 @@ class Robots():
     # it gets a function in case there are special things we need to do
     def set_environment(self, env):
         self.env = env
-        self.spawn_before_start_line(self.spawn_radius, self.offsets)
 
-    # Spawn robots in a circular manner around a point such that no robots are overlapping.
-    def generate_circular_spawn_offsets(self, density):
-        tiebreaker = itertools.count()
-
-        square_r = 1
-        r = 1
-        spawned = 0
-        points = [(0, next(tiebreaker), np.array([0, 0]))]
-        raw_offsets = []
-
-        # Dynamically keep track of the furthest extent so we can adjust the X coordinates
-        # to behind the starting line.
-        max_radius = 0
-        while spawned < self.num:
-            offsets = []
-            for offset in range(-square_r, square_r+1):
-                offsets.append(np.array([offset, square_r])) # Top
-                offsets.append(np.array([offset, -square_r])) # Bottom
-
-            for offset in range(-square_r+1, square_r):
-                offsets.append(np.array([square_r, offset])) # Right
-                offsets.append(np.array([-square_r, offset])) # Left
-
-            new_entries = []
-            for rel_pos in offsets:
-                new_entries.append((np.linalg.norm(rel_pos), next(tiebreaker), rel_pos))
-
-            points.extend(new_entries)
-            heapq.heapify(points)
-            square_r += 1
-
-            while (spawned < self.num and len(points) > 0 and
-                   points[0][0] < r and points[0][0] >= r-1):
-                nearest = heapq.heappop(points)
-                if (self.rng.random() < density):
-                    if nearest[0] > max_radius:
-                        max_radius = nearest[0]
-                    raw_offsets.append(nearest[2])
-                    spawned += 1
-            r += 1
-            # While the heap is not empty and the min element is within the current ring,
-            # pop it and place a robot there. Stop when no more bots to place.
-        return max_radius, np.array(raw_offsets)
-
-    # Move behind the start line
-    def spawn_before_start_line(self, furthest_extent, offsets):
-        start_line = self.env.start_line
-        map_height = self.env.grid_num
-        center = np.array([math.floor(-furthest_extent) + start_line,  math.floor(map_height / 2)])
-        for r in range(self.num):
-            self.coords[r] = offsets[r] + center
 
     def re_sort_rightmost(self):
         self.rightmost_sorted_robots = sorted(range(self.num), reverse=True,

@@ -3,7 +3,7 @@ import subprocess
 import itertools
 from concurrent.futures import ProcessPoolExecutor
 
-# All keys will have a double hyphen appended. Ensure these use the same form as the long argument name.
+# All keys will have a double hyphen added. Ensure these use the same form as the long argument name.
 params = {
         "num": [n*50 for n in range(1, 10)],
         "gridnum": 300,
@@ -25,7 +25,7 @@ keys = normalized.keys()
 values = normalized.values()
 
 combinations = [dict(zip(keys, v)) for v in itertools.product(*values)]
-print(combinations)
+# print(combinations)
 
 def run_single_sim(params):
     args = [sys.executable, simulator]

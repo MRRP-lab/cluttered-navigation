@@ -50,16 +50,20 @@ class Environment():
             offset = (offset + 1) % (pin_gap + 1)
         return obstacles
 
-    def add_reflecting_boundary(self, obstacles, angle, x_offset):
-        line_length = 200
-        x0 = x_offset
-        y0 = round(obstacles.shape[1] / 2)
-        x1 = round(x0 + line_length * math.cos(angle)) + x_offset
-        y1_neg = round(y0 - line_length * math.sin(angle))
-        y1_pos = round(y0 + line_length * math.sin(angle))
+    def add_reflecting_boundary(self, obstacles, angle, y_offset):
+        # max possible just to make sure our boundary gets to the end
+        line_length = self.grid_num * math.sqrt(2)
+        start_x = 0
+        end_x = round(line_length * math.cos(angle))
+        # top and bottom visually
+        top_y0 = round((self.grid_num / 2) - y_offset)
+        top_y1 = round(top_y0 - line_length * math.sin(angle))
 
-        self.add_rasterized_obstacle_line(obstacles, x0, y0, x1, y1_neg)
-        self.add_rasterized_obstacle_line(obstacles, x0, y0, x1, y1_pos)
+        bot_y0 = round((self.grid_num / 2) + y_offset)
+        bot_y1 = round(top_y0 + line_length * math.sin(angle))
+
+        self.add_rasterized_obstacle_line(obstacles, start_x, top_y0, end_x, top_y1)
+        self.add_rasterized_obstacle_line(obstacles, start_x, bot_y0, end_x, bot_y1)
 
     # Rasterize some lines into grid cells.
     # Right now, it casts the lines from a point starting in the middle
@@ -126,8 +130,3 @@ class Environment():
            and (y < obstacles.shape[1] and y >= 0)):
             obstacles[y, x] = value
 
-    def is_startLine(self, x, y):
-        return (x == self.start_line)
-    
-    def is_finishLine(self, x, y):
-        return (x == self.finishLine)
