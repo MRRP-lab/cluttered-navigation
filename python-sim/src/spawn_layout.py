@@ -21,7 +21,7 @@ class SpawnLayout:
     # Move behind the start line
     def spawn_before_start_line(self):
         map_height = self.grid_num
-        center = np.array([math.floor(-self.max_radius) + self.start_line,  math.floor(map_height / 2)])
+        center = np.array([math.floor(-self.max_radius) + self.start_line,  math.ceil(map_height / 2)])
         for r in range(self.num):
             self.offsets[r] = self.offsets[r] + center
 
@@ -67,4 +67,4 @@ class SpawnLayout:
             r += 1
             # While the heap is not empty and the min element is within the current ring,
             # pop it and place a robot there. Stop when no more bots to place.
-        return max_radius, np.array(raw_offsets)
+        return 1 + math.ceil(max_radius), np.array(raw_offsets)

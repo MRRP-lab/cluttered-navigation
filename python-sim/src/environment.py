@@ -11,8 +11,10 @@ class Environment():
         self.seed = seed
         self.rng = np.random.default_rng(seed)
         self.obstacles = self.generate_plinko_grid(1, 2, 1, 0)
-        if boundary:
-            self.add_reflecting_boundary(self.obstacles, math.radians(boundary_angle), boundary_offset)
+        self.boundary = boundary
+        self.boundary_offset = boundary_offset
+        if self.boundary:
+            self.add_reflecting_boundary(self.obstacles, math.radians(boundary_angle), self.boundary_offset)
 
         self.start_line = 0
         self.finish_line = self.grid_num
@@ -53,15 +55,18 @@ class Environment():
     def add_reflecting_boundary(self, obstacles, angle, y_offset):
         # max possible just to make sure our boundary gets to the end
         line_length = self.grid_num * math.sqrt(2)
+        center_y = math.ceil(self.grid_num / 2)
         start_x = 0
         end_x = round(line_length * math.cos(angle))
+
         # top and bottom visually
-        top_y0 = round((self.grid_num / 2) - y_offset)
+        top_y0 = round(center_y - y_offset)
         top_y1 = round(top_y0 - line_length * math.sin(angle))
 
-        bot_y0 = round((self.grid_num / 2) + y_offset)
-        bot_y1 = round(top_y0 + line_length * math.sin(angle))
-
+        bot_y0 = round(center_y + y_offset)
+        bot_y1 = round(bot_y0 + line_length * math.sin(angle))
+        print("TOP: ", top_y0)
+        print("BOT: ", bot_y0)
         self.add_rasterized_obstacle_line(obstacles, start_x, top_y0, end_x, top_y1)
         self.add_rasterized_obstacle_line(obstacles, start_x, bot_y0, end_x, bot_y1)
 
@@ -118,6 +123,13 @@ class Environment():
                 plot_line_high(x0, y0, x1, y1)
 
     def is_obstacle(self, x, y):
+        # Extend straight lines out of the ends of the
+        # boundary at the beginning
+        if (self.boundary and x < 0):
+            if abs(y - round(self.grid_num / 2)) < self.boundary_offset:
+                return 0
+            else:
+                return 1
         if (x >= self.obstacles.shape[0] or x < 0):
             return 0
         if (y >= self.obstacles.shape[1] or y < 0):

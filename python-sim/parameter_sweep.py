@@ -5,11 +5,11 @@ from concurrent.futures import ProcessPoolExecutor
 
 # All keys will have a double hyphen added. Ensure these use the same form as the long argument name.
 params = {
-        "num": [n*50 for n in range(1, 10)],
-        "gridnum": 300,
+        "num": [1, 5, 9, 500],
+        "gridnum": [25, 26, 250],
         "boundary": True,
         "boundary-angle": 22.5,
-        "experiment-name": "angle fixed 22.5"
+        "experiment-name": "small num"
         }
 
 simulator = "./generate_demo.py"
