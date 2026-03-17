@@ -16,3 +16,7 @@ class Params:
     cell_size = 5 # Size of a grid cell in px
 
     experiment_name = "Default"
+
+    row_gap = 2
+    pin_gap = 1
+    noise = 0

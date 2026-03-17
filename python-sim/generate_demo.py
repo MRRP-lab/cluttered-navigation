@@ -23,7 +23,8 @@ spawn_layout = SpawnLayout(sim_args.seed, sim_args.num, sim_args.density,
                            sim_args.gridnum, start_line
                            )
 env = Environment(sim_args.gridnum, sim_args.seed,
-                  sim_args.boundary, sim_args.boundary_angle, spawn_layout.boundary_line_y_offset
+                  sim_args.boundary, sim_args.boundary_angle, spawn_layout.boundary_line_y_offset,
+                  sim_args.row_gap, sim_args.pin_gap, sim_args.noise
                   )
 robots = Robots(sim_args.num, sim_args.seed, spawn_layout.offsets)
 robots.set_environment(env)

@@ -7,7 +7,8 @@ import yaml
 indexed_columns = ["simulation_id", "experiment_name",
                    "num", "seed", "strategy", "gridnum",
                    "density",
-                   "boundary", "boundary_angle", "boundary_offset"]
+                   "boundary", "boundary_angle", "boundary_offset", 
+                   "row_gap", "pin_gap", "noise"]
 
 path = os.path.dirname(__file__)
 index_path = os.path.join(path, "index.csv")
