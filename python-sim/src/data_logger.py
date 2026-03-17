@@ -1,18 +1,16 @@
 import os
 import yaml
 import pandas as pd
-
-# Temporary until we generate simulation_ids
-from datetime import datetime
-
+import hashlib
+import json
 
 class DataLogger():
 
     def __init__(self, sim_args):
         self.sim_args = vars(sim_args)
 
-        # set the filepath of the output data, coming up with an identifier by hashing the params.
-        self.simulation_id = datetime.now().strftime("%Y%m%d-%H%M%S-%f")
+        # TODO set the filepath of the output data, coming up with an identifier by hashing the params.
+        self.simulation_id = self.hash_params(self.sim_args)
         self.sim_args["simulation_id"] = self.simulation_id
         self.data = []
 
@@ -37,3 +35,7 @@ class DataLogger():
 
         sim_data = pd.DataFrame(data = self.data, columns = ["x","y"])
         sim_data.to_csv(playback_path, lineterminator = "")
+
+    def hash_params(self, params):
+        param_string = json.dumps(params, sort_keys=True).encode("utf-8")
+        return hashlib.sha256(param_string).hexdigest()

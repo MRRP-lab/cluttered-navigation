@@ -37,6 +37,7 @@ class SpawnLayout:
 
         # Dynamically keep track of the furthest extent so we can adjust the X coordinates
         # to behind the starting line.
+        # TODO a bounding box would be better than furthest extent.
         max_radius = 0
         while spawned < self.num:
             offsets = []
