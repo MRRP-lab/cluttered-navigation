@@ -54,6 +54,18 @@ return: a namespace with parsed arguments'''
                         help="Name an experiment for easier filtering during analysis.",
                         type=str, default=Params.experiment_name)
 
+    parser.add_argument("--pin-gap",
+                        help="The horizontal distance between obstacles.",
+                        type=int, default=Params.pin_gap)
+
+    parser.add_argument("--row-gap",
+                        help="The vertical distance between obstacles.",
+                        type=int, default=Params.row_gap)
+
+    parser.add_argument("--noise",
+                        help="Max value for randomized x/y displacement of obstacles: noisiness of obstacles.",
+                        type=int, default=Params.noise)
+    
 
     #parse arguments 
     #and return namespace with arguments

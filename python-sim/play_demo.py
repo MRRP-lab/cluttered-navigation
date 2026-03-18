@@ -82,7 +82,8 @@ spawn_layout = SpawnLayout(sim_args.seed, sim_args.num, sim_args.density,
                            )
 
 env = Environment(sim_args.gridnum, sim_args.seed,
-                  sim_args.boundary, sim_args.boundary_angle, spawn_layout.boundary_line_y_offset)
+                  sim_args.boundary, sim_args.boundary_angle, spawn_layout.boundary_line_y_offset,
+                  sim_args.row_gap, sim_args.pin_gap, sim_args.noise)
 
 coords = np.array([x_list,y_list]).T
 

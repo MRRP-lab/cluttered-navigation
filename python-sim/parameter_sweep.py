@@ -76,7 +76,7 @@ for result in results:
             print(result["err"])
         case "FAILED":
             full_success = False
-            print(f"Simulation failed with code {result["exit_code"]}:")
+            print(f'Simulation failed with code {result["exit_code"]}:')
             print(result["stderr"])
 
 if (full_success):

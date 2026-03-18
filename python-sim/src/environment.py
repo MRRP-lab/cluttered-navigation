@@ -5,12 +5,12 @@ import math
 
 
 class Environment():
-    def __init__(self, grid_num, seed, boundary, boundary_angle, boundary_offset):
+    def __init__(self, grid_num, seed, boundary, boundary_angle, boundary_offset, row_gap, pin_gap, noise):
         self.grid_num = grid_num
         self.x_coords = np.arange(0, self.grid_num, dtype=float)
         self.seed = seed
         self.rng = np.random.default_rng(seed)
-        self.obstacles = self.generate_plinko_grid(1, 2, 1, 0)
+        self.obstacles = self.generate_plinko_grid(1, row_gap, pin_gap, noise)
         self.boundary = boundary
         self.boundary_offset = boundary_offset
         if self.boundary:
