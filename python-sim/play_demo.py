@@ -4,6 +4,8 @@ import pandas as pd
 import os
 import glob
 import sys
+
+from data.index_gen import query_index, fetch_sim_file
 from src.environment import Environment
 from src.arg_parser import parse_args
 from src.spawn_layout import SpawnLayout
@@ -17,17 +19,8 @@ ss = sim_args.cell_size * sim_args.gridnum
 def find_simulation(params):
     # Ignore experiment name when searching
     del params.experiment_name
-
-    if not os.path.exists("./data/index.csv"):
-        raise FileNotFoundError("Index not found.")
-    index = pd.read_csv("./data/index.csv")
-    # print(index)
-    query = vars(params)
-    # print(query)
-    cols = [key for key in query if key in index.columns]
-    mask = (index[list(cols)] == pd.Series(query)[cols]).all(axis=1)
-    result = index[mask]
-    # print(result)
+    
+    result = query_index(params)
     match_count = len(result)
     if (match_count == 0):
         raise FileNotFoundError("A simulation with the supplied parameters is not indexed.")
@@ -46,9 +39,8 @@ viddir = './videos'
 
 # import the data from generate_demo
 sim_data = find_simulation(sim_args)
-run_directory = os.path.join("./data/runs/", sim_data["simulation_id"])
+replay_data = fetch_sim_file(sim_data["simulation_id"], "playback.csv", dtype='int32')
 
-replay_data = pd.read_csv(os.path.join(run_directory, "playback.csv"),dtype='int32')
 ########################## SETUP ##########################
 
 if not os.path.exists(viddir):
