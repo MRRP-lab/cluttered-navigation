@@ -21,13 +21,13 @@ def find_simulation(params):
     if not os.path.exists("./data/index.csv"):
         raise FileNotFoundError("Index not found.")
     index = pd.read_csv("./data/index.csv")
-    print(index)
+    # print(index)
     query = vars(params)
-    print(query)
+    # print(query)
     cols = [key for key in query if key in index.columns]
     mask = (index[list(cols)] == pd.Series(query)[cols]).all(axis=1)
     result = index[mask]
-    print(result)
+    # print(result)
     match_count = len(result)
     if (match_count == 0):
         raise FileNotFoundError("A simulation with the supplied parameters is not indexed.")
@@ -48,7 +48,7 @@ viddir = './videos'
 sim_data = find_simulation(sim_args)
 run_directory = os.path.join("./data/runs/", sim_data["simulation_id"])
 
-replay_data = pd.read_csv(os.path.join(run_directory, "playback.csv"),dtype=object)
+replay_data = pd.read_csv(os.path.join(run_directory, "playback.csv"),dtype='int32')
 ########################## SETUP ##########################
 
 if not os.path.exists(viddir):
@@ -71,13 +71,9 @@ screen = pygame.display.set_mode([ss,ss], pygame.SRCALPHA)
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("Arial", 18)
 
-x_list = []
-y_list = []
-theta_list = []
-for i in range(replay_data['x'].shape[0]):
-    x_list.append(list(map(float,replay_data['x'][i][1:-1].replace(" \n", "").split())))
-    y_list.append(list(map(float,replay_data['y'][i][1:-1].replace(" \n", "").split())))
-
+# Rearrange pd data to what we expect
+x_list = replay_data["x"].values.reshape(-1, sim_data["num"])
+y_list = replay_data["y"].values.reshape(-1, sim_data["num"])
 
 ########################## MAIN  ###########################################3
 start_line = 0
@@ -95,8 +91,8 @@ running = True
 
 # sim loop
 framenum = 0
-
-for time in range(len(replay_data)):
+sim_time = np.shape(x_list)[0]
+for time in range(sim_time):
     if(not running):
         break
     # did the user click the close button?
@@ -141,8 +137,8 @@ for time in range(len(replay_data)):
     centering_offset = np.array([sim_args.cell_size / 2, sim_args.cell_size / 2]) + np.array([1, 1])
     # update robot positions
     for r in range(sim_args.num):
-
         c = coords[r,time] * sim_args.cell_size
+        
         pygame.draw.circle(screen, (0,0,255), np.ceil(c) + centering_offset, max(sim_args.cell_size/2 - 1, 2))
 
 

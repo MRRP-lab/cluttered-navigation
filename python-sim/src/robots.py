@@ -52,7 +52,6 @@ class Robots():
         xnew = c[0]
         ynew = c[1]
         progress = False
-
         right = self.env.is_obstacle(c[0]+1, c[1]) +\
             self.is_robot(c[0]+1, c[1])
 
@@ -108,3 +107,8 @@ class Robots():
             if (x == pos[0] and y == pos[1]):
                 return 1
         return 0
+    
+    # Returns a list of entries containing these entries for each robot:
+    # [id, x, y]
+    def get_coordinate_data(self):
+        return [[i, self.coords[i, 0], self.coords[i, 1]] for i in range(self.num)]
