@@ -25,15 +25,20 @@ class DataLogger():
         with open(parameter_path, "w") as f:
             yaml.safe_dump(self.sim_args, f)
 
-    def add_data(self, data):
+    # Add a single row of data
+    def append_data(self, data):
         self.data.append(data)
+
+    # Add many rows of data where each row is an element in data
+    def extend_data(self, data):
+        self.data.extend(data)
 
     # Export data. Compute no additional calculations, as that is the job of the analytics script.
     def export_data(self):
 
         playback_path = os.path.join(self.directory, "playback.csv")
 
-        sim_data = pd.DataFrame(data = self.data, columns = ["x","y"])
+        sim_data = pd.DataFrame(data = self.data, columns = ["time", "id", "x", "y"])
         sim_data.to_csv(playback_path, lineterminator = "")
 
     def hash_params(self, params):

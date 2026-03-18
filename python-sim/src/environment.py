@@ -65,8 +65,6 @@ class Environment():
 
         bot_y0 = round(center_y + y_offset)
         bot_y1 = round(bot_y0 + line_length * math.sin(angle))
-        print("TOP: ", top_y0)
-        print("BOT: ", bot_y0)
         self.add_rasterized_obstacle_line(obstacles, start_x, top_y0, end_x, top_y1)
         self.add_rasterized_obstacle_line(obstacles, start_x, bot_y0, end_x, bot_y1)
 

@@ -1,4 +1,5 @@
 import pandas as pd
+import yaml
 import os
 import sys
 import subprocess
@@ -9,8 +10,11 @@ INDEX = "index.csv"
 INDEXER = "index_gen.py"
 
 PLAYBACK = "playback.csv"
+ANALYTICS = "analytics.yaml"
+PARAMS = "params.yaml"
 
 def main():
+    # Fetch index
     index = os.path.join(DATA_ROOT, INDEX)
     if not os.path.exists(index):
         print("Index does not exist. Generating...")
@@ -28,33 +32,60 @@ def main():
             exit(1)
 
     index_data = pd.read_csv(index)
-
+    
+    # Compute analytics.yaml for each simulation
     sim_ids = index_data["simulation_id"]
     print("Generating analytics for each simulation.")
     for sim_id in sim_ids:
-        playback_path = os.path.join(DATA_ROOT, RUNS, sim_id, PLAYBACK)
+        SIM_ROOT = os.path.join(DATA_ROOT, RUNS, sim_id)
+        playback_path = os.path.join(SIM_ROOT, PLAYBACK)
+        params_path = os.path.join(SIM_ROOT, PARAMS)
         if not os.path.exists(playback_path):
             print(f"Could not read {sim_id}. Skipping.")
         else:
-            data = compute_analytics(playback_path)
+            data = compute_analytics(playback_path, params_path)
 
-def compute_analytics(playback_file):
-    raw_playback_data = pd.read_csv(playback_file)
-    # Compute Wasserstein EMD (all time steps? which EMD?)
-    # Makespan
-    # Traversal
+            analytics = os.path.join(SIM_ROOT, ANALYTICS)
+            with open(analytics, "w") as f:
+                yaml.safe_dump(data, f)
 
-# Entry and exit times per drone.
-def compute_traversal():
+# Returns a dictionary of calculated metrics from the playback of a file.
+# Includes: EMD for each time step.
+# Traversal statistics for each drone.
+# Finish line makespan
+def compute_analytics(playback_path, params_path):
+    raw_playback_data = pd.read_csv(playback_path)
+    with open(params_path) as f:
+        params = yaml.safe_load(f)
+    print(raw_playback_data)
+    playback_data = raw_playback_data
+    data = {}
+    compute_traversal_stats(playback_data, params, data)
+    compute_makespan(playback_data, data)
+    compute_EMD(playback_data, data)
+    return data
+
+# Given the playback, params, and data, computes various statistics related to traversal and
+# adds them to data.
+def compute_traversal_stats(playback, params, data):
+    compute_traversal(playback, data, params.num)
     pass
-
-# Earth movers distance per timestep
-def compute_EMD():
+# Entry and exit times per drone. Helps with makespan
+# [start_time, y], [finish_time, y]
+# Given the playback data, add traversal times for each drone to data.
+def compute_traversal(playback, data, num):
+    traversal = []
     pass
 
 # Single number, the finishing makespan
-def compute_makespan():
+# Given the playback data and data containing traversal info, add the finish line makespan to data.
+def compute_makespan(playback, num, data):
     pass
+
+# Given the playback data, add earth movers distance per timestep to data.
+def compute_EMD(playback, data):
+    pass
+
 
 if __name__ == "__main__":
     main()

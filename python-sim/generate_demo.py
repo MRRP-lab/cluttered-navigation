@@ -31,12 +31,18 @@ robots.set_environment(env)
 ### Simulation Loop
 
 no_progress = 0
+time = 0
+
 while no_progress < 10:
     progress = robots.update_movement()
     if (not progress):
         no_progress += 1
     else:
         no_progress = 0
-    playback_log.add_data([robots.coords[:,0].copy(), robots.coords[:,1].copy()])
 
+    coordinate_data = robots.get_coordinate_data()
+    coordinate_data = [[time] + row for row in coordinate_data]
+
+    playback_log.extend_data(coordinate_data)
+    time += 1
 playback_log.export_data()
