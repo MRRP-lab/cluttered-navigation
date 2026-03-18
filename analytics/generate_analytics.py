@@ -4,6 +4,7 @@ import os
 import sys
 import subprocess
 
+
 DATA_ROOT = "../python-sim/data/"
 RUNS = "runs/"
 INDEX = "index.csv"
@@ -44,7 +45,7 @@ def main():
             print(f"Could not read {sim_id}. Skipping.")
         else:
             data = compute_analytics(playback_path, params_path)
-
+            print(data)
             analytics = os.path.join(SIM_ROOT, ANALYTICS)
             with open(analytics, "w") as f:
                 yaml.safe_dump(data, f)
@@ -54,50 +55,64 @@ def main():
 # Traversal statistics for each drone.
 # Finish line makespan
 def compute_analytics(playback_path, params_path):
-    playback_data = pd.read_csv(playback_path)
+    playback = pd.read_csv(playback_path)
     with open(params_path) as f:
         params = yaml.safe_load(f)
     data = {}
 
-    compute_traversal_stats(playback_data, params, data)
-    compute_EMD(playback_data, data)
+    # Data that is useful for multiple calculations, but in the end we won't be keeping.
+    intermediate_data = {}
+    intermediate_data["starts"] = playback[playback["x"] == 0]
+    intermediate_data["finishes"] = playback[playback["x"] == params["gridnum"]]
+
+    compute_traversal_stats(playback, data, intermediate_data, params)
+    # compute_EMD(playback, data)
     return data
 
 # Given the playback, params, and data, computes various statistics related to traversal and
 # adds them to data.
-def compute_traversal_stats(playback, params, data):
-    compute_traversal(playback, data, params)
-    compute_makespan(playback, data, params)
-    pass
+def compute_traversal_stats(playback, data, intermediate_data, params):
+
+    compute_traversal(playback, data, intermediate_data, params)
+    compute_makespan(playback, data, intermediate_data, params)
+
 # Entry and exit times per drone. Helps with makespan
 # {'entry': [start_time, y], 'exit': [finish_time, y]}
 # Given the playback data, add traversal times for each drone to data.
-def compute_traversal(playback, data, params):
+def compute_traversal(playback, data, intermediate_data, params):
     data["traversal"] = []
-    starts = playback[playback["x"] == 0]
-    finishes = playback[playback["x"] == params["gridnum"]]
 
     # Left join so we can detect when a robot starts but never finishes.
-    merged = starts.merge(finishes, on="id", how="left", suffixes=("_entry", "_exit"))
+    merged = intermediate_data["starts"].merge(
+            intermediate_data["finishes"],
+            on="id", how="left", suffixes=("_entry", "_exit"))
+
     merged = merged.fillna(-1)
     data["traversal"] = [
             {
                 "id": row.id,
-                "entry": [row.time_entry, row.y_entry],
-                "exit": [row.time_exit, row.y_exit]
+                "time": row.time_exit - row.time_entry if row.time_exit > -1 else -1,
+                "y_i": row.y_entry,
+                "y_f": row.y_exit
             }
             for row in merged.itertuples()
      ]
 
 # Single number, the finishing makespan
 # Given the playback data and data containing traversal info, add the finish line makespan to data.
-def compute_makespan(playback, data, num):
-    pass
+def compute_makespan(playback, data, intermediate_data, params):
+    #last finish time - first finish time
+    finishes = intermediate_data["finishes"]["time"]
 
-# Given the playback data, add earth movers distance per timestep to data.
-def compute_EMD(playback, data):
-    pass
+    # Drones that never finish get a time of -1
+    finishes = finishes[finishes > -1]
 
+    first_finish = intermediate_data["finishes"]["time"].min()
+    last_finish = intermediate_data["finishes"]["time"].max()
+    intermediate_data["last_finish"] = last_finish
+
+    # PyYAML doesn't support numpy types when dumping to file.
+    data["makespan"] = int(last_finish - first_finish)
 
 if __name__ == "__main__":
     main()
