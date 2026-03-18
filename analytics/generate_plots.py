@@ -6,6 +6,23 @@ import numpy as np
 from scipy.stats import wasserstein_distance
 import matplotlib.pyplot as plt
 
+# PLOT IDEAS
+# Main ideas: Compare centralized vs. decentralized.
+
+# Makespan:
+# Makespan vs. drone count (each strategy)
+# Makespan vs. angle (each strategy)
+
+# Traversal:
+# Avg traversal time vs. drone count (violin or scatter?) (each strategy)
+# Vs. angle (each strategy)
+
+# EMD of one reference distribution compared to an interval of some other parameter.
+#   (single vs. agg.?)
+#   0 noise obstacles to lots of noise?
+
+# So, compare metrics of each. Makespan (agg. vs. agg.), traversal (agg. vs. agg.).
+
 ROOT_FOLDER = '/mnt/files/files/school/wwu/research/robotics/simulationSwarm/cluttered-navigation/plinko-drones/output-data/root'
 MAKESPAN_DIR = 'Makespan'
 SPATIAL_DIR = 'Spatial'
@@ -86,8 +103,6 @@ def printDescriptiveStats(title, dataDict):
 def plotScatter(data, title, xLabel, yLabel, xIntTicks=False):
     """Reusable scatter plot with best-fit line and descriptive stats."""
     # Early exit if no data
-    if not data:
-        print(f"No data for {title}"); return
     xValues, yValues = zip(*data)
     # Print stats for y-values (dependent variable)
     printDescriptiveStats(title, {yLabel: yValues})
@@ -118,16 +133,6 @@ def plotBox(samplesDict, title, yLabel):
     """Reusable boxplot with descriptive stats for each group (e.g., strategy)."""
     printDescriptiveStats(title, samplesDict)
     
-    # Check if both strategies have data
-    if 'Centralized' not in samplesDict or 'Decentralized' not in samplesDict:
-        print(f"Skipping plot '{title}': Missing data for one or both strategies.\n")
-        return
-    
-    # Check if both strategies have non-empty data
-    if len(samplesDict['Centralized']) == 0 or len(samplesDict['Decentralized']) == 0:
-        print(f"Skipping plot '{title}': One or both strategies have no data points.\n")
-        return
-    
     plt.figure(figsize=FIGURE_SIZE)
     plt.boxplot(
         [samplesDict['Centralized'], samplesDict['Decentralized']],
@@ -147,6 +152,12 @@ def plotBox(samplesDict, title, yLabel):
     plt.xlabel('Strategy', fontsize=FONT_SIZE)
     plt.show()
 
+def query_simulations(params):
+    pass
+
+def fetch_sim_file(sim_id, ):
+    pass
 if __name__ == "__main__":
-    # Compute our plots
+    # Compute our plots.
+    # The user should be able to specify a range of simulation parameters to aggregate data with and plot specific simulations/aggregations against each other using various plot types.
     pass

@@ -14,41 +14,8 @@ PLAYBACK = "playback.csv"
 ANALYTICS = "analytics.yaml"
 PARAMS = "params.yaml"
 
-def main():
-    # Fetch index
-    index = os.path.join(DATA_ROOT, INDEX)
-    if not os.path.exists(index):
-        print("Index does not exist. Generating...")
-        cmd = [sys.executable, INDEXER]
-        indexing_result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                check=False
-                )
-        if (indexing_result.returncode == 0):
-            print("Simulation re-indexing successful.")
-        else:
-            print(f"Simulation re-indexing unsuccessful. Exit code: {indexing_result.returncode}")
-            exit(1)
-
-    index_data = pd.read_csv(index)
-    
-    # Compute analytics.yaml for each simulation
-    sim_ids = index_data["simulation_id"]
-    print("Generating analytics for each simulation.")
-    for sim_id in sim_ids:
-        SIM_ROOT = os.path.join(DATA_ROOT, RUNS, sim_id)
-        playback_path = os.path.join(SIM_ROOT, PLAYBACK)
-        params_path = os.path.join(SIM_ROOT, PARAMS)
-        if not os.path.exists(playback_path):
-            print(f"Could not read {sim_id}. Skipping.")
-        else:
-            data = compute_analytics(playback_path, params_path)
-            print(data)
-            analytics = os.path.join(SIM_ROOT, ANALYTICS)
-            with open(analytics, "w") as f:
-                yaml.safe_dump(data, f)
+# Unfortunately, we don't compute any statistics in here that
+# come from comparing with another simulation, like earth mover's distance.
 
 # Returns a dictionary of calculated metrics from the playback of a file.
 # Includes: EMD for each time step.
@@ -114,5 +81,40 @@ def compute_makespan(playback, data, intermediate_data, params):
     # PyYAML doesn't support numpy types when dumping to file.
     data["makespan"] = int(last_finish - first_finish)
 
+def main():
+    # Fetch index
+    index = os.path.join(DATA_ROOT, INDEX)
+    if not os.path.exists(index):
+        print("Index does not exist. Generating...")
+        cmd = [sys.executable, INDEXER]
+        indexing_result = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                check=False
+                )
+        if (indexing_result.returncode == 0):
+            print("Simulation re-indexing successful.")
+        else:
+            print(f"Simulation re-indexing unsuccessful. Exit code: {indexing_result.returncode}")
+            exit(1)
+
+    index_data = pd.read_csv(index)
+    
+    # Compute analytics.yaml for each simulation
+    sim_ids = index_data["simulation_id"]
+    print("Generating analytics for each simulation.")
+    for sim_id in sim_ids:
+        SIM_ROOT = os.path.join(DATA_ROOT, RUNS, sim_id)
+        playback_path = os.path.join(SIM_ROOT, PLAYBACK)
+        params_path = os.path.join(SIM_ROOT, PARAMS)
+        if not os.path.exists(playback_path):
+            print(f"Could not read {sim_id}. Skipping.")
+        else:
+            data = compute_analytics(playback_path, params_path)
+            print(data)
+            analytics = os.path.join(SIM_ROOT, ANALYTICS)
+            with open(analytics, "w") as f:
+                yaml.safe_dump(data, f)
 if __name__ == "__main__":
     main()

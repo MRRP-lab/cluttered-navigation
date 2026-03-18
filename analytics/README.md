@@ -23,7 +23,7 @@ The `analytics` folder contains scripts and tools for analyzing and visualizing 
 
 ## Example Data: `sampleOutput/`
 
-The `sampleOutput/` directory contains example output data files and directory structure for makespan and spatial experiments, including both centralized and decentralized strategies. This folder is structured to match the expected input for the analysis scripts.
+The `sampleOutput/` directory contains example output data files and directory structure for makespan and spatial experiments, including both centralized and decentralized strategies. This folder is structured to match the expected input for the analysis scripts. To view some example data, run `generateFakeData.py`.
 
 - **Structure:**
   - `sampleOutput/` contains two main subfolders:

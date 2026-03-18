@@ -11,11 +11,11 @@ import scipy.stats
 # === USER-CONFIGURABLE CONSTANTS ===
 
 # Directory paths
-ROOT_FOLDER = '/mnt/files/files/school/wwu/research/robotics/simulationSwarm/cluttered-navigation/plinko-drones/output-data/root'
-MAKESPAN_DIR = 'Makespan'
-SPATIAL_DIR = 'Spatial'
-STRATEGIES = ['Centralized', 'Decentralized']
-FOLDER_TYPES = ['BothFixed', 'AngleFixed', 'CountFixed']
+ROOT_FOLDER = './sampleOutput/root/'
+MAKESPAN_DIR = 'makespan'
+SPATIAL_DIR = 'spatial'
+STRATEGIES = ['centralized', 'decentralized']
+FOLDER_TYPES = ['bothFixed', 'angleFixed', 'countFixed']
 
 # Plotting options
 PLOT_COLORS = [
@@ -227,19 +227,20 @@ def plotBox(samplesDict, title, yLabel):
     printDescriptiveStats(title, samplesDict)
     
     # Check if both strategies have data
-    if 'Centralized' not in samplesDict or 'Decentralized' not in samplesDict:
+    print(title)
+    if 'centralized' not in samplesDict or 'decentralized' not in samplesDict:
         print(f"Skipping plot '{title}': Missing data for one or both strategies.\n")
         return
     
     # Check if both strategies have non-empty data
-    if len(samplesDict['Centralized']) == 0 or len(samplesDict['Decentralized']) == 0:
+    if len(samplesDict['centralized']) == 0 or len(samplesDict['decentralized']) == 0:
         print(f"Skipping plot '{title}': One or both strategies have no data points.\n")
         return
     
     plt.figure(figsize=FIGURE_SIZE)
     plt.boxplot(
-        [samplesDict['Centralized'], samplesDict['Decentralized']],
-        tick_labels=['Centralized', 'Decentralized'],
+        [samplesDict['centralized'], samplesDict['decentralized']],
+        tick_labels=['centralized', 'decentralized'],
         patch_artist=True,
         showmeans=SHOW_MEANS,
         meanprops={"marker":"o","markerfacecolor":"white","markeredgecolor":"black"},
@@ -263,7 +264,7 @@ def analyzeFixed(folderType, rootFolder, strategies, xAxis, statFuncs, plotFuncs
     """
     for strategy in strategies:
         # Build paths for makespan and spatial data for this strategy and folder type
-        pathMakespan = os.path.join(rootFolder, 'Makespan', strategy, folderType)
+        pathMakespan = os.path.join(rootFolder, 'makespan', strategy, folderType)
         pathSpatial = os.path.join(rootFolder, 'Spatial', strategy, folderType)
         # For makespan and traversal, plot for each stat function
         if os.path.isdir(pathMakespan):
@@ -374,12 +375,12 @@ def main():
         [extractMakespan, extractTraversal],
         [plotScatter, plotScatter, plotScatter],
         {
-            'Centralized': [
+            'centralized': [
                 TITLE_MAKESPAN_DRONECOUNT_CENTRALIZED,
                 TITLE_TRAVERSAL_DRONECOUNT_CENTRALIZED,
                 TITLE_EMD_DRONECOUNT_CENTRALIZED
             ],
-            'Decentralized': [
+            'decentralized': [
                 TITLE_MAKESPAN_DRONECOUNT_DECENTRALIZED,
                 TITLE_TRAVERSAL_DRONECOUNT_DECENTRALIZED,
                 TITLE_EMD_DRONECOUNT_DECENTRALIZED
@@ -395,12 +396,12 @@ def main():
         [extractMakespan, extractTraversal],
         [plotScatter, plotScatter, plotScatter],
         {
-            'Centralized': [
+            'centralized': [
                 TITLE_MAKESPAN_ANGLE_CENTRALIZED,
                 TITLE_TRAVERSAL_ANGLE_CENTRALIZED,
                 TITLE_EMD_ANGLE_CENTRALIZED
             ],
-            'Decentralized': [
+            'decentralized': [
                 TITLE_MAKESPAN_ANGLE_DECENTRALIZED,
                 TITLE_TRAVERSAL_ANGLE_DECENTRALIZED,
                 TITLE_EMD_ANGLE_DECENTRALIZED
