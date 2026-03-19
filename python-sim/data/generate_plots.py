@@ -1,7 +1,7 @@
-import os
-import yaml
 import pandas as pd
 import numpy as np
+import seaborn as sns
+from index_gen import query_index, fetch_sim_file
 
 from scipy.stats import wasserstein_distance
 import matplotlib.pyplot as plt
@@ -23,11 +23,9 @@ import matplotlib.pyplot as plt
 
 # So, compare metrics of each. Makespan (agg. vs. agg.), traversal (agg. vs. agg.).
 
-ROOT_FOLDER = '/mnt/files/files/school/wwu/research/robotics/simulationSwarm/cluttered-navigation/plinko-drones/output-data/root'
-MAKESPAN_DIR = 'Makespan'
-SPATIAL_DIR = 'Spatial'
-STRATEGIES = ['Centralized', 'Decentralized']
-FOLDER_TYPES = ['BothFixed', 'AngleFixed', 'CountFixed']
+PLAYBACK = "playback.csv"
+ANALYTICS = "analytics.yaml"
+PARAMS = "params.yaml"
 
 # Plotting options
 PLOT_COLORS = [
@@ -36,6 +34,7 @@ PLOT_COLORS = [
     "#000000", # [2]: whiskers and caps in boxplots
     "#ffff60"  # [3]: outlier (flier) points in boxplots
 ]
+
 FIGURE_SIZE = (7, 6)
 BOX_WIDTH = 0.5
 FONT_SIZE = 12
@@ -47,32 +46,13 @@ BEST_FIT_LABEL = {1: 'Linear Best Fit', 2: 'Quadratic Best Fit', 3: 'Cubic Best 
 # Margin of error/confidence interval
 CONFIDENCE_LEVEL = 0.95
 
-# Title templates for all graphs (customize as needed)
-TITLE_BARCHART_MAKESPAN_STRATEGY = 'Makespan by Strategy (Angle & Count Fixed)'
-TITLE_BARCHART_TRAVERSAL_STRATEGY = 'Average Traversal Time by Strategy (Angle & Count Fixed)'
-TITLE_BARCHART_EMD_STRATEGY = 'EMD by Strategy (Angle & Count Fixed)'
-TITLE_MAKESPAN_DRONECOUNT_CENTRALIZED = 'Makespan vs. Drone Count for Centralized Strategy'
-TITLE_TRAVERSAL_DRONECOUNT_CENTRALIZED = 'Average Traversal Time vs. Drone Count for Centralized Strategy'
-TITLE_EMD_DRONECOUNT_CENTRALIZED = 'EMD vs. Drone Count for Centralized Strategy'
-TITLE_MAKESPAN_DRONECOUNT_DECENTRALIZED = 'Makespan vs. Drone Count for Decentralized Strategy'
-TITLE_TRAVERSAL_DRONECOUNT_DECENTRALIZED = 'Average Traversal Time vs. Drone Count for Decentralized Strategy'
-TITLE_EMD_DRONECOUNT_DECENTRALIZED = 'EMD vs. Drone Count for Decentralized Strategy'
-TITLE_MAKESPAN_ANGLE_CENTRALIZED = 'Makespan vs. Angle for Centralized Strategy'
-TITLE_TRAVERSAL_ANGLE_CENTRALIZED = 'Average Traversal Time vs. Angle for Centralized Strategy'
-TITLE_EMD_ANGLE_CENTRALIZED = 'EMD vs. Angle for Centralized Strategy'
-TITLE_MAKESPAN_ANGLE_DECENTRALIZED = 'Makespan vs. Angle for Decentralized Strategy'
-TITLE_TRAVERSAL_ANGLE_DECENTRALIZED = 'Average Traversal Time vs. Angle for Decentralized Strategy'
-TITLE_EMD_ANGLE_DECENTRALIZED = 'EMD vs. Angle for Decentralized Strategy'
-
 # Other settings
 SHOW_MEANS = True
 SHOW_LEGEND = True
 
-
-
 # Given the playback data, add earth movers distance per timestep to data.
 # TODO what distributions are we comparing???
-def compute_EMD(playback, data, intermediate_data, params):
+def compute_EMD():
     
     pass
 
@@ -105,7 +85,6 @@ def plotScatter(data, title, xLabel, yLabel, xIntTicks=False):
     # Early exit if no data
     xValues, yValues = zip(*data)
     # Print stats for y-values (dependent variable)
-    printDescriptiveStats(title, {yLabel: yValues})
     plt.figure(figsize=FIGURE_SIZE)
     plt.scatter(xValues, yValues, label='Data Points', color=PLOT_COLORS[0])  # Data points (same as box color)
     # Add best-fit line if more than one point
@@ -131,7 +110,6 @@ def plotScatter(data, title, xLabel, yLabel, xIntTicks=False):
 
 def plotBox(samplesDict, title, yLabel):
     """Reusable boxplot with descriptive stats for each group (e.g., strategy)."""
-    printDescriptiveStats(title, samplesDict)
     
     plt.figure(figsize=FIGURE_SIZE)
     plt.boxplot(
@@ -152,12 +130,34 @@ def plotBox(samplesDict, title, yLabel):
     plt.xlabel('Strategy', fontsize=FONT_SIZE)
     plt.show()
 
-def query_simulations(params):
-    pass
-
-def fetch_sim_file(sim_id, ):
-    pass
 if __name__ == "__main__":
+
     # Compute our plots.
     # The user should be able to specify a range of simulation parameters to aggregate data with and plot specific simulations/aggregations against each other using various plot types.
-    pass
+    # Makespan: We separate by buckets (centralized vs. decentralized), then aggregate over each.
+    
+    # wasserstein line plot?
+
+    # Makespan vs. number for a fixed angle
+    query = {
+        "angle": 20
+        }
+
+    results = query_index(query)
+
+    data = []
+
+    for id in results["simulation_id"]:
+        analytics = fetch_sim_file(id, ANALYTICS)
+        params = fetch_sim_file(id, PARAMS)
+        # playback = fetch_sim_file(id, PLAYBACK)
+        data.append([analytics["makespan"], params["num"]])
+        # finishes = playback[playback["x"] == params["gridnum"]]["y"]
+        # finishes.plot(kind="hist", bins=20)
+
+
+    data = pd.DataFrame(data=data, columns=["makespan", "num"]).sort_values("num")
+    sns.lineplot(data=data, x="num", y="makespan")
+
+    plt.show()
+

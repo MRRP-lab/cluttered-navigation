@@ -5,7 +5,7 @@ import sys
 import subprocess
 
 
-DATA_ROOT = "../python-sim/data/"
+DATA_ROOT = "./"
 RUNS = "runs/"
 INDEX = "index.csv"
 INDEXER = "index_gen.py"
@@ -112,7 +112,6 @@ def main():
             print(f"Could not read {sim_id}. Skipping.")
         else:
             data = compute_analytics(playback_path, params_path)
-            print(data)
             analytics = os.path.join(SIM_ROOT, ANALYTICS)
             with open(analytics, "w") as f:
                 yaml.safe_dump(data, f)
