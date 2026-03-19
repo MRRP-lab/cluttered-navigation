@@ -135,6 +135,7 @@ def EMD_by_noise(reference_dist, other_dists):
 
 
 if __name__ == "__main__":
+
     # Compute our plots.
     # The user should be able to specify a range of simulation parameters to aggregate data with and plot specific simulations/aggregations against each other using various plot types.
     # Makespan: We separate by buckets (centralized vs. decentralized), then aggregate over each.
@@ -143,7 +144,7 @@ if __name__ == "__main__":
 
     # Makespan vs. number for a fixed angle
     constants = {
-            "experiment-name":
+            "experiment-name": "EMD calc"
         }
 
     results = query_index(constants)

@@ -20,7 +20,9 @@ def query_index(params):
         raise FileNotFoundError("Index not found.")
     index = pd.read_csv(index_path)
 
-    query = vars(params)
+    query = params
+    if (type(params) != dict):
+        query = vars(params)
 
     cols = [key for key in query if key in index.columns]
     mask = (index[list(cols)] == pd.Series(query)[cols]).all(axis=1)
@@ -32,8 +34,7 @@ def query_index(params):
 # Depending on the file extension, will return different types.
 # *.csv files will return a dataframe.
 # *.yaml files will return a dictionary.
-# kwargs:
-#   dtype: Used for data type in csv read.
+# kwargs are passed directly to the file parser.
 def fetch_sim_file(sim_id, file, **kwargs):
     path = os.path.join(runs_dir, sim_id, file)
     if not os.path.exists(path):

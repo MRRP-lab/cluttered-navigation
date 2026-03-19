@@ -1,15 +1,18 @@
 import sys
 import subprocess
 import itertools
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, as_completed
 
 # All keys will have a double hyphen added. Ensure these use the same form as the long argument name.
 params = {
-        "num": [5, 9],
-        "gridnum": [25],
+        "num": [100],
         "boundary": True,
-        "boundary-angle": 22.5,
-        "experiment-name": "small num"
+        "boundary-angle": [22.5],
+        "density": [0.2, 0.5, 1],
+        "row-gap": [1, 2, 3, 4, 5, 6],
+        "pin-gap": [1, 2, 3, 4, 5, 6],
+        "noise": [0, 1, 2, 3, 4, 5],
+        "experiment-name": "EMD calc"
         }
 
 simulator = "./generate_demo.py"
@@ -55,10 +58,17 @@ def run_single_sim(params):
         return {**params, "status": "CRASHED", "err": str(e)}
 
 def run_sweep(all_combinations):
-    # TODO: Add progress counter
+    total = len(all_combinations)
+    done = 0
+    print(f"Progress: [{done}/{total}]", end="")
+    results = []
     with ProcessPoolExecutor() as executor:
-        results = list(executor.map(run_single_sim, all_combinations))
-
+        futures = [executor.submit(run_single_sim, p) for p in all_combinations]
+        for future in as_completed(futures):
+            results.append(future.result())
+            done += 1
+            print(f"\rProgress: [{done}/{total}]", end="", flush=True)
+    print()
     return results
 
 print("Running parameter sweep now.")
