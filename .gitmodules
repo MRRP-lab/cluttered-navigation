@@ -1,3 +1,4 @@
 [submodule "python-sim/src/optimal-mrppg"]
 	path = python-sim/src/optimal-mrppg
 	url = git@github.com:Mrnibblesg/optimal-mrppg.git
+	branch = protobuf-time-solver
