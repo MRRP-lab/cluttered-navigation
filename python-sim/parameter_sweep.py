@@ -9,7 +9,8 @@ params = {
         "gridnum": [25],
         "boundary": True,
         "boundary-angle": 22.5,
-        "experiment-name": "small num"
+        "strategy": "centralized",
+        "experiment-name": "Centralized test"
         }
 
 simulator = "./generate_demo.py"

@@ -29,7 +29,13 @@ env = Environment(sim_args.gridnum, sim_args.seed,
 robots = Robots(sim_args.num, sim_args.seed, spawn_layout.offsets)
 robots.set_environment(env)
 
-### Simulation Loop
+# In the case of a centralized strategy, it drives itself and produces stats all at once.
+# We'd have to give the java program information about both the robots and environment. Regardless, we should still be starting in this file. The robot class should set itself up based on the strategy. Abstract the strategy into another class. Decentralized gets a robot controller, and the centralized one gets a robot controller.
+# The thing is, decentralized currently doesn't drive itself, and stats are collected from the outside.
+# The centralized strategy will drive itself and the stats are collected from the outside and published back via protobuf.
+# It feels to me like we need another architecture rework. It won't be too big, the relevant code isn't very much. Maybe i should just make them behave similarly. Change the decentralized stuff to produce its stats all at once instead of piece by piece. I like this idea.
+# Also make it appear to drive itself from the outside. It's probably important for the outside to drive everything.
+# All of this also calls into question the greater structuring of the project... this is the python simulator but we're deferring to a java solution. Also this python version is turning into the main project. It feels like we're slowly losing the plot in terms of organization. I placed the submodules in some places that don't make much sense when you think about it.
 
 no_progress = 0
 time = 0
