@@ -43,7 +43,7 @@ def run_single_sim(params):
     try:
         result = subprocess.run(
                 args,
-                capture_output=True,
+                #capture_output=True,
                 text=True,
                 check=False
                 )
@@ -77,6 +77,7 @@ def run_sweep(all_combinations):
     with java_solver_server(enabled=needs_java):
         with ProcessPoolExecutor() as executor:
             results = list(executor.map(run_single_sim, all_combinations))
+        print("Parameter sweep done!")
     return results
 
 print("Running parameter sweep now.")

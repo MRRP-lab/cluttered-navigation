@@ -1,4 +1,5 @@
 from src.strategies.plinko import PlinkoStrategy
+from src.strategies.optimal import OptimalStrategy
 from src.strategies.navstrategy import NavStrategy
 
 
@@ -29,6 +30,6 @@ def prepare_simulation(params) -> NavStrategy:
 
         # The centralized strategy assumes the java solver server is running. 
         case "centralized":
-            raise ValueError("Centralized strategy not yet implemented.")
+            return OptimalStrategy(robots, env)
         case _:
             raise ValueError(f"Unknown strategy: {params.strategy}")
