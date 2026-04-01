@@ -6,7 +6,7 @@ from contextlib import contextmanager
 
 # All keys will have a double hyphen added. Ensure these use the same form as the long argument name.
 params = {
-        "num": [5, 9],
+        "num": [5],
         "gridnum": [25],
         "boundary": True,
         "boundary-angle": 22.5,
@@ -16,6 +16,7 @@ params = {
 
 simulator = "./generate_demo.py"
 indexer = "./data/index_gen.py"
+java_server = "./src/optimal-mrppg/bytecode/server.jar"
 
 # If we don't do this, itertools.product will treat strings as a list of characters.
 normalized = {
@@ -62,7 +63,7 @@ def java_solver_server(enabled=True, workers=1):
         yield None
         return
     print("Starting Java server for optimal centralized solutions.")
-    proc = subprocess.Popen(["echo", "hello world"])
+    proc = subprocess.Popen(["java", "-jar", java_server, str(workers)])
     try:
         yield proc
     finally:
@@ -71,7 +72,7 @@ def java_solver_server(enabled=True, workers=1):
         proc.wait()
 
 def run_sweep(all_combinations):
-    needs_java = "centralized" in params.strategy
+    needs_java = "centralized" in params["strategy"]
     # TODO: Add progress counter
     with java_solver_server(enabled=needs_java):
         with ProcessPoolExecutor() as executor:

@@ -11,3 +11,4 @@ compile:
 	protoc --proto_path=${PY_SRC_DIR} --python_out=${PY_DST_DIR} ./src/multiagent-pathfinding-protobuf/problem.proto
 	
 	protoc --proto_path=${JAVA_SRC_DIR} --java_out=${JAVA_DST_DIR} ./src/optimal-mrppg/multiagent-pathfinding-protobuf/problem.proto
+	$(MAKE) -C ${JAVA_SRC_DIR}
