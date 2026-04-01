@@ -26,6 +26,8 @@ def prepare_simulation(params) -> NavStrategy:
         case "decentralized":
             progress_timeout = 10
             return PlinkoStrategy(params.num, robots, env, params.seed, progress_timeout)
+
+        # The centralized strategy assumes the java solver server is running. 
         case "centralized":
             raise ValueError("Centralized strategy not yet implemented.")
         case _:

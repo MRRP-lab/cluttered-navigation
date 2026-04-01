@@ -2,6 +2,7 @@ import sys
 import subprocess
 import itertools
 from concurrent.futures import ProcessPoolExecutor
+from contextlib import contextmanager
 
 # All keys will have a double hyphen added. Ensure these use the same form as the long argument name.
 params = {
@@ -55,11 +56,26 @@ def run_single_sim(params):
     except Exception as e:
         return {**params, "status": "CRASHED", "err": str(e)}
 
-def run_sweep(all_combinations):
-    # TODO: Add progress counter
-    with ProcessPoolExecutor() as executor:
-        results = list(executor.map(run_single_sim, all_combinations))
+@contextmanager
+def java_solver_server(enabled=True, workers=1):
+    if not enabled:
+        yield None
+        return
+    print("Starting Java server for optimal centralized solutions.")
+    proc = subprocess.Popen(["echo", "hello world"])
+    try:
+        yield proc
+    finally:
+        print("Stopping Java server.")
+        proc.terminate()
+        proc.wait()
 
+def run_sweep(all_combinations):
+    needs_java = "centralized" in params.strategy
+    # TODO: Add progress counter
+    with java_solver_server(enabled=needs_java):
+        with ProcessPoolExecutor() as executor:
+            results = list(executor.map(run_single_sim, all_combinations))
     return results
 
 print("Running parameter sweep now.")
