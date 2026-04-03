@@ -18,6 +18,8 @@ class OptimalStrategy(NavStrategy):
         assignment_msg.robot_id = 100
         assignment_msg.start_id = 123
         assignment_msg.finish_id = 500
+        
+        protobuf = self.populate_protobuf()
 
         message = assignment_msg.SerializeToString()
         self.socket.sendall(message)
@@ -35,6 +37,9 @@ class OptimalStrategy(NavStrategy):
         print(f"Python: {assignment_resp.start_id}")
         print(f"Python: {assignment_resp.finish_id}")
 
+    def populate_protobuf(self):
+        adj_list, sinks = self.env.to_adj_matrix_with_supersinks(self.robots.num)
+        return adj_list
 
     def extract_data(self):
         pass
