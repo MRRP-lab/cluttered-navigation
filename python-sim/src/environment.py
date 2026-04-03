@@ -174,7 +174,7 @@ class Environment():
         for x in range(-2 * self.boundary_offset, 0):
             # range excludes the end so add one
             for y in range(-self.boundary_offset, self.boundary_offset+1):
-                adj_list[(x, y)] = Node(x, y)
+                adj_list[(x, y + center_y)] = Node(x, y + center_y)
 
         for node in adj_list.values():
             neighbors = node.get_euclidean_neighbor_coords()

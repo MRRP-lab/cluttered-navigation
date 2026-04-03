@@ -20,8 +20,8 @@ class OptimalStrategy(NavStrategy):
         assignment_msg.finish_id = 500
         
         protobuf = self.populate_protobuf()
-
-        message = assignment_msg.SerializeToString()
+        
+        message = protobuf.SerializeToString()
         self.socket.sendall(message)
         self.socket.shutdown(socket.SHUT_WR)
 
@@ -39,7 +39,26 @@ class OptimalStrategy(NavStrategy):
 
     def populate_protobuf(self):
         adj_list, sinks = self.env.to_adj_matrix_with_supersinks(self.robots.num)
-        return adj_list
+
+        problem_proto = problem.Instance()
+        for node in list(adj_list.values()) + sinks:
+            node_proto = problem_proto.nodes.add()
+            node_proto.id = node.id
+            for neighbor in node.neighbors:
+                node_proto.neighbors.append(neighbor.id)
+
+        robot_id = 0
+        for c in self.robots.coords:
+            assignment_proto = problem_proto.assignments.add()
+
+            assignment_proto.robot_id = robot_id
+            assignment_proto.finish_id = sinks[robot_id].id
+            # c is stored as a numpy array, turn it to a tuple before using it in the dict
+            assignment_proto.start_id = adj_list[(int(c[0]), int(c[1]))].id
+
+            robot_id += 1
+
+        return problem_proto
 
     def extract_data(self):
         pass
