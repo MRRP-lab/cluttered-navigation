@@ -1,16 +1,16 @@
 import sys
 import subprocess
 import itertools
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from contextlib import contextmanager
 
 # All keys will have a double hyphen added. Ensure these use the same form as the long argument name.
 params = {
-        "num": [30],
-        "gridnum": [30],
+        "num": [20],
+        "gridnum": [20, 25, 30],
         "boundary": True,
-        "boundary-angle": 22.5,
-        "strategy": "centralized",
+        "boundary-angle": [22.5, 20, 15, 10, 7],
+        "strategy": ["centralized", "decentralized"],
         "experiment-name": "Centralized test"
         }
 
@@ -43,7 +43,7 @@ def run_single_sim(params):
     try:
         result = subprocess.run(
                 args,
-                #capture_output=True,
+                capture_output=True,
                 text=True,
                 check=False
                 )
@@ -73,11 +73,19 @@ def java_solver_server(enabled=True, workers=1):
 
 def run_sweep(all_combinations):
     needs_java = "centralized" in params["strategy"]
-    # TODO: Add progress counter
+    total = len(all_combinations)
+    done = 0
+    print(f"Progress: [{done}/{total}]", end="")
+    results = []
     with java_solver_server(enabled=needs_java):
         with ProcessPoolExecutor() as executor:
-            results = list(executor.map(run_single_sim, all_combinations))
-        print("Parameter sweep done!")
+            futures = [executor.submit(run_single_sim, p) for p in all_combinations]
+            for future in as_completed(futures):
+                results.append(future.result())
+                done += 1
+                print(f"\rProgress: [{done}/{total}]", end="", flush=True)
+        print()
+    print("Parameter sweep done!")
     return results
 
 print("Running parameter sweep now.")
