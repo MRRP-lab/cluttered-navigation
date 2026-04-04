@@ -54,7 +54,7 @@ class Environment():
     def add_reflecting_boundary(self, obstacles, angle, y_offset):
         # max possible just to make sure our boundary gets to the end
         line_length = self.grid_num * math.sqrt(2)
-        center_y = math.ceil(self.grid_num / 2)
+        center_y = math.floor(self.grid_num / 2)
         start_x = 0
         end_x = round(line_length * math.cos(angle))
 
@@ -152,17 +152,23 @@ class Environment():
         first_node = Node(0, center_y)
         remaining_nodes = [first_node]
         adj_list = {}
+        visited = {(first_node.x, first_node.y)}
 
         while len(remaining_nodes) > 0:
-            #Get next coords, find valid neighbors, add node to adj list with neighbors set.
             current = remaining_nodes.pop()
+            adj_list[(current.x, current.y)] = current
             neighbors = current.get_euclidean_neighbor_coords()
 
             for neighbor in neighbors:
-                if (self.is_obstacle(neighbor[0], neighbor[1], strict_bounds=True) or
-                    not neighbor in adj_list):
+                if (self.is_obstacle(neighbor[0], neighbor[1], strict_bounds=True)):
+                    continue
+                if neighbor in visited:
+                    if neighbor in adj_list:
+                        current.add_neighbor(adj_list[neighbor])
+                        adj_list[neighbor].add_neighbor(current)
                     continue
 
+                visited.add(neighbor)
                 new_node = Node(neighbor[0], neighbor[1])
                 current.add_neighbor(new_node)
                 new_node.add_neighbor(current)
@@ -173,7 +179,7 @@ class Environment():
         # first populate with nodes then create edges
         for x in range(-2 * self.boundary_offset, 0):
             # range excludes the end so add one
-            for y in range(-self.boundary_offset, self.boundary_offset+1):
+            for y in range(-self.boundary_offset, self.boundary_offset):
                 adj_list[(x, y + center_y)] = Node(x, y + center_y)
 
         for node in adj_list.values():
@@ -192,7 +198,6 @@ class Environment():
             if node is not None:
                 for sink in sinks:
                     node.add_neighbor(sink)
-        print(sinks)
         return adj_list, sinks
 
 # Used to aid adjacency list representation.

@@ -33,10 +33,6 @@ class OptimalStrategy(NavStrategy):
         assignment_resp = problem.Assignment()
         assignment_resp.ParseFromString(resp)
 
-        print(f"Python: {assignment_resp.robot_id}")
-        print(f"Python: {assignment_resp.start_id}")
-        print(f"Python: {assignment_resp.finish_id}")
-
     def populate_protobuf(self):
         adj_list, sinks = self.env.to_adj_matrix_with_supersinks(self.robots.num)
 
