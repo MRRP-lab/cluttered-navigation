@@ -17,5 +17,7 @@ playback_log = DataLogger(sim_args)
 
 simulation = prepare_simulation(sim_args)
 simulation.run()
+
+# Playback data consists of rows of the structure [time, robot id, x, y]
 playback_log.extend_data(simulation.extract_data())
 playback_log.export_data()

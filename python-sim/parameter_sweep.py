@@ -6,8 +6,8 @@ from contextlib import contextmanager
 
 # All keys will have a double hyphen added. Ensure these use the same form as the long argument name.
 params = {
-        "num": [15],
-        "gridnum": [100],
+        "num": [30],
+        "gridnum": [30],
         "boundary": True,
         "boundary-angle": 22.5,
         "strategy": "centralized",
