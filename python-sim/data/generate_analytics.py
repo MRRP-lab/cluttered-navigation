@@ -17,6 +17,17 @@ PARAMS = "params.yaml"
 # Unfortunately, we don't compute any statistics in here that
 # come from comparing with another simulation, like earth mover's distance.
 
+# TODO (Per-robot)
+# Path length
+# Number of collisions per robot
+# Number of waits
+
+# TODO (Per-simulation)
+# Throughput curve
+# Cell visitation heatmap?
+# Entropy of final distribution?
+# Skewness?
+
 # Returns a dictionary of calculated metrics from the playback of a file.
 # Includes: EMD for each time step.
 # Traversal statistics for each drone.
@@ -30,7 +41,9 @@ def compute_analytics(playback_path, params_path):
     # Data that is useful for multiple calculations, but in the end we won't be keeping.
     intermediate_data = {}
     intermediate_data["starts"] = playback[playback["x"] == 0]
-    intermediate_data["finishes"] = playback[playback["x"] == params["gridnum"]]
+
+    # TODO fix this jank. we need to subtract 1 because gridnum stores the amount of grid cells along the grid, but the value stored is an index.
+    intermediate_data["finishes"] = playback[playback["x"] == (params["gridnum"]-1)]
 
     compute_traversal_stats(playback, data, intermediate_data, params)
     # compute_EMD(playback, data)

@@ -6,22 +6,26 @@ from index_gen import query_index, fetch_sim_file
 from scipy.stats import wasserstein_distance
 import matplotlib.pyplot as plt
 
-# PLOT IDEAS
-# Main ideas: Compare centralized vs. decentralized.
+# TODO
+# Distribution
+# - ridge plot for measuring distribution at each row of obstacles. (where is the spreading concentrated?)
+# - Quantile tracking swarm percentile x positions over time.
 
-# Makespan:
-# Makespan vs. drone count (each strategy)
-# Makespan vs. angle (each strategy)
+# Phase diagrams
+# - Heatmap with axes as row spacing x pin spacing colored by EMD or makespan.
+# - Robot density x obstacle noise, colored by collision rate or makespan. (can we find a jamming transition?)
+# - Boundary angle x noise, colored by final distribution entropy?
 
-# Traversal:
-# Avg traversal time vs. drone count (violin or scatter?) (each strategy)
-# Vs. angle (each strategy)
+# Throughput curves
+# - Overlaid throughput curves for different strategies on the same plot. Calculate area between as a cost of a certain strategy.
+# - Throughput curves for increasing robot density
 
-# EMD of one reference distribution compared to an interval of some other parameter.
-#   (single vs. agg.?)
-#   0 noise obstacles to lots of noise?
+# Things to watch for:
+# - The jamming transition
+# - The price of decentralized
+# - Does the output fit a normal distribution?
+# - Effective diffusion coefficient, at each row compute the mean squared lateral displacement
 
-# So, compare metrics of each. Makespan (agg. vs. agg.), traversal (agg. vs. agg.).
 
 PLAYBACK = "playback.csv"
 ANALYTICS = "analytics.yaml"
