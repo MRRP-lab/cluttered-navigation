@@ -117,6 +117,42 @@ def distribution_ridge_plot(run, slices=None):
 
     plt.show()
 
+# Produce a heatmap from runs where the x dimension is the row spacing and the y dimension is the pin spacing.
+# The heatmap is in reference to a default normal distribution because we're interested in seeing how our parameters make our robots deviate from the norm.
+def EMD_heatmap(runs):
+    
+    # Pre-load metrics
+    data = {}
+    for id in runs["simulation_id"]:
+        data[id] = {
+                "analytics": fetch_sim_file(id, ANALYTICS)
+                }
+    pass
+
+# Produces a heatmap from the runs. x dimension is obstacle noise, y is robot amount.
+# TODO aggregate makespans across seeds.
+def makespan_heatmap(runs):
+    # Pre-load metrics
+    records = []
+    for id in runs["simulation_id"]:
+        analytics = fetch_sim_file(id, ANALYTICS)
+        # we can just loop over itertuples instead so we don't need to do this.
+        run = runs[runs["simulation_id"] == id].iloc[0]
+
+        records.append({
+            "noise": run["noise"],
+            "num": run["num"],
+            "makespan": analytics["makespan"]
+        })
+    df = pd.DataFrame(records)
+
+    makespans = df.pivot_table(index="num", columns="noise", values="makespan", aggfunc="mean")
+
+    # Draw a heatmap with the numeric values in each cell
+    f, ax = plt.subplots(figsize=(9, 6))
+    sns.heatmap(makespans, annot=True, fmt=".1f", linewidths=.5, ax=ax)
+    plt.show()
+
 # EMD
 # for obstacle density levels present in runs
 #     for drone density levels present in runs
@@ -181,19 +217,28 @@ if __name__ == "__main__":
     # Compute our plots.
     # The user should be able to specify a range of simulation parameters to aggregate data with and plot specific simulations/aggregations against each other using various plot types.
     constants = {
-            "experiment-name": "Collision test",
+            "experiment-name": "Heatmap test",
             "boundary": True,
-            "num": 30,
-            "row_gap": 2,
-            "pin_gap": 1,
-            "noise": 0,
+            "gridnum": 150,
             "density": 1,
         }
 
     results = query_index(constants)
     print(results)
-    distribution_ridge_plot(results.iloc[0], )
-    distribution_ridge_plot(results.iloc[1], )
+    makespan_heatmap(results)
+    #constants = {
+    #        "experiment-name": "Collision test",
+    #        "boundary": True,
+    #        "num": 30,
+    #        "row_gap": 2,
+    #        "pin_gap": 1,
+    #        "noise": 0,
+    #        "density": 1,
+    #    }
+    #results = query_index(constants)
+    #distribution_ridge_plot(results.iloc[0])
+    #distribution_ridge_plot(results.iloc[1])
+
     #by_pin_gap = results.groupby("pin_gap")
     #for pin_gap, group in by_pin_gap:
     #    print("pin gap: ", pin_gap)

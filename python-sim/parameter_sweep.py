@@ -5,12 +5,14 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 
 # All keys will have a double hyphen added. Ensure these use the same form as the long argument name.
 params = {
-        "num": [30],
+        "num": [n*50 for n in range(1,10)],
+        "noise": [n for n in range(0,5)],
+        "gridnum": [150, 250, 350],
+        "seed": [s for s in range(10)],
         "boundary": True,
         "boundary-angle": [22.5],
-        "density": [0.2, 0.5, 1],
-        "collision": [False, True],
-        "experiment-name": "Collision test"
+        "collision": [True],
+        "experiment-name": "Heatmap test"
         }
 
 simulator = "./generate_demo.py"
