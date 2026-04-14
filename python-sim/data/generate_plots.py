@@ -181,18 +181,19 @@ if __name__ == "__main__":
     # Compute our plots.
     # The user should be able to specify a range of simulation parameters to aggregate data with and plot specific simulations/aggregations against each other using various plot types.
     constants = {
-            "experiment-name": "EMD calc",
+            "experiment-name": "Collision test",
             "boundary": True,
             "num": 30,
             "row_gap": 2,
             "pin_gap": 1,
-            "noise": 2,
+            "noise": 0,
+            "density": 1,
         }
 
     results = query_index(constants)
-    print(results.iloc[0])
+    print(results)
     distribution_ridge_plot(results.iloc[0], )
-
+    distribution_ridge_plot(results.iloc[1], )
     #by_pin_gap = results.groupby("pin_gap")
     #for pin_gap, group in by_pin_gap:
     #    print("pin gap: ", pin_gap)

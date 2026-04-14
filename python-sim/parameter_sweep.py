@@ -9,11 +9,8 @@ params = {
         "boundary": True,
         "boundary-angle": [22.5],
         "density": [0.2, 0.5, 1],
-        "row-gap": [1, 2, 3, 4, 5, 6],
-        "pin-gap": [1, 2, 3, 4, 5, 6],
-        "noise": [0, 1, 2, 3, 4, 5],
-        "seed": [s for s in range(10)],
-        "experiment-name": "EMD calc"
+        "collision": [False, True],
+        "experiment-name": "Collision test"
         }
 
 simulator = "./generate_demo.py"
