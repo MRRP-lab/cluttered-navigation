@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 # Distribution
 # - ridge plot for measuring distribution at each row of obstacles. (where is the spreading concentrated?)
 # - Quantile tracking swarm percentile x positions over time.
+# - Throughput curve (just sort robots by finish time)
+# - Cell visitation heatmap?
 
 # Phase diagrams
 # - Heatmap with axes as row spacing x pin spacing colored by EMD or makespan.

@@ -18,20 +18,12 @@ PARAMS = "params.yaml"
 # come from comparing with another simulation, like earth mover's distance.
 
 # TODO (Per-robot)
-# Path length
-#   count the amount of times the coodinate changes from one timestep to the next, until the finish.
 # Number of collisions per robot(?)
-# Number of waits
-#   Number of times the coordinate for a single robot is the same in the next timestep, until the finish.
 
 # TODO (Per-simulation)
-# Throughput curve (just sort robots by finish time)
-# Cell visitation heatmap?
 # Entropy of final distribution?
-# Skewness?
 
 # Returns a dictionary of calculated metrics from the playback of a file.
-# Includes: EMD for each time step.
 # Traversal statistics for each drone.
 # Finish line makespan
 def compute_analytics(playback_path, params_path):
@@ -78,14 +70,17 @@ def compute_traversal(playback, data, intermediate_data, params):
         path = playback[playback["id"] == id].sort_values(by="time")
         prev = None
         total_len = 0
+        delays = 0
         for pos in path.itertuples():
             curr = (pos.x, pos.y)
             if prev is not None and curr != prev:
                 total_len += 1
+            elif prev is not None and curr == prev:
+                delays += 1
             elif pos.x > finish_line:
                 break
             prev = curr
-        path_lengths.append({"id": id, "path_len": total_len})
+        path_lengths.append({"id": id, "delays": delays, "path_len": total_len})
 
     path_len_df = pd.DataFrame(path_lengths)
 
@@ -107,6 +102,7 @@ def compute_traversal(playback, data, intermediate_data, params):
                 "id": row.id,
                 "time": row.time_exit - row.time_entry if row.time_exit > -1 else -1,
                 "path_len": row.path_len,
+                "delays": row.delays,
                 "y_i": row.y_entry,
                 "y_f": row.y_exit
             }
