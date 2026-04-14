@@ -3,6 +3,7 @@ import yaml
 import os
 import sys
 import subprocess
+import math
 
 
 DATA_ROOT = "./"
@@ -93,9 +94,6 @@ def compute_traversal(playback, data, intermediate_data, params):
         on="id", how="left"
     )
 
-    # For each id, iterate over coords and check if it has moved. If so, add to path length.
-    # Add to data[that robot's id]
-
     merged = merged.fillna(-1)
     data["traversal"] = [
             {
@@ -124,7 +122,11 @@ def compute_makespan(playback, data, intermediate_data, params):
     intermediate_data["last_finish"] = last_finish
 
     # PyYAML doesn't support numpy types when dumping to file.
-    data["makespan"] = int(last_finish - first_finish)
+    if (math.isnan(first_finish)):
+        print("Check out simulation: ", params["simulation_id"])
+        data["makespan"] = None
+    else:
+        data["makespan"] = int(last_finish - first_finish)
 
 def main():
     # Fetch index

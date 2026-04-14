@@ -42,10 +42,6 @@ return: a namespace with parsed arguments'''
                         help="Positive and negative reflecting boundary angle in degrees", 
                         type=float, default=Params.boundary_angle)
 
-    parser.add_argument("--boundary-offset",
-                        help="X offset for the reflecting boundary.",
-                        type=int, default=Params.boundary_offset)
-
     parser.add_argument("-d", "-D", "--density", 
                         help="Density of robot group spawn. 0-1, 1 represents perfect compression.",
                         type=float, default=Params.density)

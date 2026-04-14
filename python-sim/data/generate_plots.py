@@ -1,5 +1,4 @@
 import pandas as pd
-import numpy as np
 import seaborn as sns
 from index_gen import query_index, fetch_sim_file
 
@@ -56,6 +55,68 @@ CONFIDENCE_LEVEL = 0.95
 SHOW_MEANS = True
 SHOW_LEGEND = True
 
+
+# Generates a ridge plot for a single run.
+# This ridge plot shows how the distribution of robots
+# evolves as the robots traverse the field.
+# Along the super-y axis (each individual distribution) is the x-coordinate slice that each distribution is along.
+# Inside each distribution: We measure the distribution of robots entering this x slice at the y-coordinates.
+# Optional slices parameter is at which x slices to take distributions at.
+def distribution_ridge_plot(run, slices=None):
+
+    sns.set_theme(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
+    run_id = run["simulation_id"]
+    playback = fetch_sim_file(run_id, PLAYBACK)
+
+    if slices is None:
+        slices = [x for x in range(0, run["gridnum"], 5)]
+
+    distribution = []
+    frames = []
+    for x in slices:
+        #At each slice, count the rows at each y value.
+        at_slice = playback[playback["x"] == x]
+        first_entries = at_slice.groupby("id")["time"].idxmin()
+
+        y_values = at_slice.loc[first_entries, "y"].reset_index(drop=True)
+
+        frames.append(pd.DataFrame({"x_slice": x, "y": y_values}))
+
+    distribution = pd.concat(frames, ignore_index=True)
+
+    # Initialize the FacetGrid object
+    pal = sns.cubehelix_palette(10, rot=-.25, light=.7)
+    g = sns.FacetGrid(distribution, row="x_slice", hue="x_slice", aspect=15, height=0.5, palette=pal)
+
+    # Draw the densities in a few steps
+    g.map(sns.kdeplot, "y",
+          bw_adjust=.5, clip_on=False,
+          fill=True, alpha=1, linewidth=1.5)
+    g.map(sns.kdeplot, "y", clip_on=False, color="w", lw=2, bw_adjust=.5)
+
+    # passing color=None to refline() uses the hue mapping
+    g.refline(y=0, linewidth=2, linestyle="-", color=None, clip_on=False)
+
+
+    # Define and use a simple function to label the plot in axes coordinates
+    def label(x, color, label):
+        ax = plt.gca()
+        ax.text(0, .2, label, fontweight="bold", color=color,
+                ha="left", va="center", transform=ax.transAxes)
+
+
+    g.map(label, "y")
+
+    # Set the subplots to overlap
+    g.figure.subplots_adjust(hspace=-0.5)
+
+    # Remove axes details that don't play well with overlap
+    g.set_titles("")
+    g.set(yticks=[], ylabel="")
+    g.despine(bottom=True, left=True)
+
+    plt.show()
+
 # EMD
 # for obstacle density levels present in runs
 #     for drone density levels present in runs
@@ -70,7 +131,7 @@ def EMD_by_noise(runs):
     data = {}
     for id in runs["simulation_id"]:
         data[id] = {
-                "analytics": fetch_sim_file(id, "analytics.yaml")
+                "analytics": fetch_sim_file(id, ANALYTICS)
                 }
 
     # Select unique groupings of these parameters
@@ -91,6 +152,9 @@ def EMD_by_noise(runs):
         reference_distr = [tr["y_f"] for tr in reference_analytics["traversal"]]
 
         for _, row in group.iterrows():
+            # Don't include the reference, it's a useless data point
+            if row["noise"] == 0:
+                continue
             curr_analytics = data[row["simulation_id"]]["analytics"]
             curr_distr = [tr["y_f"] for tr in curr_analytics["traversal"]]
             emd = wasserstein_distance(reference_distr, curr_distr)
@@ -116,15 +180,21 @@ if __name__ == "__main__":
 
     # Compute our plots.
     # The user should be able to specify a range of simulation parameters to aggregate data with and plot specific simulations/aggregations against each other using various plot types.
-
     constants = {
             "experiment-name": "EMD calc",
+            "boundary": True,
+            "num": 30,
+            "row_gap": 2,
+            "pin_gap": 1,
+            "noise": 2,
         }
 
     results = query_index(constants)
+    print(results.iloc[0])
+    distribution_ridge_plot(results.iloc[0], )
 
-    by_pin_gap = results.groupby("pin_gap")
-    for pin_gap, group in by_pin_gap:
-        print("pin gap: ", pin_gap)
-        EMD_by_noise(group)
+    #by_pin_gap = results.groupby("pin_gap")
+    #for pin_gap, group in by_pin_gap:
+    #    print("pin gap: ", pin_gap)
+    #    EMD_by_noise(group)
 
