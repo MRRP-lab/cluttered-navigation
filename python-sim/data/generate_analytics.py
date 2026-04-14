@@ -19,11 +19,13 @@ PARAMS = "params.yaml"
 
 # TODO (Per-robot)
 # Path length
-# Number of collisions per robot
+#   count the amount of times the coodinate changes from one timestep to the next, until the finish.
+# Number of collisions per robot(?)
 # Number of waits
+#   Number of times the coordinate for a single robot is the same in the next timestep, until the finish.
 
 # TODO (Per-simulation)
-# Throughput curve
+# Throughput curve (just sort robots by finish time)
 # Cell visitation heatmap?
 # Entropy of final distribution?
 # Skewness?
@@ -40,7 +42,10 @@ def compute_analytics(playback_path, params_path):
 
     # Data that is useful for multiple calculations, but in the end we won't be keeping.
     intermediate_data = {}
-    intermediate_data["starts"] = playback[playback["x"] == 0]
+
+    # Keep only the earliest start for each bot.
+    intermediate_data["starts"] = (playback[playback["x"] == 0]
+                                   .loc[lambda df: df.groupby("id")["time"].idxmin()])
 
     # TODO fix this jank. we need to subtract 1 because gridnum stores the amount of grid cells along the grid, but the value stored is an index.
     intermediate_data["finishes"] = playback[playback["x"] == (params["gridnum"]-1)]
@@ -62,21 +67,52 @@ def compute_traversal_stats(playback, data, intermediate_data, params):
 def compute_traversal(playback, data, intermediate_data, params):
     data["traversal"] = []
 
+    # Compute path lengths, merge with other data
+    finish_line = params["gridnum"]-1
+    ids = playback["id"].unique()
+
+    path_lengths = []
+
+    # Per robot, count movement steps. compare curr and prev positions
+    for id in ids:
+        path = playback[playback["id"] == id].sort_values(by="time")
+        prev = None
+        total_len = 0
+        for pos in path.itertuples():
+            curr = (pos.x, pos.y)
+            if prev is not None and curr != prev:
+                total_len += 1
+            elif pos.x > finish_line:
+                break
+            prev = curr
+        path_lengths.append({"id": id, "path_len": total_len})
+
+    path_len_df = pd.DataFrame(path_lengths)
+
     # Left join so we can detect when a robot starts but never finishes.
     merged = intermediate_data["starts"].merge(
             intermediate_data["finishes"],
-            on="id", how="left", suffixes=("_entry", "_exit"))
+            on="id", how="left", suffixes=("_entry", "_exit")
+    ).merge(
+        path_len_df,
+        on="id", how="left"
+    )
+
+    # For each id, iterate over coords and check if it has moved. If so, add to path length.
+    # Add to data[that robot's id]
 
     merged = merged.fillna(-1)
     data["traversal"] = [
             {
                 "id": row.id,
                 "time": row.time_exit - row.time_entry if row.time_exit > -1 else -1,
+                "path_len": row.path_len,
                 "y_i": row.y_entry,
                 "y_f": row.y_exit
             }
             for row in merged.itertuples()
      ]
+
 
 # Single number, the finishing makespan
 # Given the playback data and data containing traversal info, add the finish line makespan to data.
