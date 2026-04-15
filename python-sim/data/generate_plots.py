@@ -10,12 +10,10 @@ import matplotlib.pyplot as plt
 # - ridge plot for measuring distribution at each row of obstacles. (where is the spreading concentrated?)
 # - Quantile tracking swarm percentile x positions over time.
 # - Throughput curve (just sort robots by finish time)
-# - Cell visitation heatmap?
 
 # Phase diagrams
-# - Heatmap with axes as row spacing x pin spacing colored by EMD or makespan.
 # - Robot density x obstacle noise, colored by collision rate or makespan. (can we find a jamming transition?)
-# - Boundary angle x noise, colored by final distribution entropy?
+# - Boundary angle x noise, colored by EMD?
 
 # Throughput curves
 # - Overlaid throughput curves for different strategies on the same plot. Calculate area between as a cost of a certain strategy.
@@ -24,8 +22,6 @@ import matplotlib.pyplot as plt
 # Things to watch for:
 # - The jamming transition
 # - The price of decentralized
-# - Does the output fit a normal distribution?
-# - Effective diffusion coefficient, at each row compute the mean squared lateral displacement
 
 
 PLAYBACK = "playback.csv"
