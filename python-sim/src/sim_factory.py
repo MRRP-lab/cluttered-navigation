@@ -15,12 +15,12 @@ def prepare_simulation(params) -> NavStrategy:
 
     spawn_layout = SpawnLayout(params.seed, params.num, params.density,
                                params.gridnum, start_line
-                               )
+    )
     env = Environment(params.gridnum, params.seed,
                       params.boundary, params.boundary_angle, spawn_layout.boundary_line_y_offset,
                       params.row_gap, params.pin_gap, params.noise
-                      )
-    robots = Robots(params.num, spawn_layout.offsets)
+    )
+    robots = Robots(params.num, spawn_layout.offsets, params.collision)
     robots.set_environment(env)
 
     match params.strategy:

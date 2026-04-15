@@ -41,6 +41,8 @@ class Environment():
 
                 x_noise = self.rng.integers(-noise, noise, endpoint=True)
                 y_noise = self.rng.integers(-noise, noise, endpoint=True)
+                #x_noise = round(self.rng.normal(0, noise))
+                #y_noise = round(self.rng.normal(0, noise))
                 x = col + x_noise
                 y = row + y_noise
 

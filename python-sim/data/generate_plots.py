@@ -1,27 +1,28 @@
 import pandas as pd
-import numpy as np
 import seaborn as sns
 from index_gen import query_index, fetch_sim_file
 
 from scipy.stats import wasserstein_distance
 import matplotlib.pyplot as plt
 
-# PLOT IDEAS
-# Main ideas: Compare centralized vs. decentralized.
+# TODO
+# Distribution
+# - ridge plot for measuring distribution at each row of obstacles. (where is the spreading concentrated?)
+# - Quantile tracking swarm percentile x positions over time.
+# - Throughput curve (just sort robots by finish time)
 
-# Makespan:
-# Makespan vs. drone count (each strategy)
-# Makespan vs. angle (each strategy)
+# Phase diagrams
+# - Robot density x obstacle noise, colored by collision rate or makespan. (can we find a jamming transition?)
+# - Boundary angle x noise, colored by EMD?
 
-# Traversal:
-# Avg traversal time vs. drone count (violin or scatter?) (each strategy)
-# Vs. angle (each strategy)
+# Throughput curves
+# - Overlaid throughput curves for different strategies on the same plot. Calculate area between as a cost of a certain strategy.
+# - Throughput curves for increasing robot density
 
-# EMD of one reference distribution compared to an interval of some other parameter.
-#   (single vs. agg.?)
-#   0 noise obstacles to lots of noise?
+# Things to watch for:
+# - The jamming transition
+# - The price of decentralized
 
-# So, compare metrics of each. Makespan (agg. vs. agg.), traversal (agg. vs. agg.).
 
 PLAYBACK = "playback.csv"
 ANALYTICS = "analytics.yaml"
@@ -50,114 +51,192 @@ CONFIDENCE_LEVEL = 0.95
 SHOW_MEANS = True
 SHOW_LEGEND = True
 
-# Given the playback data, add earth movers distance per timestep to data.
-# TODO what distributions are we comparing???
-def compute_EMD():
-    
-    pass
 
-def printDescriptiveStats(title, dataDict):
-    """Print descriptive statistics for each group in a pretty way with a title."""
-    # Print a formatted table of stats for each group (e.g., strategy)
-    print(f"\n=== {title} ===")
-    for group, values in dataDict.items():
-        arr = np.array(values)
-        if arr.size == 0:
-            print(f"{group}: No data.")
-            continue
-        # Compute and print common descriptive statistics
-        stats = {
-            'Count': len(arr),
-            'Mean': np.mean(arr),
-            'Std': np.std(arr, ddof=1) if len(arr) > 1 else 0.0,
-            'Min': np.min(arr),
-            '25%': np.percentile(arr, 25),
-            'Median': np.median(arr),
-            '75%': np.percentile(arr, 75),
-            'Max': np.max(arr)
-        }
-        print(f"{group}:")
-        for k, v in stats.items():
-            print(f"  {k:>6}: {v:>10.3f}" if isinstance(v, float) else f"  {k:>6}: {v}")
+# Generates a ridge plot for a single run.
+# This ridge plot shows how the distribution of robots
+# evolves as the robots traverse the field.
+# Along the super-y axis (each individual distribution) is the x-coordinate slice that each distribution is along.
+# Inside each distribution: We measure the distribution of robots entering this x slice at the y-coordinates.
+# Optional slices parameter is at which x slices to take distributions at.
+def distribution_ridge_plot(run, slices=None):
 
-def plotScatter(data, title, xLabel, yLabel, xIntTicks=False):
-    """Reusable scatter plot with best-fit line and descriptive stats."""
-    # Early exit if no data
-    xValues, yValues = zip(*data)
-    # Print stats for y-values (dependent variable)
-    plt.figure(figsize=FIGURE_SIZE)
-    plt.scatter(xValues, yValues, label='Data Points', color=PLOT_COLORS[0])  # Data points (same as box color)
-    # Add best-fit line if more than one point
-    if len(xValues) > 1:
-        coeffs = np.polyfit(xValues, yValues, BEST_FIT_DEGREE)
-        poly = np.poly1d(coeffs)
-        xFit = np.linspace(min(xValues), max(xValues), 100)
-        plt.plot(xFit, poly(xFit), color=PLOT_COLORS[1], label=BEST_FIT_LABEL.get(BEST_FIT_DEGREE, 'Best Fit'))  # Best-fit line (same as median)
-    plt.title(title, fontsize=FONT_SIZE)
-    plt.xlabel(xLabel, fontsize=FONT_SIZE)
-    plt.ylabel(yLabel, fontsize=FONT_SIZE)
-    # Set x-axis ticks for integer-based axes
-    if xIntTicks:
-        xMin, xMax = int(min(xValues)), int(max(xValues))
-        if xLabel.startswith('Drone Count'):
-            plt.xticks(np.arange(0, xMax+1, 5))
-        else:
-            step = 5 if xMax - xMin > 6 else 1
-            plt.xticks(np.arange(xMin, xMax+1, step))
-    if SHOW_LEGEND:
-        plt.legend()
+    sns.set_theme(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
+    run_id = run["simulation_id"]
+    playback = fetch_sim_file(run_id, PLAYBACK)
+
+    if slices is None:
+        slices = [x for x in range(0, run["gridnum"], 5)]
+
+    distribution = []
+    frames = []
+    for x in slices:
+        #At each slice, count the rows at each y value.
+        at_slice = playback[playback["x"] == x]
+        first_entries = at_slice.groupby("id")["time"].idxmin()
+
+        y_values = at_slice.loc[first_entries, "y"].reset_index(drop=True)
+
+        frames.append(pd.DataFrame({"x_slice": x, "y": y_values}))
+
+    distribution = pd.concat(frames, ignore_index=True)
+
+    # Initialize the FacetGrid object
+    pal = sns.cubehelix_palette(10, rot=-.25, light=.7)
+    g = sns.FacetGrid(distribution, row="x_slice", hue="x_slice", aspect=15, height=0.5, palette=pal)
+
+    # Draw the densities in a few steps
+    g.map(sns.kdeplot, "y",
+          bw_adjust=.5, clip_on=False,
+          fill=True, alpha=1, linewidth=1.5)
+    g.map(sns.kdeplot, "y", clip_on=False, color="w", lw=2, bw_adjust=.5)
+
+    # passing color=None to refline() uses the hue mapping
+    g.refline(y=0, linewidth=2, linestyle="-", color=None, clip_on=False)
+
+
+    # Define and use a simple function to label the plot in axes coordinates
+    def label(x, color, label):
+        ax = plt.gca()
+        ax.text(0, .2, label, fontweight="bold", color=color,
+                ha="left", va="center", transform=ax.transAxes)
+
+
+    g.map(label, "y")
+
+    # Set the subplots to overlap
+    g.figure.subplots_adjust(hspace=-0.5)
+
+    # Remove axes details that don't play well with overlap
+    g.set_titles("")
+    g.set(yticks=[], ylabel="")
+    g.despine(bottom=True, left=True)
+
     plt.show()
 
-def plotBox(samplesDict, title, yLabel):
-    """Reusable boxplot with descriptive stats for each group (e.g., strategy)."""
+# Produce a heatmap from runs where the x dimension is the row spacing and the y dimension is the pin spacing.
+# The heatmap is in reference to a default normal distribution because we're interested in seeing how our parameters make our robots deviate from the norm.
+def EMD_heatmap(runs):
     
-    plt.figure(figsize=FIGURE_SIZE)
-    plt.boxplot(
-        [samplesDict['Centralized'], samplesDict['Decentralized']],
-        tick_labels=['Centralized', 'Decentralized'],
-        patch_artist=True,
-        showmeans=SHOW_MEANS,
-        meanprops={"marker":"o","markerfacecolor":"white","markeredgecolor":"black"},
-        widths=BOX_WIDTH,
-        boxprops=dict(color=PLOT_COLORS[0], facecolor=PLOT_COLORS[0]), # Box color (same as scatter data points)
-        medianprops=dict(color=PLOT_COLORS[1]), # Median line (same as best-fit line)
-        whiskerprops=dict(color=PLOT_COLORS[2]), # Whiskers
-        capprops=dict(color=PLOT_COLORS[2]), # Caps
-        flierprops=dict(markerfacecolor=PLOT_COLORS[3], marker='o') # Outliers
+    # Pre-load metrics
+    data = {}
+    for id in runs["simulation_id"]:
+        data[id] = {
+                "analytics": fetch_sim_file(id, ANALYTICS)
+                }
+    pass
+
+# Produces a heatmap from the runs. x dimension is obstacle noise, y is robot amount.
+# TODO aggregate makespans across seeds.
+def makespan_heatmap(runs):
+    # Pre-load metrics
+    records = []
+    for id in runs["simulation_id"]:
+        analytics = fetch_sim_file(id, ANALYTICS)
+        # we can just loop over itertuples instead so we don't need to do this.
+        run = runs[runs["simulation_id"] == id].iloc[0]
+
+        records.append({
+            "noise": run["noise"],
+            "num": run["num"],
+            "makespan": analytics["makespan"]
+        })
+    df = pd.DataFrame(records)
+
+    makespans = df.pivot_table(index="num", columns="noise", values="makespan", aggfunc="mean")
+
+    # Draw a heatmap with the numeric values in each cell
+    f, ax = plt.subplots(figsize=(9, 6))
+    sns.heatmap(makespans, annot=True, fmt=".1f", linewidths=.5, ax=ax)
+    plt.show()
+
+# EMD
+# for obstacle density levels present in runs
+#     for drone density levels present in runs
+#         locate reference distribution for 0 noise
+#         for noise levels
+#             extract final distribution
+#             calculate EMD, join with runs
+def EMD_by_noise(runs):
+    result_list = []
+
+    # Pre-load metrics
+    data = {}
+    for id in runs["simulation_id"]:
+        data[id] = {
+                "analytics": fetch_sim_file(id, ANALYTICS)
+                }
+
+    # Select unique groupings of these parameters
+    grouped = runs.groupby(["density", "row_gap"])
+
+    for (density, row_gap), group in grouped:
+
+        # There should only be one possible reference here.
+        reference = group[group["noise"] == 0]
+
+        if reference.empty:
+            print(f"no 0 noise reference for density {density}, row_gap {row_gap}.")
+            continue
+
+        # DF to series to id to reference final distribution
+        reference_id = reference.iloc[0]["simulation_id"]
+        reference_analytics = data[reference_id]["analytics"]
+        reference_distr = [tr["y_f"] for tr in reference_analytics["traversal"]]
+
+        for _, row in group.iterrows():
+            # Don't include the reference, it's a useless data point
+            if row["noise"] == 0:
+                continue
+            curr_analytics = data[row["simulation_id"]]["analytics"]
+            curr_distr = [tr["y_f"] for tr in curr_analytics["traversal"]]
+            emd = wasserstein_distance(reference_distr, curr_distr)
+            result_list.append({
+                "noise": row["noise"],
+                "EMD": emd,
+                "row_gap": row["row_gap"],
+                "density": row["density"]
+                })
+    result = pd.DataFrame(result_list)
+    print(result)
+    g = sns.relplot(
+        data=result,
+        x="noise", y="EMD",
+        row="row_gap", col="density",
+        kind="line",
+        height=2, aspect=1.5, legend=False,
     )
-    plt.title(title, fontsize=FONT_SIZE)
-    plt.ylabel(yLabel, fontsize=FONT_SIZE)
-    plt.xlabel('Strategy', fontsize=FONT_SIZE)
+    g.fig.suptitle("Robot EMD Sensitivity Analysis", y=1.02)
     plt.show()
 
 if __name__ == "__main__":
 
     # Compute our plots.
     # The user should be able to specify a range of simulation parameters to aggregate data with and plot specific simulations/aggregations against each other using various plot types.
-    # Makespan: We separate by buckets (centralized vs. decentralized), then aggregate over each.
-    
-    # wasserstein line plot?
-
-    # Makespan vs. number for a fixed angle
-    query = {
-        "angle": 20
+    constants = {
+            "experiment-name": "Heatmap test",
+            "boundary": True,
+            "gridnum": 150,
+            "density": 1,
         }
 
-    results = query_index(query)
+    results = query_index(constants)
+    print(results)
+    makespan_heatmap(results)
+    #constants = {
+    #        "experiment-name": "Collision test",
+    #        "boundary": True,
+    #        "num": 30,
+    #        "row_gap": 2,
+    #        "pin_gap": 1,
+    #        "noise": 0,
+    #        "density": 1,
+    #    }
+    #results = query_index(constants)
+    #distribution_ridge_plot(results.iloc[0])
+    #distribution_ridge_plot(results.iloc[1])
 
-    data = []
-
-    for id in results["simulation_id"]:
-        analytics = fetch_sim_file(id, ANALYTICS)
-        params = fetch_sim_file(id, PARAMS)
-        # playback = fetch_sim_file(id, PLAYBACK)
-        data.append([analytics["makespan"], params["num"]])
-        # finishes = playback[playback["x"] == params["gridnum"]]["y"]
-        # finishes.plot(kind="hist", bins=20)
-
-
-    data = pd.DataFrame(data=data, columns=["makespan", "num"]).sort_values("num")
-    sns.lineplot(data=data, x="num", y="makespan")
-
-    plt.show()
+    #by_pin_gap = results.groupby("pin_gap")
+    #for pin_gap, group in by_pin_gap:
+    #    print("pin gap: ", pin_gap)
+    #    EMD_by_noise(group)
 

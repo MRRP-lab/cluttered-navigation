@@ -5,13 +5,16 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from contextlib import contextmanager
 
 # All keys will have a double hyphen added. Ensure these use the same form as the long argument name.
+# TODO Some parameters are exclusive with each other. That is, they either have no effect or are incompatible with each other. We should deal with this somehow. For example:
+# - The centralized nav strategy and collision have no effect. We can't 
 params = {
         "num": [20],
         "gridnum": [20, 25, 30],
         "boundary": True,
         "boundary-angle": [22.5, 20, 15, 10, 7],
         "strategy": ["centralized", "decentralized"],
-        "experiment-name": "Centralized test"
+        "experiment-name": "Centralized test",
+        "collision": [True],
         }
 
 simulator = "./generate_demo.py"

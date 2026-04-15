@@ -7,9 +7,10 @@ class Params:
 
     density = 1
 
+    collision = True
+
     boundary = False
     boundary_angle = 22.5
-    boundary_offset = -10
 
     # Params mainly for playback
     FPS = 10

@@ -1,9 +1,10 @@
 
 class Robots():
-    def __init__(self, N, spawns):
+    def __init__(self, N, spawns, collision):
         self.env = None
         self.num = N
         self.coords = spawns
+        self.collision = collision
 
     def set_environment(self, env):
         self.env = env
