@@ -6,7 +6,7 @@ import yaml
 # TODO: Centralize the names somewhere so we can do this programmatically instead. Parameters are very fragile this way.
 indexed_columns = ["simulation_id", "experiment_name",
                    "num", "seed", "strategy", "gridnum",
-                   "density", "collision",
+                   "density", "disable_collision",
                    "boundary", "boundary_angle",
                    "row_gap", "pin_gap", "noise"]
 
