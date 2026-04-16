@@ -12,17 +12,19 @@ experiments = [{
     "experiment-name": "Heatmap test",
     "num": [n*50 for n in range(1,10)],
     "noise": [n for n in range(0,5)],
-    "gridnum": [150, 250, 350],
-    "seed": [s for s in range(7)],
+    "gridnum": [150],
+    "seed": [s for s in range(5)],
     "disable-collision": False,
     "boundary": True,
     "boundary-angle": [22.5],
-    },{
+    },
+    {
     "experiment-name": "Gaussian test",
     "disable-collision": [True, False],
-    "num": 200,
-    "gridnum": 300,
-    "row-gap": 1,
+    "boundary": True,
+    "num": 50,
+    "gridnum": 50,
+    "row-gap": 2,
     "pin-gap": 1,
     }
 ]

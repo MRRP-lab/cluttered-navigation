@@ -146,8 +146,11 @@ def main():
         if not os.path.exists(playback_path):
             print(f"Could not read {sim_id}. Skipping.")
         else:
-            data = compute_analytics(playback_path, params_path)
             analytics = os.path.join(SIM_ROOT, ANALYTICS)
+            # Avoid recomputing the same numbers if analytics were already done.
+            if (os.path.exists(analytics)):
+                continue
+            data = compute_analytics(playback_path, params_path)
             with open(analytics, "w") as f:
                 yaml.safe_dump(data, f)
 if __name__ == "__main__":

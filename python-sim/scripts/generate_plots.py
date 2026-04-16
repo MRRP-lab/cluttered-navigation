@@ -220,20 +220,20 @@ if __name__ == "__main__":
         }
 
     results = query_index(constants)
-    print(results)
     makespan_heatmap(results)
-    #constants = {
-    #        "experiment-name": "Collision test",
-    #        "boundary": True,
-    #        "num": 30,
-    #        "row_gap": 2,
-    #        "pin_gap": 1,
-    #        "noise": 0,
-    #        "density": 1,
-    #    }
-    #results = query_index(constants)
-    #distribution_ridge_plot(results.iloc[0])
-    #distribution_ridge_plot(results.iloc[1])
+
+    constants = {
+            "experiment-name": "Gaussian test",
+            "boundary": True,
+            "num": 50,
+            "gridnum": 50,
+            "row_gap": 2,
+            "pin_gap": 1,
+        }
+    results = query_index(constants)
+    print(results)
+    distribution_ridge_plot(results.iloc[0])
+    distribution_ridge_plot(results.iloc[1])
 
     #by_pin_gap = results.groupby("pin_gap")
     #for pin_gap, group in by_pin_gap:
