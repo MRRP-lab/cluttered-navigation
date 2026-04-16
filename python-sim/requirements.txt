@@ -4,5 +4,4 @@ pyyaml
 matplotlib
 numpy
 scipy
-protobuf
 seaborn

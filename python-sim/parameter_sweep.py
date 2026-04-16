@@ -2,24 +2,21 @@ import sys
 import subprocess
 import itertools
 from concurrent.futures import ProcessPoolExecutor, as_completed
-from contextlib import contextmanager
 
 # All keys will have a double hyphen added. Ensure these use the same form as the long argument name.
-# TODO Some parameters are exclusive with each other. That is, they either have no effect or are incompatible with each other. We should deal with this somehow. For example:
-# - The centralized nav strategy and collision have no effect. We can't 
 params = {
-        "num": [20],
-        "gridnum": [20, 25, 30],
+        "num": [n*50 for n in range(1,10)],
+        "noise": [n for n in range(0,5)],
+        "gridnum": [150, 250, 350],
+        "seed": [s for s in range(10)],
         "boundary": True,
-        "boundary-angle": [22.5, 20, 15, 10, 7],
-        "strategy": ["centralized", "decentralized"],
-        "experiment-name": "Centralized test",
+        "boundary-angle": [22.5],
         "collision": [True],
+        "experiment-name": "Heatmap test"
         }
 
 simulator = "./generate_demo.py"
 indexer = "./data/index_gen.py"
-java_server = "./src/optimal-mrppg/bytecode/server.jar"
 
 # If we don't do this, itertools.product will treat strings as a list of characters.
 normalized = {
@@ -60,35 +57,18 @@ def run_single_sim(params):
     except Exception as e:
         return {**params, "status": "CRASHED", "err": str(e)}
 
-@contextmanager
-def java_solver_server(enabled=True, workers=1):
-    if not enabled:
-        yield None
-        return
-    print("Starting Java server for optimal centralized solutions.")
-    proc = subprocess.Popen(["java", "-jar", java_server, str(workers)])
-    try:
-        yield proc
-    finally:
-        print("Stopping Java server.")
-        proc.terminate()
-        proc.wait()
-
 def run_sweep(all_combinations):
-    needs_java = "centralized" in params["strategy"]
     total = len(all_combinations)
     done = 0
     print(f"Progress: [{done}/{total}]", end="")
     results = []
-    with java_solver_server(enabled=needs_java):
-        with ProcessPoolExecutor() as executor:
-            futures = [executor.submit(run_single_sim, p) for p in all_combinations]
-            for future in as_completed(futures):
-                results.append(future.result())
-                done += 1
-                print(f"\rProgress: [{done}/{total}]", end="", flush=True)
-        print()
-    print("Parameter sweep done!")
+    with ProcessPoolExecutor() as executor:
+        futures = [executor.submit(run_single_sim, p) for p in all_combinations]
+        for future in as_completed(futures):
+            results.append(future.result())
+            done += 1
+            print(f"\rProgress: [{done}/{total}]", end="", flush=True)
+    print()
     return results
 
 print("Running parameter sweep now.")
