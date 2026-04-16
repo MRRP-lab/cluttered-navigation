@@ -3,21 +3,29 @@ import subprocess
 import itertools
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
-# All keys will have a double hyphen added. Ensure these use the same form as the long argument name.
-params = {
-        "num": [n*50 for n in range(1,10)],
-        "noise": [n for n in range(0,5)],
-        "gridnum": [150, 250, 350],
-        "boundary": True,
-        "boundary-angle": [22.5],
-        "disable-collision": False,
-        "experiment-name": "Heatmap test"
-        }
-
 _here = os.path.dirname(__file__)
 SIMULATOR = os.path.join(_here, "generate_demo.py")
 INDEXER = os.path.join(_here, "index_gen.py")
 
+# All keys will have a double hyphen added. Ensure these use the same form as the long argument name.
+experiments = [{
+    "experiment-name": "Heatmap test",
+    "num": [n*50 for n in range(1,10)],
+    "noise": [n for n in range(0,5)],
+    "gridnum": [150, 250, 350],
+    "seed": [s for s in range(7)],
+    "disable-collision": False,
+    "boundary": True,
+    "boundary-angle": [22.5],
+    },{
+    "experiment-name": "Gaussian test",
+    "disable-collision": [True, False],
+    "num": 200,
+    "gridnum": 300,
+    "row-gap": 1,
+    "pin-gap": 1,
+    }
+]
 
 def run_single_sim(params):
     args = [sys.executable, SIMULATOR]
@@ -110,6 +118,10 @@ def reindex():
 
 
 if __name__ == "__main__":
-    results = full_sweep(params)
-    print_results(results)
+    experiment_num = 1
+    for experiment in experiments:
+        print(f"Experiment {experiment_num}: ")
+        results = full_sweep(experiment)
+        print_results(results)
+        experiment_num += 1
     reindex()

@@ -101,7 +101,9 @@ class Robots():
         return progress
 
 
-    # TODO better representation of robot coordinates could make this quicker
+    # TODO better representation of robot coordinates could make this quicker. Trade space for time type deal.
+    # As it stands, if all robots are doing robot-robot collision detection,
+    # the total cost per frame is O(3n^2) when it could be O(3n). (storing robot coords in a matrix would make access equal O(1)
     # Returns true if there's a robot at this position
     def is_robot(self, x, y):
         for pos in self.coords:
