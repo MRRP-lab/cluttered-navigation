@@ -7,7 +7,7 @@ class Params:
 
     density = 1
 
-    collision = True
+    disable_collision = False
 
     boundary = False
     boundary_angle = 22.5

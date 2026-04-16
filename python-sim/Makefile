@@ -2,7 +2,7 @@ STAMPS := .stamps
 
 export PYTHONPATH := $(shell pwd)
 
-.PHONY: $(STAMPS)/plots
+.PHONY: $(STAMPS)/plots parameter_sweep
 
 ARGS ?= 
 
@@ -16,6 +16,8 @@ ARGS ?=
 # then this method breaks. You'd need to clear the appropriate stamps and re-run.
 
 all: $(STAMPS)/plots
+
+parameter_sweep: $(STAMPS)/parameter_sweep
 
 $(STAMPS)/parameter_sweep: scripts/parameter_sweep.py
 	python scripts/parameter_sweep.py

@@ -8,10 +8,9 @@ params = {
         "num": [n*50 for n in range(1,10)],
         "noise": [n for n in range(0,5)],
         "gridnum": [150, 250, 350],
-        "seed": [s for s in range(10)],
         "boundary": True,
         "boundary-angle": [22.5],
-        "collision": [True],
+        "disable-collision": False,
         "experiment-name": "Heatmap test"
         }
 

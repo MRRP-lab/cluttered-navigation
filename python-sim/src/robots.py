@@ -8,12 +8,12 @@ class PlinkoState(Enum):
     TRAPPED = 3
 
 class Robots():
-    def __init__(self, N, seed, spawns, collision):
+    def __init__(self, N, seed, spawns, disabled_collision):
         self.env = None
         self.num = N
         self.rng = np.random.default_rng(seed)
         self.coords = spawns
-        self.collision = collision
+        self.disabled_collision = disabled_collision
 
         # TODO: Separate navigation logic for each different strategy
         # to a different place.
@@ -57,7 +57,7 @@ class Robots():
         up = self.env.is_obstacle(c[0], c[1]-1)
         down = self.env.is_obstacle(c[0], c[1]+1)
         
-        if (self.collision):
+        if (not self.disabled_collision):
             right += self.is_robot(c[0]+1, c[1])
             up += self.is_robot(c[0], c[1]-1)
             down += self.is_robot(c[0], c[1]+1)

@@ -38,9 +38,9 @@ return: a namespace with parsed arguments'''
                         help="Include to add a reflecting boundary.",
                         default=Params.boundary, action="store_true")
 
-    parser.add_argument("--collision",
+    parser.add_argument("--disable-collision",
                         help="Include to disable robot-robot collision.",
-                        default=Params.collision, action="store_false")
+                        default=Params.disable_collision, action="store_true")
 
     parser.add_argument("-a", "--boundary-angle", 
                         help="Positive and negative reflecting boundary angle in degrees", 
