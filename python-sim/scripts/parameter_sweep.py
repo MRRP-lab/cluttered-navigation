@@ -19,17 +19,6 @@ _here = os.path.dirname(__file__)
 SIMULATOR = os.path.join(_here, "generate_demo.py")
 INDEXER = os.path.join(_here, "index_gen.py")
 
-# If we don't do this, itertools.product will treat strings as a list of characters.
-normalized = {
-        k: [v] if isinstance(v, (str, int, float)) or v is None else v
-        for k, v in params.items()
-        }
-
-keys = normalized.keys()
-values = normalized.values()
-
-combinations = [dict(zip(keys, v)) for v in itertools.product(*values)]
-# print(combinations)
 
 def run_single_sim(params):
     args = [sys.executable, SIMULATOR]
@@ -58,7 +47,7 @@ def run_single_sim(params):
     except Exception as e:
         return {**params, "status": "CRASHED", "err": str(e)}
 
-def run_sweep(all_combinations):
+def run_sims(all_combinations):
     total = len(all_combinations)
     done = 0
     print(f"Progress: [{done}/{total}]", end="")
@@ -72,34 +61,56 @@ def run_sweep(all_combinations):
     print()
     return results
 
-print("Running parameter sweep now.")
-results = run_sweep(combinations)
+def full_sweep(params):
+    # If we don't do this, itertools.product will treat strings as a list of characters.
+    normalized = {
+            k: [v] if isinstance(v, (str, int, float)) or v is None else v
+            for k, v in params.items()
+            }
 
-full_success = True
-for result in results:
-    # Advanced debug
-    #for k, v in result.items():
-    #    print(f"{k}:", v)
-    match(result["status"]):
-        case "CRASHED":
-            full_success = False
-            print("Simulation crashed with err:")
-            print(result["err"])
-        case "FAILED":
-            full_success = False
-            print(f'Simulation failed with code {result["exit_code"]}:')
-            print(result["stderr"])
+    keys = normalized.keys()
+    values = normalized.values()
 
-if (full_success):
-    print("All simulations successful!")
+    combinations = [dict(zip(keys, v)) for v in itertools.product(*values)]
+    # print(combinations)
 
-indexing_result = subprocess.run([sys.executable, INDEXER],
-                                 capture_output=True,
-                                 text=True,
-                                 check=False
-                                 )
-if (indexing_result.returncode == 0):
-    print("Simulation re-indexing successful.")
-else:
-    print(f"Simulation re-indexing unsuccessful. Exit code: {indexing_result.returncode}")
+    print("Running parameter sweep now.")
+    return run_sims(combinations)
 
+def print_results(results):
+    full_success = True
+    for result in results:
+        # Advanced debug
+        #for k, v in result.items():
+        #    print(f"{k}:", v)
+        match(result["status"]):
+            case "CRASHED":
+                full_success = False
+                print("Simulation crashed with err:")
+                print(result["err"])
+            case "FAILED":
+                full_success = False
+                print(f'Simulation failed with code {result["exit_code"]}:')
+                print(result["stderr"])
+
+    if (full_success):
+        print("All simulations successful!")
+
+
+def reindex():
+    indexing_result = subprocess.run([sys.executable, INDEXER],
+                                     capture_output=True,
+                                     text=True,
+                                     check=False
+                                     )
+
+    if (indexing_result.returncode == 0):
+        print("Simulation re-indexing successful.")
+    else:
+        print(f"Simulation re-indexing unsuccessful. Exit code: {indexing_result.returncode}")
+
+
+if __name__ == "__main__":
+    results = full_sweep(params)
+    print_results(results)
+    reindex()
