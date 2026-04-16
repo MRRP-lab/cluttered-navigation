@@ -11,7 +11,6 @@ from src.data_logger import DataLogger
 ########################## PARAMETERS ###########################################
 sim_args = parse_args(sys.argv)
 
-# TODO add experiment name parameter
 playback_log = DataLogger(sim_args)
 
 ############################### MAIN ##############################################
