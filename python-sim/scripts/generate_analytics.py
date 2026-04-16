@@ -5,11 +5,10 @@ import sys
 import subprocess
 import math
 
-
-DATA_ROOT = "./"
+_here = os.path.dirname(__file__)
+DATA_ROOT = os.path.join(_here, "../data")
 RUNS = "runs/"
 INDEX = "index.csv"
-INDEXER = "index_gen.py"
 
 PLAYBACK = "playback.csv"
 ANALYTICS = "analytics.yaml"
@@ -132,19 +131,8 @@ def main():
     # Fetch index
     index = os.path.join(DATA_ROOT, INDEX)
     if not os.path.exists(index):
-        print("Index does not exist. Generating...")
-        cmd = [sys.executable, INDEXER]
-        indexing_result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                check=False
-                )
-        if (indexing_result.returncode == 0):
-            print("Simulation re-indexing successful.")
-        else:
-            print(f"Simulation re-indexing unsuccessful. Exit code: {indexing_result.returncode}")
-            exit(1)
+        print("Index does not exist. Exiting...")
+        exit(1)
 
     index_data = pd.read_csv(index)
     

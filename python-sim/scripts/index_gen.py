@@ -10,15 +10,16 @@ indexed_columns = ["simulation_id", "experiment_name",
                    "boundary", "boundary_angle",
                    "row_gap", "pin_gap", "noise"]
 
-path = os.path.dirname(__file__)
-index_path = os.path.join(path, "index.csv")
-runs_dir = os.path.join(path, "runs/")
+_here = os.path.dirname(__file__)
+DATA_ROOT = os.path.join(_here, "../data/")
+INDEX_PATH = os.path.join(DATA_ROOT, "index.csv")
+RUNS_DIR = os.path.join(DATA_ROOT, "runs/")
 
 
 def query_index(params):
-    if not os.path.exists(index_path):
+    if not os.path.exists(INDEX_PATH):
         raise FileNotFoundError("Index not found.")
-    index = pd.read_csv(index_path)
+    index = pd.read_csv(INDEX_PATH)
 
     query = params
     if (type(params) != dict):
@@ -36,7 +37,7 @@ def query_index(params):
 # *.yaml files will return a dictionary.
 # kwargs are passed directly to the file parser.
 def fetch_sim_file(sim_id, file, **kwargs):
-    path = os.path.join(runs_dir, sim_id, file)
+    path = os.path.join(RUNS_DIR, sim_id, file)
     if not os.path.exists(path):
         raise FileNotFoundError(f"File {file} does not exist for simulation {sim_id}.")
     else:
@@ -53,14 +54,14 @@ def fetch_sim_file(sim_id, file, **kwargs):
 def main():
     index = []
 
-    for run_path in glob.glob(runs_dir + "/*"):
+    for run_path in glob.glob(RUNS_DIR + "/*"):
         with open(os.path.join(run_path, "params.yaml")) as f:
             run_parameters = yaml.safe_load(f)
             index.append(run_parameters)
 
     index = pd.DataFrame(data=index, columns=indexed_columns)
 
-    index.to_csv(index_path, lineterminator="")
+    index.to_csv(INDEX_PATH, lineterminator="")
 
 
 

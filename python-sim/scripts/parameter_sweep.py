@@ -1,4 +1,4 @@
-import sys
+import sys, os
 import subprocess
 import itertools
 from concurrent.futures import ProcessPoolExecutor, as_completed
@@ -15,8 +15,9 @@ params = {
         "experiment-name": "Heatmap test"
         }
 
-simulator = "./generate_demo.py"
-indexer = "./data/index_gen.py"
+_here = os.path.dirname(__file__)
+SIMULATOR = os.path.join(_here, "generate_demo.py")
+INDEXER = os.path.join(_here, "index_gen.py")
 
 # If we don't do this, itertools.product will treat strings as a list of characters.
 normalized = {
@@ -31,7 +32,7 @@ combinations = [dict(zip(keys, v)) for v in itertools.product(*values)]
 # print(combinations)
 
 def run_single_sim(params):
-    args = [sys.executable, simulator]
+    args = [sys.executable, SIMULATOR]
     for k, v in params.items():
 
         if isinstance(v, bool):
@@ -92,7 +93,7 @@ for result in results:
 if (full_success):
     print("All simulations successful!")
 
-indexing_result = subprocess.run([sys.executable, indexer],
+indexing_result = subprocess.run([sys.executable, INDEXER],
                                  capture_output=True,
                                  text=True,
                                  check=False

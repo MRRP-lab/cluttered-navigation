@@ -1,11 +1,10 @@
 import numpy as np
 import pygame
-import pandas as pd
 import os
 import glob
 import sys
 
-from data.index_gen import query_index, fetch_sim_file
+from index_gen import query_index, fetch_sim_file
 from src.environment import Environment
 from src.arg_parser import parse_args
 from src.spawn_layout import SpawnLayout
@@ -33,9 +32,10 @@ def find_simulation(params):
 
 SAVE_VID = True
 VIZGRID = True
-vid_name = "test.mp4"
+VID_NAME = "test.mp4"
 tag = "" # replace with informative parameters
-viddir = './videos'
+_here = os.path.dirname(__file__)
+VID_DIR = os.path.join(_here, '../videos')
 
 # import the data from generate_demo
 sim_data = find_simulation(sim_args)
@@ -43,9 +43,9 @@ replay_data = fetch_sim_file(sim_data["simulation_id"], "playback.csv", dtype='i
 
 ########################## SETUP ##########################
 
-if not os.path.exists(viddir):
-    os.mkdir(viddir)
-vid_out = os.path.join(viddir, vid_name)
+if not os.path.exists(VID_DIR):
+    os.mkdir(VID_DIR)
+vid_out = os.path.join(VID_DIR, VID_NAME)
 
 # set up folder for saving frames
 if SAVE_VID:

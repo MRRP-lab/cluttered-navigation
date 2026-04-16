@@ -1,4 +1,5 @@
 .python-version
+.stamps/
 _frames/
 my-venv/
 data/runs/
