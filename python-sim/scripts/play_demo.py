@@ -16,16 +16,16 @@ ss = sim_args.cell_size * sim_args.gridnum
 # Either provide file, or specify parameters. If param not specified, use defaults.
 # Search for the recorded simulation that matches exactly.
 def find_simulation(params):
-    # Ignore experiment name when searching
-    del params.experiment_name
-    
     result = query_index(params)
     match_count = len(result)
     if (match_count == 0):
+        print("query: ", params)
         raise FileNotFoundError("A simulation with the supplied parameters is not indexed.")
     elif (match_count > 1):
         # TODO shouldn't be a generic exception. couldnt be asked to deal with figuring it out.
         # we should make the user specify which one.
+        print("query:", params)
+        print(result)
         raise Exception("Ambiguous parameter set, could be a few different simulations")
     else:
         return result.iloc[0]

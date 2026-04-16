@@ -21,9 +21,10 @@ class SpawnLayout:
     # Move behind the start line
     def spawn_before_start_line(self):
         map_height = self.grid_num
-        center = np.array([math.floor(-self.max_radius) + self.start_line,  math.ceil(map_height / 2)])
+        center = np.array([math.floor(-self.max_radius) + self.start_line,  math.floor(map_height / 2)])
         for r in range(self.num):
             self.offsets[r] = self.offsets[r] + center
+        
 
     # Spawn robots in a circular manner around a point such that no robots are overlapping.
     def generate_circular_spawn_offsets(self, density):

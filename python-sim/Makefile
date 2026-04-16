@@ -1,3 +1,7 @@
+PY_SRC_DIR := ./src
+PY_DST_DIR := ./src/protobuf
+JAVA_SRC_DIR := ./src/optimal-mrppg
+PROTOBUF := ./src/multiagent-pathfinding-protobuf/problem.proto
 STAMPS := .stamps
 
 export PYTHONPATH := $(shell pwd)
@@ -31,12 +35,21 @@ $(STAMPS)/plots: $(STAMPS)/analytics
 	python scripts/generate_plots.py
 	mkdir -p $(STAMPS) && touch $@
 
+# How to use: make single_sim args="(parameters go here)"
 single_sim: 
 	python scripts/generate_demo.py $(ARGS)
 	python scripts/index_gen.py
 	python scripts/play_demo.py $(ARGS)
 
+compile: 
+	mkdir -p ${PY_DST_DIR}
+	protoc --proto_path=${PY_SRC_DIR} --python_out=${PY_DST_DIR} ${PROTOBUF}
+	$(MAKE) -C ${JAVA_SRC_DIR}
+
 clean:
 	rm -rf data/runs
 	rm -f data/index.csv
 	rm -rf $(STAMPS)
+	rm -rf ${PY_DST_DIR}
+	$(MAKE) clean -C ${JAVA_SRC_DIR}
+

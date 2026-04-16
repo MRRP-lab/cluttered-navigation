@@ -1,0 +1,7 @@
+[submodule "python-sim/src/optimal-mrppg"]
+	path = python-sim/src/optimal-mrppg
+	url = git@github.com:Mrnibblesg/optimal-mrppg.git
+	branch = protobuf-time-solver
+[submodule "python-sim/src/multiagent-pathfinding-protobuf"]
+	path = python-sim/src/multiagent-pathfinding-protobuf
+	url = git@github.com:Mrnibblesg/multiagent-pathfinding-protobuf.git

@@ -6,5 +6,4 @@ data/runs/
 data/index.csv
 venv
 videos/
-
-
+src/protobuf

@@ -2,10 +2,15 @@ import sys, os
 import subprocess
 import itertools
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from contextlib import contextmanager
+
+# So we can check the default value of strategy
+from src.params import Params
 
 _here = os.path.dirname(__file__)
 SIMULATOR = os.path.join(_here, "generate_demo.py")
 INDEXER = os.path.join(_here, "index_gen.py")
+java_server = "./src/optimal-mrppg/bytecode/server.jar"
 
 # All keys will have a double hyphen added. Ensure these use the same form as the long argument name.
 experiments = [{
@@ -56,17 +61,35 @@ def run_single_sim(params):
     except Exception as e:
         return {**params, "status": "CRASHED", "err": str(e)}
 
-def run_sims(all_combinations):
+@contextmanager
+def java_solver_server(enabled=True, workers=1):
+    if not enabled:
+        yield None
+        return
+    print("Starting Java server for optimal centralized solutions.")
+    proc = subprocess.Popen(["java", "-jar", java_server, str(workers)])
+    try:
+        yield proc
+    finally:
+        print("Stopping Java server.")
+        proc.terminate()
+        proc.wait()
+
+def run_sims(params, all_combinations):
+    needs_java = ("strategy" not in params and Params.strategy == "centralized") or \
+            ("strategy" in params and "centralized" in params["strategy"])
+
     total = len(all_combinations)
     done = 0
     print(f"Progress: [{done}/{total}]", end="")
     results = []
-    with ProcessPoolExecutor() as executor:
-        futures = [executor.submit(run_single_sim, p) for p in all_combinations]
-        for future in as_completed(futures):
-            results.append(future.result())
-            done += 1
-            print(f"\rProgress: [{done}/{total}]", end="", flush=True)
+    with java_solver_server(enabled=needs_java):
+        with ProcessPoolExecutor() as executor:
+            futures = [executor.submit(run_single_sim, p) for p in all_combinations]
+            for future in as_completed(futures):
+                results.append(future.result())
+                done += 1
+                print(f"\rProgress: [{done}/{total}]", end="", flush=True)
     print()
     return results
 
@@ -84,7 +107,7 @@ def full_sweep(params):
     # print(combinations)
 
     print("Running parameter sweep now.")
-    return run_sims(combinations)
+    return run_sims(params, combinations)
 
 def print_results(results):
     full_success = True
