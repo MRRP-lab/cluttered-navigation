@@ -235,8 +235,14 @@ if __name__ == "__main__":
     distribution_ridge_plot(results.iloc[0])
     distribution_ridge_plot(results.iloc[1])
 
-    #by_pin_gap = results.groupby("pin_gap")
-    #for pin_gap, group in by_pin_gap:
-    #    print("pin gap: ", pin_gap)
-    #    EMD_by_noise(group)
+    constants = {
+        "experiment-name": "EMD calc",
+    }
+    results = query_index(constants)
+
+    by_pin_gap = results.groupby("pin_gap")
+    for pin_gap, group in by_pin_gap:
+        print("pin gap: ", pin_gap)
+        EMD_by_noise(group)
+
 

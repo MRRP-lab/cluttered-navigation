@@ -31,7 +31,16 @@ experiments = [{
     "gridnum": 50,
     "row-gap": 2,
     "pin-gap": 1,
-    }
+    },
+    {
+    "num": [100],
+    "boundary": True,
+    "density": [0.2, 0.5, 1],
+    "row-gap": [1, 2, 3, 4, 5, 6],
+    "pin-gap": [1, 2, 3, 4, 5, 6],
+    "noise": [0, 1, 2, 3, 4, 5],
+    "experiment-name": "EMD calc"
+    },
 ]
 
 def run_single_sim(params):

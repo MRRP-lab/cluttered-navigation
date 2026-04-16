@@ -41,6 +41,9 @@ single_sim:
 	python scripts/index_gen.py
 	python scripts/play_demo.py $(ARGS)
 
+show_sim:
+	python scripts/play_demo.py $(ARGS)
+
 compile: 
 	mkdir -p ${PY_DST_DIR}
 	protoc --proto_path=${PY_SRC_DIR} --python_out=${PY_DST_DIR} ${PROTOBUF}
