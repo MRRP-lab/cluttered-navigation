@@ -66,6 +66,9 @@ return: a namespace with parsed arguments'''
                         help="Max value for randomized x/y displacement of obstacles: noisiness of obstacles.",
                         type=int, default=Params.noise)
     
+    parser.add_argument("--simulation-id",
+                        help="Useful only when playing back data. When included, other parameters are ignored.",
+                        type=str)
 
     #parse arguments 
     #and return namespace with arguments

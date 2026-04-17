@@ -9,14 +9,20 @@ from src.environment import Environment
 from src.arg_parser import parse_args
 from src.spawn_layout import SpawnLayout
 ########################## PARAMETERS ###########################################
+# Used purely to query the existing simulation runs.
 sim_args = parse_args(sys.argv)
-
-ss = sim_args.cell_size * sim_args.gridnum
+PLAYBACK = "playback.csv"
+PARAMS = "params.yaml"
 
 # Either provide file, or specify parameters. If param not specified, use defaults.
 # Search for the recorded simulation that matches exactly.
 def find_simulation(params):
-    result = query_index(params)
+    result = None
+    if "simulation_id" in params:
+        result = query_index({"simulation_id": params.simulation_id})
+    else:
+        result = query_index(params)
+
     match_count = len(result)
     if (match_count == 0):
         print("query: ", params)
@@ -28,6 +34,7 @@ def find_simulation(params):
         print(result)
         raise Exception("Ambiguous parameter set, could be a few different simulations")
     else:
+        print(result)
         return result.iloc[0]
 
 SAVE_VID = True
@@ -39,8 +46,10 @@ VID_DIR = os.path.join(_here, '../videos')
 
 # import the data from generate_demo
 sim_data = find_simulation(sim_args)
-replay_data = fetch_sim_file(sim_data["simulation_id"], "playback.csv", dtype='int32')
+replay_data = fetch_sim_file(sim_data["simulation_id"], PLAYBACK, dtype='int32')
+sim_args = fetch_sim_file(sim_data["simulation_id"], PARAMS)
 
+ss = sim_args["cell_size"] * sim_args["gridnum"]
 ########################## SETUP ##########################
 
 if not os.path.exists(VID_DIR):
@@ -69,13 +78,13 @@ y_list = replay_data["y"].values.reshape(-1, sim_data["num"])
 
 ########################## MAIN  ###########################################3
 start_line = 0
-spawn_layout = SpawnLayout(sim_args.seed, sim_args.num, sim_args.density,
-                           sim_args.gridnum, start_line
+spawn_layout = SpawnLayout(sim_args["seed"], sim_args["num"], sim_args["density"],
+                           sim_args["gridnum"], start_line
                            )
 
-env = Environment(sim_args.gridnum, sim_args.seed,
-                  sim_args.boundary, sim_args.boundary_angle, spawn_layout.boundary_line_y_offset,
-                  sim_args.row_gap, sim_args.pin_gap, sim_args.noise)
+env = Environment(sim_args["gridnum"], sim_args["seed"],
+                  sim_args["boundary"], sim_args["boundary_angle"], spawn_layout.boundary_line_y_offset,
+                  sim_args["row_gap"], sim_args["pin_gap"], sim_args["noise"])
 
 coords = np.array([x_list,y_list]).T
 
@@ -95,22 +104,22 @@ for time in range(sim_time):
     # fill the background with white
     screen.fill((255,255,255))
 
-    for r in range(sim_args.num):
+    for r in range(sim_args["num"]):
         c = coords[r,time]
 
     # Draw the start and finish Lines:
     pygame.draw.rect(screen, (255, 255, 0),
-                     pygame.Rect(sim_args.cell_size * env.start_line, 0, sim_args.cell_size, ss))
+                     pygame.Rect(sim_args["cell_size"] * env.start_line, 0, sim_args["cell_size"], ss))
 
     pygame.draw.rect(screen, (0, 255, 0),
-                     pygame.Rect(sim_args.cell_size * (env.finish_line - 1), 0, sim_args.cell_size, ss))
+                     pygame.Rect(sim_args["cell_size"] * (env.finish_line - 1), 0, sim_args["cell_size"], ss))
 
     # Draw obstacles:
-    for row in range(sim_args.gridnum):
-        for square in range(sim_args.gridnum):
+    for row in range(sim_args["gridnum"]):
+        for square in range(sim_args["gridnum"]):
             if env.obstacles[row,square] == 1:
-                rect = pygame.Rect(square * sim_args.cell_size, row * sim_args.cell_size, 
-                                   sim_args.cell_size, sim_args.cell_size)
+                rect = pygame.Rect(square * sim_args["cell_size"], row * sim_args["cell_size"], 
+                                   sim_args["cell_size"], sim_args["cell_size"])
                 pygame.draw.rect(screen, (0, 0, 0), rect)
 
     # Draws all of the lines needed to make the grid, prints the box numbers (starting at 1)
@@ -126,15 +135,15 @@ for time in range(sim_time):
     ############################################################################
 
 
-    centering_offset = np.array([sim_args.cell_size / 2, sim_args.cell_size / 2]) + np.array([1, 1])
+    centering_offset = np.array([sim_args["cell_size"] / 2, sim_args["cell_size"] / 2]) + np.array([1, 1])
     # update robot positions
-    for r in range(sim_args.num):
-        c = coords[r,time] * sim_args.cell_size
+    for r in range(sim_args["num"]):
+        c = coords[r,time] * sim_args["cell_size"]
         
-        pygame.draw.circle(screen, (0,0,255), np.ceil(c) + centering_offset, max(sim_args.cell_size/2 - 1, 2))
+        pygame.draw.circle(screen, (0,0,255), np.ceil(c) + centering_offset, max(sim_args["cell_size"]/2 - 1, 2))
 
 
-    clock.tick(sim_args.FPS)
+    clock.tick(sim_args["FPS"])
 
     # save frame to disk
     if SAVE_VID:
@@ -151,7 +160,7 @@ pygame.quit()
 ########################## SAVE TO VID ###########################################
 
 if SAVE_VID:
-    cmd = str(f"ffmpeg -r {sim_args.FPS} -f image2 -i {tag}_frames/%04d.png -y -qscale 0 -s {width}x{height} {vid_out}")
+    cmd = str(f"ffmpeg -r {sim_args["FPS"]} -f image2 -i {tag}_frames/%04d.png -y -qscale 0 -s {width}x{height} {vid_out}")
     os.system(cmd)
 
     # remove frames when done: python should wait...

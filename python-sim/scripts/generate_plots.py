@@ -197,7 +197,8 @@ def EMD_by_noise(runs):
                 "density": row["density"]
                 })
     result = pd.DataFrame(result_list)
-    print(result)
+    
+    print(result["EMD"].max())
     g = sns.relplot(
         data=result,
         x="noise", y="EMD",
