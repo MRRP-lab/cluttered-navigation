@@ -61,10 +61,10 @@ class Environment():
         end_x = round(line_length * math.cos(angle))
 
         # top and bottom visually
-        top_y0 = round(center_y - y_offset)
+        top_y0 = math.ceil(center_y - y_offset)
         top_y1 = round(top_y0 - line_length * math.sin(angle))
 
-        bot_y0 = round(center_y + y_offset)
+        bot_y0 = math.floor(center_y + y_offset)
         bot_y1 = round(bot_y0 + line_length * math.sin(angle))
         self.add_rasterized_obstacle_line(obstacles, start_x, top_y0, end_x, top_y1)
         self.add_rasterized_obstacle_line(obstacles, start_x, bot_y0, end_x, bot_y1)

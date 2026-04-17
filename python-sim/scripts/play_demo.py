@@ -18,7 +18,7 @@ PARAMS = "params.yaml"
 # Search for the recorded simulation that matches exactly.
 def find_simulation(params):
     result = None
-    if "simulation_id" in params:
+    if hasattr(params, "simulation_id"):
         result = query_index({"simulation_id": params.simulation_id})
     else:
         result = query_index(params)
@@ -38,7 +38,7 @@ def find_simulation(params):
         return result.iloc[0]
 
 SAVE_VID = True
-VIZGRID = True
+VIZGRID = False
 VID_NAME = "test.mp4"
 tag = "" # replace with informative parameters
 _here = os.path.dirname(__file__)
@@ -48,7 +48,7 @@ VID_DIR = os.path.join(_here, '../videos')
 sim_data = find_simulation(sim_args)
 replay_data = fetch_sim_file(sim_data["simulation_id"], PLAYBACK, dtype='int32')
 sim_args = fetch_sim_file(sim_data["simulation_id"], PARAMS)
-
+print(sim_args["cell_size"])
 ss = sim_args["cell_size"] * sim_args["gridnum"]
 ########################## SETUP ##########################
 

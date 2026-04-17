@@ -68,7 +68,7 @@ return: a namespace with parsed arguments'''
     
     parser.add_argument("--simulation-id",
                         help="Useful only when playing back data. When included, other parameters are ignored.",
-                        type=str)
+                        type=str, default=argparse.SUPPRESS)
 
     #parse arguments 
     #and return namespace with arguments
