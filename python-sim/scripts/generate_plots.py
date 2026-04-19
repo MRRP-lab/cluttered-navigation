@@ -58,14 +58,13 @@ SHOW_LEGEND = True
 # Along the super-y axis (each individual distribution) is the x-coordinate slice that each distribution is along.
 # Inside each distribution: We measure the distribution of robots entering this x slice at the y-coordinates.
 # Optional slices parameter is at which x slices to take distributions at.
-def distribution_ridge_plot(run, slices=None):
-
+def distribution_ridge_plot(run, title, slices=None):
     sns.set_theme(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
     run_id = run["simulation_id"]
     playback = fetch_sim_file(run_id, PLAYBACK)
-
+    print(run["gridnum"])
     if slices is None:
-        slices = [x for x in range(0, run["gridnum"], 5)]
+        slices = [x for x in range(0, run["gridnum"], 10)]
 
     distribution = []
     frames = []
@@ -89,7 +88,7 @@ def distribution_ridge_plot(run, slices=None):
           bw_adjust=.5, clip_on=False,
           fill=True, alpha=1, linewidth=1.5)
     g.map(sns.kdeplot, "y", clip_on=False, color="w", lw=2, bw_adjust=.5)
-
+    g.set(xlim=(0, run["gridnum"]))
     # passing color=None to refline() uses the hue mapping
     g.refline(y=0, linewidth=2, linestyle="-", color=None, clip_on=False)
 
@@ -110,8 +109,66 @@ def distribution_ridge_plot(run, slices=None):
     g.set_titles("")
     g.set(yticks=[], ylabel="")
     g.despine(bottom=True, left=True)
+    plt.suptitle(title)
+    plt.show(block=False)
 
-    plt.show()
+#This does the same thing but acts on a series of runs, averaging the distributions first.
+def avg_distribution_ridge_plot(runs, title, slices=None):
+    sns.set_theme(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
+    distributions = []
+    gridnum = runs.iloc[0]["gridnum"]
+    for idx, run in runs.iterrows():
+        playback = fetch_sim_file(run["simulation_id"], PLAYBACK)
+        if slices is None:
+            slices = [x for x in range(0, run["gridnum"], 10)]
+
+        frames = []
+        for x in slices:
+            #At each slice, count the rows at each y value.
+            at_slice = playback[playback["x"] == x]
+            first_entries = at_slice.groupby("id")["time"].idxmin()
+
+            y_values = at_slice.loc[first_entries, "y"].reset_index(drop=True)
+            frames.append(pd.DataFrame({"x_slice": x, "y": y_values}))
+
+        distributions.append(pd.concat(frames, ignore_index=True))
+    
+    # Now, we average the distribution on each x_slice (can we just add them together)
+    distribution = pd.concat(distributions, ignore_index=True)
+    # Initialize the FacetGrid object
+    pal = sns.cubehelix_palette(10, rot=-.25, light=.7)
+    g = sns.FacetGrid(distribution, row="x_slice", hue="x_slice", aspect=15, height=0.5, palette=pal)
+
+    # Draw the densities in a few steps
+    g.map(sns.kdeplot, "y",
+          bw_adjust=.5, clip_on=False,
+          fill=True, alpha=1, linewidth=1.5)
+    g.map(sns.kdeplot, "y", clip_on=False, color="w", lw=2, bw_adjust=.5)
+    g.set(xlim=(0, gridnum))
+    # passing color=None to refline() uses the hue mapping
+    g.refline(y=0, linewidth=2, linestyle="-", color=None, clip_on=False)
+
+
+    # Define and use a simple function to label the plot in axes coordinates
+    def label(x, color, label):
+        ax = plt.gca()
+        ax.text(0, .2, label, fontweight="bold", color=color,
+                ha="left", va="center", transform=ax.transAxes)
+
+
+    g.map(label, "y")
+
+    # Set the subplots to overlap
+    g.figure.subplots_adjust(hspace=-0.5)
+
+    # Remove axes details that don't play well with overlap
+    g.set_titles("")
+    g.set(yticks=[], ylabel="")
+    g.despine(bottom=True, left=True)
+    plt.suptitle(title)
+    plt.show(block=False)
+
+
 
 # Produce a heatmap from runs where the x dimension is the row spacing and the y dimension is the pin spacing.
 # The heatmap is in reference to a default normal distribution because we're interested in seeing how our parameters make our robots deviate from the norm.
@@ -147,7 +204,7 @@ def makespan_heatmap(runs):
     # Draw a heatmap with the numeric values in each cell
     f, ax = plt.subplots(figsize=(9, 6))
     sns.heatmap(makespans, annot=True, fmt=".1f", linewidths=.5, ax=ax)
-    plt.show()
+    plt.show(block=False)
 
 # EMD
 # for obstacle density levels present in runs
@@ -207,43 +264,49 @@ def EMD_by_noise(runs):
         height=2, aspect=1.5, legend=False,
     )
     g.fig.suptitle("Robot EMD Sensitivity Analysis", y=1.02)
-    plt.show()
+    plt.show(block=False)
 
 if __name__ == "__main__":
 
     # Compute our plots.
     # The user should be able to specify a range of simulation parameters to aggregate data with and plot specific simulations/aggregations against each other using various plot types.
-    constants = {
-            "experiment-name": "Heatmap test",
-            "boundary": True,
-            "gridnum": 150,
-            "density": 1,
-        }
+    #query = {
+    #        "experiment-name": "Heatmap test",
+    #        "boundary": True,
+    #        "gridnum": 150,
+    #        "density": 1,
+    #    }
 
-    results = query_index(constants)
-    makespan_heatmap(results)
+    #results = query_index(query)
+    #makespan_heatmap(results)
 
-    constants = {
-            "experiment-name": "Gaussian test",
-            "boundary": True,
-            "num": 50,
-            "gridnum": 50,
-            "row_gap": 2,
-            "pin_gap": 1,
-        }
-    results = query_index(constants)
-    print(results)
-    distribution_ridge_plot(results.iloc[0])
-    distribution_ridge_plot(results.iloc[1])
+    #query = {
+    #        "experiment-name": "Gaussian test",
+    #        "boundary": True,
+    #        "num": 50,
+    #        "gridnum": 50,
+    #        "row_gap": 2,
+    #        "pin_gap": 1,
+    #    }
+    #results = query_index(query)
+    #print(results)
+    #distribution_ridge_plot(results.iloc[0], "No collision")
+    #distribution_ridge_plot(results.iloc[1], "Collision")
 
-    constants = {
-        "experiment-name": "EMD calc",
+    #plt.show()
+    # Does a lower spawn density cause the final distribution to be more bell-shaped? I think it does.
+    # A higher spawn density causes more resistance to entering the middle.
+    # in some cases, it's harder to tell. Like for seed 2. density is clearly further towards the center, but the furthest extent is the same.
+    # Some distribution measurements (variance or quartiles) or kurtosis measurements would be perfect here to back up the claims.
+    query = {
+        "experiment-name": "Density Skewness",
     }
-    results = query_index(constants)
+    results = query_index(query)
+    print("results: ", results)
+    for density, group in results.groupby(by="density", sort=True):
+        avg_distribution_ridge_plot(group, f"Average over 10 seeds with density {density}")
 
-    by_pin_gap = results.groupby("pin_gap")
-    for pin_gap, group in by_pin_gap:
-        print("pin gap: ", pin_gap)
-        EMD_by_noise(group)
-
-
+        #for idx, result in results.iterrows():
+    #    print(result["density"])
+    #    distribution_ridge_plot(result, f"Density: {result['density']}")
+    plt.show()
