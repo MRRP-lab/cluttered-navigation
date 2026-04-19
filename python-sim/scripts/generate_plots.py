@@ -23,7 +23,6 @@ import matplotlib.pyplot as plt
 # - The jamming transition
 # - The price of decentralized
 
-
 PLAYBACK = "playback.csv"
 ANALYTICS = "analytics.yaml"
 PARAMS = "params.yaml"
@@ -149,6 +148,28 @@ def makespan_heatmap(runs):
     sns.heatmap(makespans, annot=True, fmt=".1f", linewidths=.5, ax=ax)
     plt.show()
 
+# Produces a heatmap where x is obstacle noise, y is robot density
+def density_noise_heatmap(runs):
+    records = []
+    for _, run in runs.iterrows():
+        id = run["simulation_id"]
+        analytics = fetch_sim_file(id, ANALYTICS)
+        records.append({
+            "noise": run["noise"],
+            "density": run["density"],
+            "makespan": analytics["makespan"]
+        })
+    df = pd.DataFrame(records)
+    makespans = df.pivot_table(index="density", columns="noise", values="makespan", aggfunc="mean")
+    
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(makespans, annot=True, fmt=".1f", linewidths=.5, cmap="viridis")
+    plt.xlabel("Obstacle noise")
+    plt.ylabel("Robot density")
+    plt.title("Density vs Noise (mean makespan)")
+    plt.tight_layout()
+    plt.show()
+
 # EMD
 # for obstacle density levels present in runs
 #     for drone density levels present in runs
@@ -213,37 +234,42 @@ if __name__ == "__main__":
 
     # Compute our plots.
     # The user should be able to specify a range of simulation parameters to aggregate data with and plot specific simulations/aggregations against each other using various plot types.
-    constants = {
-            "experiment-name": "Heatmap test",
-            "boundary": True,
-            "gridnum": 150,
-            "density": 1,
-        }
+    # constants = {
+    #          "experiment-name": "Heatmap test",
+    #          "boundary": True,
+    #          "gridnum": 150,
+    #          "density": 1,
+    #      }
 
-    results = query_index(constants)
-    makespan_heatmap(results)
+    #  results = query_index(constants)
+    #  makespan_heatmap(results)
+
+    #  constants = {
+    #          "experiment-name": "Gaussian test",
+    #          "boundary": True,
+    #          "num": 50,
+    #          "gridnum": 50,
+    #          "row_gap": 2,
+    #          "pin_gap": 1,
+    #      }
+    #  results = query_index(constants)
+    #  print(results)
+    #  distribution_ridge_plot(results.iloc[0])
+    #  distribution_ridge_plot(results.iloc[1])
+
+    #  constants = {
+    #      "experiment-name": "EMD calc",
+    #  }
+    #  results = query_index(constants)
+
+    #  by_pin_gap = results.groupby("pin_gap")
+    #  for pin_gap, group in by_pin_gap:
+    #      print("pin gap: ", pin_gap)
+    #      EMD_by_noise(group)
 
     constants = {
-            "experiment-name": "Gaussian test",
-            "boundary": True,
-            "num": 50,
-            "gridnum": 50,
-            "row_gap": 2,
-            "pin_gap": 1,
-        }
-    results = query_index(constants)
-    print(results)
-    distribution_ridge_plot(results.iloc[0])
-    distribution_ridge_plot(results.iloc[1])
-
-    constants = {
-        "experiment-name": "EMD calc",
+    "experiment-name": "Heatmap: Density v.s. Noise",
     }
     results = query_index(constants)
-
-    by_pin_gap = results.groupby("pin_gap")
-    for pin_gap, group in by_pin_gap:
-        print("pin gap: ", pin_gap)
-        EMD_by_noise(group)
-
-
+    density_noise_heatmap(results)
+    

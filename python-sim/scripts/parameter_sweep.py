@@ -13,34 +13,42 @@ INDEXER = os.path.join(_here, "index_gen.py")
 java_server = "./src/optimal-mrppg/bytecode/server.jar"
 
 # All keys will have a double hyphen added. Ensure these use the same form as the long argument name.
-experiments = [{
-    "experiment-name": "Heatmap test",
-    "num": [n*50 for n in range(1,10)],
-    "noise": [n for n in range(0,5)],
-    "gridnum": [150],
-    "seed": [s for s in range(5)],
-    "disable-collision": False,
-    "boundary": True,
-    "boundary-angle": [22.5],
-    },
+
+experiments = [
+   # "experiment-name": "Heatmap test",
+   # "num": [n*50 for n in range(1,10)],
+   # "noise": [n for n in range(0,5)],
+   # "gridnum": [150],
+   # "seed": [s for s in range(5)],
+   # "disable-collision": False,
+   # "boundary": True,
+   # "boundary-angle": [22.5],
+   # },
     {
-    "experiment-name": "Gaussian test",
-    "disable-collision": [True, False],
+    "experiment-name": "heatmap: density v.s. noise",
+    "num": 100,
+    "noise": [n for n in range(0,20)],
     "boundary": True,
-    "num": 50,
-    "gridnum": 50,
-    "row-gap": 2,
-    "pin-gap": 1,
-    },
-    {
-    "num": [100],
-    "boundary": True,
-    "density": [0.2, 0.5, 1],
-    "row-gap": [1, 2, 3, 4, 5, 6],
-    "pin-gap": [1, 2, 3, 4, 5, 6],
-    "noise": [0, 1, 2, 3, 4, 5],
-    "experiment-name": "EMD calc"
-    },
+    "density": [n*0.1 for n in range(1,11)],
+    }, 
+   # {
+   # "experiment-name": "Gaussian test",
+   # "disable-collision": [True, False],
+   # "boundary": True,
+   # "num": 50,
+   # "gridnum": 50,
+   # "row-gap": 2,
+   # "pin-gap": 1,
+   # },
+   # {
+   # "num": [100],
+   # "boundary": True,
+   # "density": [0.2, 0.5, 1],
+   # "row-gap": [1, 2, 3, 4, 5, 6],
+   # "pin-gap": [1, 2, 3, 4, 5, 6],
+   # "noise": [0, 1, 2, 3, 4, 5],
+   # "experiment-name": "EMD calc"
+   # },
 ]
 
 def run_single_sim(params):
