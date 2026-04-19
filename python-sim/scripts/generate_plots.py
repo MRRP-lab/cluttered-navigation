@@ -2,7 +2,7 @@ import pandas as pd
 import seaborn as sns
 from index_gen import query_index, fetch_sim_file
 
-from scipy.stats import wasserstein_distance
+from scipy.stats import wasserstein_distance, kurtosis
 import matplotlib.pyplot as plt
 
 # TODO
@@ -120,7 +120,7 @@ def avg_distribution_ridge_plot(runs, title, slices=None):
     for idx, run in runs.iterrows():
         playback = fetch_sim_file(run["simulation_id"], PLAYBACK)
         if slices is None:
-            slices = [x for x in range(0, run["gridnum"], 10)]
+            slices = [x for x in range(0, run["gridnum"]+1, 10)]
 
         frames = []
         for x in slices:
@@ -135,6 +135,11 @@ def avg_distribution_ridge_plot(runs, title, slices=None):
     
     # Now, we average the distribution on each x_slice (can we just add them together)
     distribution = pd.concat(distributions, ignore_index=True)
+    print(title)
+    for x in slices:
+        subset = distribution[distribution["x_slice"] == x]["y"]
+        print(f"x={x} kurtosis={kurtosis(subset):.3f} n={len(subset)}")
+
     # Initialize the FacetGrid object
     pal = sns.cubehelix_palette(10, rot=-.25, light=.7)
     g = sns.FacetGrid(distribution, row="x_slice", hue="x_slice", aspect=15, height=0.5, palette=pal)
@@ -167,8 +172,13 @@ def avg_distribution_ridge_plot(runs, title, slices=None):
     g.despine(bottom=True, left=True)
     plt.suptitle(title)
     plt.show(block=False)
-
-
+    
+    fig, ax = plt.subplots()
+    last_slice = distribution["x_slice"].max()
+    last_dist = distribution[distribution["x_slice"] == last_slice]["y"]
+    sns.histplot(last_dist, stat="count", ax=ax)
+    plt.title(title + " (final slice histogram)")
+    plt.show(block=False)
 
 # Produce a heatmap from runs where the x dimension is the row spacing and the y dimension is the pin spacing.
 # The heatmap is in reference to a default normal distribution because we're interested in seeing how our parameters make our robots deviate from the norm.
@@ -304,6 +314,7 @@ if __name__ == "__main__":
     results = query_index(query)
     print("results: ", results)
     for density, group in results.groupby(by="density", sort=True):
+        
         avg_distribution_ridge_plot(group, f"Average over 10 seeds with density {density}")
 
         #for idx, result in results.iterrows():

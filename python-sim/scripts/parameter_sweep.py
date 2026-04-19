@@ -37,7 +37,7 @@ experiments = [
     "experiment-name": "Density Skewness",
     "boundary": True,
     "num": 100,
-    "density": [n * 0.2 for n in range(1, 6)],
+    "density": [n * 0.1 for n in range(1, 11)],
     "seed": [n for n in range(10)],
     "gridnum": 100,
     },
