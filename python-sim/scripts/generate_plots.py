@@ -64,10 +64,11 @@ def distribution_ridge_plot(run, title, slices=None):
     sns.set_theme(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
     run_id = run["simulation_id"]
     playback = fetch_sim_file(run_id, PLAYBACK)
-    print(run["gridnum"])
-    gridnum_slice_diff = (run["gridnum"]) / 10
+
     if slices is None:
-        slices = [math.floor(slice * gridnum_slice_diff) for slice in range(11)]
+        slice_amt = 5
+        gridnum_slice_diff = (run["gridnum"]) / slice_amt 
+        slices = [math.floor(slice * gridnum_slice_diff) for slice in range(slice_amt+1)]
 
     distribution = []
     frames = []
@@ -91,7 +92,7 @@ def distribution_ridge_plot(run, title, slices=None):
           bw_adjust=.5, clip_on=False,
           fill=True, alpha=1, linewidth=1.5)
     g.map(sns.kdeplot, "y", clip_on=False, color="w", lw=2, bw_adjust=.5)
-    g.set(xlim=(0, run["gridnum"]))
+    #g.set(xlim=(0, run["gridnum"]))
     # passing color=None to refline() uses the hue mapping
     g.refline(y=0, linewidth=2, linestyle="-", color=None, clip_on=False)
 
@@ -106,7 +107,10 @@ def distribution_ridge_plot(run, title, slices=None):
     g.map(label, "y")
 
     # Set the subplots to overlap
-    g.figure.subplots_adjust(hspace=-0.5)
+    g.figure.subplots_adjust(hspace=-0.6)
+    g.figure.text(0.05, 0.5, 'X-coordinate', 
+              va='center', rotation='vertical', fontsize=12)
+    g.set_axis_labels(x_var="Y-coordinate")
 
     # Remove axes details that don't play well with overlap
     g.set_titles("")
@@ -114,8 +118,6 @@ def distribution_ridge_plot(run, title, slices=None):
     g.despine(bottom=True, left=True)
     plt.suptitle(title)
     plt.show(block=False)
-    print(distribution)
-    print(slices)
     basic_stats_qqplot(distribution[distribution["x_slice"] == slices[-1]], title)
 
 #This does the same thing but acts on a series of runs, averaging the distributions first.
@@ -326,7 +328,7 @@ def basic_stats_qqplot(distribution, title):
     plt.plot(osm, slope * np.array(osm) + intercept, 'r--', linewidth=2)
     plt.xlabel("Theoretical Quantiles")
     plt.ylabel("Sample Quantiles")
-    plt.title(f"{title} Q-Q Plot (R² = {r**2:.4f})")
+    plt.title(f"Q-Q Plot (R² = {r**2:.4f})")
     plt.tight_layout()
     plt.show(block=False)
 
@@ -354,15 +356,27 @@ if __name__ == "__main__":
     #results = query_index(query)
     #makespan_heatmap(results)
 
+
+
+
+
+
     query = {
             "experiment-name": "Gaussian test",
             "disable-collision": True,
     }
     results = query_index(query)
-    distribution_ridge_plot(results.iloc[0], f"disable collision: {results.iloc[0]["disable_collision"]}")
+    #distribution_ridge_plot(results.iloc[0], f"disable collision: {results.iloc[0]["disable_collision"]}")
 
-    distribution_ridge_plot(results.iloc[1], f"disable collision: {results.iloc[1]["disable_collision"]}")
+    distribution_ridge_plot(results.iloc[0], "Successive distributions")
     #plt.show()
+
+
+
+
+
+
+
     # Does a lower spawn density cause the final distribution to be more bell-shaped? I think it does.
     # A higher spawn density causes more resistance to entering the middle.
     # in some cases, it's harder to tell. Like for seed 2. density is clearly further towards the center, but the furthest extent is the same.
@@ -378,4 +392,10 @@ if __name__ == "__main__":
         #for idx, result in results.iterrows():
     #    print(result["density"])
     #    distribution_ridge_plot(result, f"Density: {result['density']}")
+
+
+
+
+
+
     plt.show()

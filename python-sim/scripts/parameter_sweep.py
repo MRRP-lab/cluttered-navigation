@@ -26,11 +26,12 @@ experiments = [
     #},
     {
     "experiment-name": "Gaussian test",
-    "disable-collision": [True, False],
+    "disable-collision": [True],
     "num": [100],
     "gridnum": 100,
     "row-gap": 1,
     "pin-gap": 1,
+    "seed": 3,
     },
     #{
     #"experiment-name": "Density Skewness",
