@@ -1,8 +1,10 @@
 import pandas as pd
+import numpy as np
 import seaborn as sns
 from index_gen import query_index, fetch_sim_file
 
-from scipy.stats import wasserstein_distance, kurtosis
+import math
+from scipy.stats import wasserstein_distance, kurtosis, probplot, shapiro, skew
 import matplotlib.pyplot as plt
 
 # TODO
@@ -63,8 +65,9 @@ def distribution_ridge_plot(run, title, slices=None):
     run_id = run["simulation_id"]
     playback = fetch_sim_file(run_id, PLAYBACK)
     print(run["gridnum"])
+    gridnum_slice_diff = (run["gridnum"]) / 10
     if slices is None:
-        slices = [x for x in range(0, run["gridnum"], 10)]
+        slices = [math.floor(slice * gridnum_slice_diff) for slice in range(11)]
 
     distribution = []
     frames = []
@@ -111,6 +114,9 @@ def distribution_ridge_plot(run, title, slices=None):
     g.despine(bottom=True, left=True)
     plt.suptitle(title)
     plt.show(block=False)
+    print(distribution)
+    print(slices)
+    basic_stats_qqplot(distribution[distribution["x_slice"] == slices[-1]], title)
 
 #This does the same thing but acts on a series of runs, averaging the distributions first.
 def avg_distribution_ridge_plot(runs, title, slices=None):
@@ -119,8 +125,9 @@ def avg_distribution_ridge_plot(runs, title, slices=None):
     gridnum = runs.iloc[0]["gridnum"]
     for idx, run in runs.iterrows():
         playback = fetch_sim_file(run["simulation_id"], PLAYBACK)
+        gridnum_slice_diff = (run["gridnum"]) / 10
         if slices is None:
-            slices = [x for x in range(0, run["gridnum"]+1, 10)]
+            slices = [math.floor(slice * gridnum_slice_diff) for slice in range(11)]
 
         frames = []
         for x in slices:
@@ -179,6 +186,39 @@ def avg_distribution_ridge_plot(runs, title, slices=None):
     sns.histplot(last_dist, stat="count", ax=ax)
     plt.title(title + " (final slice histogram)")
     plt.show(block=False)
+    basic_stats_qqplot(last_dist)
+
+
+# Plot the kurtosis by density.
+def kurtosis_over_slices_by_density(runs, title, slices=None):
+    sns.set_theme(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
+    distributions = []
+    gridnum = runs.iloc[0]["gridnum"]
+    for idx, run in runs.iterrows():
+        playback = fetch_sim_file(run["simulation_id"], PLAYBACK)
+        gridnum_slice_diff = (run["gridnum"]) / 10
+        if slices is None:
+            slices = [math.floor(slice * gridnum_slice_diff) for slice in range(11)]
+
+        frames = []
+        for x in slices:
+            #At each slice, count the rows at each y value.
+            at_slice = playback[playback["x"] == x]
+            first_entries = at_slice.groupby("id")["time"].idxmin()
+
+            y_values = at_slice.loc[first_entries, "y"].reset_index(drop=True)
+            frames.append(pd.DataFrame({"x_slice": x, "y": y_values}))
+
+        distributions.append(pd.concat(frames, ignore_index=True))
+    
+    # Now, we average the distribution on each x_slice (can we just add them together)
+    distribution = pd.concat(distributions, ignore_index=True)
+    print(title)
+    for x in slices:
+        subset = distribution[distribution["x_slice"] == x]["y"]
+        print(f"x={x} kurtosis={kurtosis(subset):.3f} n={len(subset)}")
+
+
 
 # Produce a heatmap from runs where the x dimension is the row spacing and the y dimension is the pin spacing.
 # The heatmap is in reference to a default normal distribution because we're interested in seeing how our parameters make our robots deviate from the norm.
@@ -276,6 +316,30 @@ def EMD_by_noise(runs):
     g.fig.suptitle("Robot EMD Sensitivity Analysis", y=1.02)
     plt.show(block=False)
 
+# report basic stats as well as a Q-Q plot against the normal distribution.
+# seaborn doesn't have qq plots
+def basic_stats_qqplot(distribution, title):
+    plt.figure()
+    (osm, osr), (slope, intercept, r) = probplot(distribution["y"], dist="norm")
+
+    plt.scatter(osm, osr, alpha=0.5, s=10)
+    plt.plot(osm, slope * np.array(osm) + intercept, 'r--', linewidth=2)
+    plt.xlabel("Theoretical Quantiles")
+    plt.ylabel("Sample Quantiles")
+    plt.title(f"{title} Q-Q Plot (R² = {r**2:.4f})")
+    plt.tight_layout()
+    plt.show(block=False)
+
+    print(f"{title}: ")
+    stat, p = shapiro(distribution["y"])
+    print(f"Shapiro-Wilk: W={stat:.4f}, p={p:.4f}")
+
+    # Summary stats
+    print(f"Mean:     {np.mean(distribution["y"]):.4f}")
+    print(f"Std:      {np.std(distribution["y"]):.4f}")
+    print(f"Skewness: {skew(distribution["y"]):.4f}")  # want ~0
+    print(f"Kurtosis: {kurtosis(distribution["y"]):.4f}")  # want ~0
+
 if __name__ == "__main__":
 
     # Compute our plots.
@@ -290,32 +354,26 @@ if __name__ == "__main__":
     #results = query_index(query)
     #makespan_heatmap(results)
 
-    #query = {
-    #        "experiment-name": "Gaussian test",
-    #        "boundary": True,
-    #        "num": 50,
-    #        "gridnum": 50,
-    #        "row_gap": 2,
-    #        "pin_gap": 1,
-    #    }
-    #results = query_index(query)
-    #print(results)
-    #distribution_ridge_plot(results.iloc[0], "No collision")
-    #distribution_ridge_plot(results.iloc[1], "Collision")
+    query = {
+            "experiment-name": "Gaussian test",
+            "disable-collision": True,
+    }
+    results = query_index(query)
+    distribution_ridge_plot(results.iloc[0], f"disable collision: {results.iloc[0]["disable_collision"]}")
 
+    distribution_ridge_plot(results.iloc[1], f"disable collision: {results.iloc[1]["disable_collision"]}")
     #plt.show()
     # Does a lower spawn density cause the final distribution to be more bell-shaped? I think it does.
     # A higher spawn density causes more resistance to entering the middle.
     # in some cases, it's harder to tell. Like for seed 2. density is clearly further towards the center, but the furthest extent is the same.
     # Some distribution measurements (variance or quartiles) or kurtosis measurements would be perfect here to back up the claims.
-    query = {
-        "experiment-name": "Density Skewness",
-    }
-    results = query_index(query)
-    print("results: ", results)
-    for density, group in results.groupby(by="density", sort=True):
-        
-        avg_distribution_ridge_plot(group, f"Average over 10 seeds with density {density}")
+    #query = {
+    #    "experiment-name": "Density Skewness",
+    #}
+    #results = query_index(query)
+    #print("results: ", results)
+    #for density, group in results.groupby(by="density", sort=True):
+    #    avg_distribution_ridge_plot(group, f"Average over 10 seeds with density {density}")
 
         #for idx, result in results.iterrows():
     #    print(result["density"])
