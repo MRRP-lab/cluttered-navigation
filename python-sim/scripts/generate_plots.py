@@ -129,8 +129,8 @@ def avg_distribution_ridge_plot(runs, title, slices=None):
         playback = fetch_sim_file(run["simulation_id"], PLAYBACK)
         gridnum_slice_diff = (run["gridnum"]) / 10
         if slices is None:
-            slices = [math.floor(slice * gridnum_slice_diff) for slice in range(11)]
-
+            #slices = [math.floor(slice * gridnum_slice_diff) for slice in range(11)]
+            slices = [0, run["gridnum"]]
         frames = []
         for x in slices:
             #At each slice, count the rows at each y value.
@@ -188,38 +188,7 @@ def avg_distribution_ridge_plot(runs, title, slices=None):
     sns.histplot(last_dist, stat="count", ax=ax)
     plt.title(title + " (final slice histogram)")
     plt.show(block=False)
-    basic_stats_qqplot(last_dist)
-
-
-# Plot the kurtosis by density.
-def kurtosis_over_slices_by_density(runs, title, slices=None):
-    sns.set_theme(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
-    distributions = []
-    gridnum = runs.iloc[0]["gridnum"]
-    for idx, run in runs.iterrows():
-        playback = fetch_sim_file(run["simulation_id"], PLAYBACK)
-        gridnum_slice_diff = (run["gridnum"]) / 10
-        if slices is None:
-            slices = [math.floor(slice * gridnum_slice_diff) for slice in range(11)]
-
-        frames = []
-        for x in slices:
-            #At each slice, count the rows at each y value.
-            at_slice = playback[playback["x"] == x]
-            first_entries = at_slice.groupby("id")["time"].idxmin()
-
-            y_values = at_slice.loc[first_entries, "y"].reset_index(drop=True)
-            frames.append(pd.DataFrame({"x_slice": x, "y": y_values}))
-
-        distributions.append(pd.concat(frames, ignore_index=True))
-    
-    # Now, we average the distribution on each x_slice (can we just add them together)
-    distribution = pd.concat(distributions, ignore_index=True)
-    print(title)
-    for x in slices:
-        subset = distribution[distribution["x_slice"] == x]["y"]
-        print(f"x={x} kurtosis={kurtosis(subset):.3f} n={len(subset)}")
-
+    basic_stats(last_dist, title)
 
 
 # Produce a heatmap from runs where the x dimension is the row spacing and the y dimension is the pin spacing.
@@ -335,12 +304,18 @@ def basic_stats_qqplot(distribution, title):
     print(f"{title}: ")
     stat, p = shapiro(distribution["y"])
     print(f"Shapiro-Wilk: W={stat:.4f}, p={p:.4f}")
+    basic_stats(distribution, title)
 
+def basic_stats(distribution, title):
+    print(title)
     # Summary stats
-    print(f"Mean:     {np.mean(distribution["y"]):.4f}")
-    print(f"Std:      {np.std(distribution["y"]):.4f}")
-    print(f"Skewness: {skew(distribution["y"]):.4f}")  # want ~0
-    print(f"Kurtosis: {kurtosis(distribution["y"]):.4f}")  # want ~0
+    print(f"Quartiles: {np.percentile(distribution, [25, 50, 75])}")
+
+    print(f"Mean:     {np.mean(distribution):.4f}")
+    print(f"Std:      {np.std(distribution):.4f}")
+    print(f"Variance: {np.var(distribution):.4f}")
+    print(f"Skewness: {skew(distribution):.4f}")  # want ~0
+    print(f"Kurtosis: {kurtosis(distribution):.4f}")  # want ~0
 
 if __name__ == "__main__":
 
@@ -361,14 +336,14 @@ if __name__ == "__main__":
 
 
 
-    query = {
-            "experiment-name": "Gaussian test",
-            "disable-collision": True,
-    }
-    results = query_index(query)
-    #distribution_ridge_plot(results.iloc[0], f"disable collision: {results.iloc[0]["disable_collision"]}")
+    #query = {
+    #        "experiment-name": "Gaussian test",
+    #        "disable-collision": True,
+    #}
+    #results = query_index(query)
+    ##distribution_ridge_plot(results.iloc[0], f"disable collision: {results.iloc[0]["disable_collision"]}")
 
-    distribution_ridge_plot(results.iloc[0], "Successive distributions")
+    #distribution_ridge_plot(results.iloc[0], "Successive distributions")
     #plt.show()
 
 
@@ -387,14 +362,16 @@ if __name__ == "__main__":
     #results = query_index(query)
     #print("results: ", results)
     #for density, group in results.groupby(by="density", sort=True):
-    #    avg_distribution_ridge_plot(group, f"Average over 10 seeds with density {density}")
+    #    avg_distribution_ridge_plot(group, f"Average over 100 seeds with density {density}")
 
         #for idx, result in results.iterrows():
-    #    print(result["density"])
-    #    distribution_ridge_plot(result, f"Density: {result['density']}")
+        #    print(result["density"])
+        #    distribution_ridge_plot(result, f"Density: {result['density']}")
 
 
 
+
+    
 
 
 
