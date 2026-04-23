@@ -306,9 +306,37 @@ def basic_stats_qqplot(distribution, title):
     print(f"Shapiro-Wilk: W={stat:.4f}, p={p:.4f}")
     basic_stats(distribution, title)
 
+# report stats for centralized with noise (without noise is the same run every time)
+def centralized_stats(runs, title):
+    # collect makespan distribution, report mean + variance
+    makespan_distr = []
+
+    # collect path lengths,
+    # count which ones didn't finish
+    not_finished = 0
+
+    path_length_distr = []
+    for idx, run in runs.iterrows():
+        analytics = fetch_sim_file(run["simulation_id"], ANALYTICS)
+        makespan_distr.append(analytics["makespan"])
+
+        # Don't include the path length of robots that don't finish because it can skew the 
+        # mean downwards when we don't want that.
+        for path in analytics["traversal"]:
+            if path["time"] < 0:
+                not_finished += 1
+                continue
+            path_length_distr.append(path["path_len"])
+
+    # report stats.
+    print(f"survival rate: {len(path_length_distr) / (len(path_length_distr) + not_finished) * 100:.3f}%")
+    basic_stats(makespan_distr, title + " Makespan")
+    basic_stats(path_length_distr, title + " Path length")
+
 def basic_stats(distribution, title):
     print(title)
     # Summary stats
+    print(f"Samples: {len(distribution)}")
     print(f"Quartiles: {np.percentile(distribution, [25, 50, 75])}")
 
     print(f"Mean:     {np.mean(distribution):.4f}")
@@ -371,8 +399,22 @@ if __name__ == "__main__":
 
 
 
+
+    # Compare the performance stats of the centralized runs in comparison to the decentralized run.
+    query = {
+        "experiment-name": "Centralized test",
+        "strategy": "centralized",
+    }
+    results = query_index(query)
+    print(results)
+    centralized_stats(results, "Centralized")
     
-
-
+    query = {
+        "experiment-name": "Centralized test",
+        "strategy": "decentralized",
+    }
+    results = query_index(query)
+    print(results)
+    centralized_stats(results, "Decentralized")
 
     plt.show()

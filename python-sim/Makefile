@@ -6,7 +6,7 @@ STAMPS := .stamps
 
 export PYTHONPATH := $(shell pwd)
 
-.PHONY: $(STAMPS)/plots parameter_sweep
+.PHONY: $(STAMPS)/plots parameter_sweep index
 
 ARGS ?= 
 
@@ -22,6 +22,9 @@ ARGS ?=
 all: $(STAMPS)/plots
 
 parameter_sweep: $(STAMPS)/parameter_sweep
+analytics: $(STAMPS)/analytics
+index: 
+	python3 scripts/index_gen.py
 
 $(STAMPS)/parameter_sweep: scripts/parameter_sweep.py
 	python scripts/parameter_sweep.py

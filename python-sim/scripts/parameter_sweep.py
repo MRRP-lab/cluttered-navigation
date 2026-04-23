@@ -53,6 +53,45 @@ experiments = [
     #"noise": 1,
     #"gridnum": 350,
     #},
+    {
+    "experiment-name": "Centralized test",
+    "strategy": ["centralized"],
+    "noise": [0],
+    "row-gap": 1,
+    "pin-gap": 1,
+    "gridnum": 50,
+    "boundary": True,
+    "num": 30,
+    },
+    {
+    "experiment-name": "Centralized test",
+    "strategy": ["centralized"],
+    "seed": [n for n in range(20)],
+    "noise": [1],
+    "row-gap": 1,
+    "pin-gap": 1,
+    "gridnum": 50,
+    "boundary": True,
+    "num": 30,
+    },
+    {
+    "experiment-name": "Centralized test",
+    "strategy": ["decentralized"],
+    "seed": [n for n in range(200)],
+    "noise": [0, 1],
+    "row-gap": 1,
+    "pin-gap": 1,
+    "gridnum": 50,
+    "boundary": True,
+    "num": 30,
+    },
+    #{
+    #"experiment-name": "Boundary test",
+    #"num": 100,
+    #"gridnum": 100,
+    #"boundary": True,
+    #"boundary-angle": [22.5, 20, 17.5, 15, 12.5, 10, 7.5]
+    #},
 ]
 
 def run_single_sim(params):

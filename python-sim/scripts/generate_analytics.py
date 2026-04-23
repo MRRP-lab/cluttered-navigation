@@ -40,7 +40,8 @@ def compute_analytics(playback_path, params_path):
                                    .loc[lambda df: df.groupby("id")["time"].idxmin()])
 
     # TODO fix this jank. we need to subtract 1 because gridnum stores the amount of grid cells along the grid, but the value stored is an index.
-    intermediate_data["finishes"] = playback[playback["x"] == (params["gridnum"]-1)]
+    intermediate_data["finishes"] = (playback[playback["x"] == (params["gridnum"]-1)]
+                                     .loc[lambda df: df.groupby("id")["time"].idxmin()])
 
     compute_traversal_stats(playback, data, intermediate_data, params)
     # compute_EMD(playback, data)
@@ -72,13 +73,17 @@ def compute_traversal(playback, data, intermediate_data, params):
         total_len = 0
         delays = 0
         for pos in path.itertuples():
+            # Skip if we're outside of the bounds of the sim
+            if pos.x < 0:
+                continue
+            if pos.x > finish_line:
+                break
+
             curr = (pos.x, pos.y)
             if prev is not None and curr != prev:
                 total_len += 1
             elif prev is not None and curr == prev:
                 delays += 1
-            elif pos.x > finish_line:
-                break
             prev = curr
         path_lengths.append({"id": id, "delays": delays, "path_len": total_len})
 
