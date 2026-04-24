@@ -333,6 +333,44 @@ def centralized_stats(runs, title):
     basic_stats(makespan_distr, title + " Makespan")
     basic_stats(path_length_distr, title + " Path length")
 
+# Compares the runs with nonzero noise to the average distribution of the runs with 0 noise.
+def EMD_stats(runs):
+    # First, take the runs with 0 noise and average them
+    no_noise = runs[runs["noise"] == 0]
+    reference = []
+    for idx, run in no_noise.iterrows():
+        analytics = fetch_sim_file(run["simulation_id"], ANALYTICS)
+
+        for path in analytics["traversal"]:
+            if path["y_f"] < 0:
+                continue
+            reference.append(path["y_f"])
+    
+
+    # Then, produce distributions of EMDs for the other noise levels compared to the 0 average.
+    records = []
+    for noise, group in runs.groupby("noise", sort=True):
+        if noise == 0:
+            continue
+        for idx, run in group.iterrows():
+            analytics = fetch_sim_file(run["simulation_id"], ANALYTICS)
+            dist = [p["y_f"] for p in analytics["traversal"] if p["y_f"] >= 0]
+            if dist:
+                records.append({
+                    "noise": noise,
+                    "emd": wasserstein_distance(reference, dist)
+                })
+
+    df = pd.DataFrame(records)
+
+    fig, ax = plt.subplots()
+    sns.boxplot(data=df, x="noise", y="emd", ax=ax)          # spread per noise level
+    sns.stripplot(data=df, x="noise", y="emd", ax=ax,        # individual run dots
+                  color="black", alpha=0.4, size=3)
+    ax.set(xlabel="Noise Level", ylabel="EMD vs 0-noise reference",
+           title="Earth Mover's Distance by Noise Level")
+    plt.show()
+
 def basic_stats(distribution, title):
     print(title)
     # Summary stats
@@ -402,26 +440,32 @@ if __name__ == "__main__":
 
 
     # Compare the performance stats of the centralized runs in comparison to the decentralized run.
-    query = {
-        "experiment-name": "Centralized test",
-        "strategy": "centralized",
-        "noise": 1
-    }
-    results = query_index(query)
-    print(results)
-    centralized_stats(results, "Centralized")
-    
-    query = {
-        "experiment-name": "Centralized test",
-        "strategy": "decentralized",
-        "noise": 1
-    }
-    results = query_index(query)
-    print(results)
-    centralized_stats(results, "Decentralized")
+    #query = {
+    #    "experiment-name": "Centralized test",
+    #    "strategy": "centralized",
+    #    "noise": 1
+    #}
+    #results = query_index(query)
+    #print(results)
+    #centralized_stats(results, "Centralized")
+    #
+    #query = {
+    #    "experiment-name": "Centralized test",
+    #    "strategy": "decentralized",
+    #    "noise": 1
+    #}
+    #results = query_index(query)
+    #print(results)
+    #centralized_stats(results, "Decentralized")
 
     # Run time stats for centralized
-    basic_stats([374326 , 120657 , 438299 , 296348 , 964136 , 282419 , 91692 , 534769 , 359769 , 128978 , 440450 , 177579 , 319498 , 489990 , 206046 , 243233 , 147214 , 227039 , 167838 , 236991], "Run times")
+    #basic_stats([374326 , 120657 , 438299 , 296348 , 964136 , 282419 , 91692 , 534769 , 359769 , 128978 , 440450 , 177579 , 319498 , 489990 , 206046 , 243233 , 147214 , 227039 , 167838 , 236991], "Run times")
+
+
+
+
+
+
 
     #query = {
     #    "experiment-name": "Boundary test",
@@ -432,5 +476,16 @@ if __name__ == "__main__":
     #for angle, group in results.groupby(by="boundary_angle", sort=True):
     #    avg_distribution_ridge_plot(group, f"Average over 100 seeds with angle {angle}")
 
+
+
+
+
+    # First, take the average of the 0 noise. Use it as the baseline.
+    # Then, take the EMD of all other EMD tests and plot as a line.
+    query = {
+        "experiment-name": "EMD test"
+    }
+    results = query_index(query)
+    EMD_stats(results)
 
     plt.show()
