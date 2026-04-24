@@ -338,6 +338,7 @@ def basic_stats(distribution, title):
     # Summary stats
     print(f"Samples: {len(distribution)}")
     print(f"Quartiles: {np.percentile(distribution, [25, 50, 75])}")
+    print(f"Min/Max: {np.min(distribution)}/{np.max(distribution)}")
 
     print(f"Mean:     {np.mean(distribution):.4f}")
     print(f"Std:      {np.std(distribution):.4f}")
@@ -404,6 +405,7 @@ if __name__ == "__main__":
     query = {
         "experiment-name": "Centralized test",
         "strategy": "centralized",
+        "noise": 1
     }
     results = query_index(query)
     print(results)
@@ -412,9 +414,23 @@ if __name__ == "__main__":
     query = {
         "experiment-name": "Centralized test",
         "strategy": "decentralized",
+        "noise": 1
     }
     results = query_index(query)
     print(results)
     centralized_stats(results, "Decentralized")
+
+    # Run time stats for centralized
+    basic_stats([374326 , 120657 , 438299 , 296348 , 964136 , 282419 , 91692 , 534769 , 359769 , 128978 , 440450 , 177579 , 319498 , 489990 , 206046 , 243233 , 147214 , 227039 , 167838 , 236991], "Run times")
+
+    #query = {
+    #    "experiment-name": "Boundary test",
+    #    "noise": 1,
+    #}
+    #results = query_index(query)
+
+    #for angle, group in results.groupby(by="boundary_angle", sort=True):
+    #    avg_distribution_ridge_plot(group, f"Average over 100 seeds with angle {angle}")
+
 
     plt.show()
