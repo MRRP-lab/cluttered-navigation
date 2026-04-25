@@ -107,16 +107,17 @@ def distribution_ridge_plot(run, title, slices=None):
     g.map(label, "y")
 
     # Set the subplots to overlap
-    g.figure.subplots_adjust(hspace=-0.6)
-    g.figure.text(0.05, 0.5, 'X-coordinate', 
-              va='center', rotation='vertical', fontsize=12)
-    g.set_axis_labels(x_var="Y-coordinate")
+    g.figure.subplots_adjust(hspace=-0.6, bottom=0.2)
+    g.figure.text(0.08, 0.4, 'X-coordinate', 
+              va='center', rotation='vertical', fontsize=18)
+    g.set_axis_labels(x_var="Y-coordinate", y_var="X-coordinate", fontsize=18)
 
     # Remove axes details that don't play well with overlap
     g.set_titles("")
     g.set(yticks=[], ylabel="")
     g.despine(bottom=True, left=True)
     plt.suptitle(title)
+    g.tick_params(axis='x', labelsize=18)
     plt.show(block=False)
     basic_stats_qqplot(distribution[distribution["x_slice"] == slices[-1]], title)
 
@@ -147,7 +148,7 @@ def avg_distribution_ridge_plot(runs, title, slices=None):
     print(title)
     for x in slices:
         subset = distribution[distribution["x_slice"] == x]["y"]
-        print(f"x={x} kurtosis={kurtosis(subset):.3f} n={len(subset)}")
+        print(f"x={x} variance={np.var(subset):.3f} n={len(subset)}")
 
     # Initialize the FacetGrid object
     pal = sns.cubehelix_palette(10, rot=-.25, light=.7)
@@ -293,18 +294,22 @@ def basic_stats_qqplot(distribution, title):
     plt.figure()
     (osm, osr), (slope, intercept, r) = probplot(distribution["y"], dist="norm")
 
+    font = {'size': 18}
+
+    plt.rc('font', **font)
+    plt.rc('xtick', labelsize=18)
+    plt.rc('ytick', labelsize=18)
     plt.scatter(osm, osr, alpha=0.5, s=10)
     plt.plot(osm, slope * np.array(osm) + intercept, 'r--', linewidth=2)
-    plt.xlabel("Theoretical Quantiles")
-    plt.ylabel("Sample Quantiles")
-    plt.title(f"Q-Q Plot (R² = {r**2:.4f})")
+    plt.xlabel("Theoretical Quantiles", size=18)
+    plt.ylabel("Sample Quantiles", size=18)
     plt.tight_layout()
     plt.show(block=False)
 
     print(f"{title}: ")
     stat, p = shapiro(distribution["y"])
     print(f"Shapiro-Wilk: W={stat:.4f}, p={p:.4f}")
-    basic_stats(distribution, title)
+    basic_stats(distribution["y"], title)
 
 # report stats for centralized with noise (without noise is the same run every time)
 def centralized_stats(runs, title):
@@ -367,8 +372,7 @@ def EMD_stats(runs):
     sns.boxplot(data=df, x="noise", y="emd", ax=ax)          # spread per noise level
     sns.stripplot(data=df, x="noise", y="emd", ax=ax,        # individual run dots
                   color="black", alpha=0.4, size=3)
-    ax.set(xlabel="Noise Level", ylabel="EMD vs 0-noise reference",
-           title="Earth Mover's Distance by Noise Level")
+    ax.set(xlabel="Perturbation Level", ylabel="EMD vs. 0-Perturbation Reference")
     plt.show()
 
 def basic_stats(distribution, title):
@@ -408,9 +412,8 @@ if __name__ == "__main__":
     #        "disable-collision": True,
     #}
     #results = query_index(query)
-    ##distribution_ridge_plot(results.iloc[0], f"disable collision: {results.iloc[0]["disable_collision"]}")
 
-    #distribution_ridge_plot(results.iloc[0], "Successive distributions")
+    #distribution_ridge_plot(results.iloc[0], "")
     #plt.show()
 
 
@@ -423,13 +426,13 @@ if __name__ == "__main__":
     # A higher spawn density causes more resistance to entering the middle.
     # in some cases, it's harder to tell. Like for seed 2. density is clearly further towards the center, but the furthest extent is the same.
     # Some distribution measurements (variance or quartiles) or kurtosis measurements would be perfect here to back up the claims.
-    #query = {
-    #    "experiment-name": "Density Skewness",
-    #}
-    #results = query_index(query)
-    #print("results: ", results)
-    #for density, group in results.groupby(by="density", sort=True):
-    #    avg_distribution_ridge_plot(group, f"Average over 100 seeds with density {density}")
+    query = {
+        "experiment-name": "Density Skewness",
+    }
+    results = query_index(query)
+    print("results: ", results)
+    for density, group in results.groupby(by="density", sort=True):
+        avg_distribution_ridge_plot(group, f"Average over 100 seeds with density {density}")
 
         #for idx, result in results.iterrows():
         #    print(result["density"])
@@ -482,10 +485,10 @@ if __name__ == "__main__":
 
     # First, take the average of the 0 noise. Use it as the baseline.
     # Then, take the EMD of all other EMD tests and plot as a line.
-    query = {
-        "experiment-name": "EMD test"
-    }
-    results = query_index(query)
-    EMD_stats(results)
+    #query = {
+    #    "experiment-name": "EMD test"
+    #}
+    #results = query_index(query)
+    #EMD_stats(results)
 
     plt.show()

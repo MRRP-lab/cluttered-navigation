@@ -33,15 +33,15 @@ experiments = [
     #"pin-gap": 1,
     #"seed": 3,
     #},
-    #{
-    #"experiment-name": "Density Skewness",
-    #"boundary": True,
-    #"num": 100,
-    #"density": [0.1, 0.5, 1],
-    #"seed": [n for n in range(100)],
-    #"noise": 1,
-    #"gridnum": 100,
-    #},
+    {
+    "experiment-name": "Density Skewness",
+    "boundary": True,
+    "num": 100,
+    "density": [0.1, 0.5, 1],
+    "seed": [n for n in range(100)],
+    "noise": 1,
+    "gridnum": 100,
+    },
     #{
     #"experiment-name": "Centralized test",
     #"strategy": ["centralized"],
@@ -80,37 +80,37 @@ experiments = [
     #"noise": [0, 1],
     #"row-gap": 2
     #},
-    {
-    "experiment-name": "EMD test",
-    "num": 100,
-    "gridnum": 100,
-    "noise": [0], #0 is the reference distribution
-    "seed": [n for n in range(100)]
-    },
-    # Each noise level gets a different set of seeds. Using the same seed range, obstacles will
-    # be perturbed in the same directions but at different intensities
-    # for the same seed at a different noise level. A different seed range will account for that.
-    {
-    "experiment-name": "EMD test",
-    "num": 100,
-    "gridnum": 100,
-    "noise": [1],
-    "seed": [n for n in range(100, 200)]
-    },
-    {
-    "experiment-name": "EMD test",
-    "num": 100,
-    "gridnum": 100,
-    "noise": [2],
-    "seed": [n for n in range(200, 300)]
-    },
-    {
-    "experiment-name": "EMD test",
-    "num": 100,
-    "gridnum": 100,
-    "noise": [3],
-    "seed": [n for n in range(300, 400)]
-    },
+    #{
+    #"experiment-name": "EMD test",
+    #"num": 100,
+    #"gridnum": 100,
+    #"noise": [0], #0 is the reference distribution
+    #"seed": [n for n in range(100)]
+    #},
+    ## Each noise level gets a different set of seeds. Using the same seed range, obstacles will
+    ## be perturbed in the same directions but at different intensities
+    ## for the same seed at a different noise level. A different seed range will account for that.
+    #{
+    #"experiment-name": "EMD test",
+    #"num": 100,
+    #"gridnum": 100,
+    #"noise": [1],
+    #"seed": [n for n in range(100, 200)]
+    #},
+    #{
+    #"experiment-name": "EMD test",
+    #"num": 100,
+    #"gridnum": 100,
+    #"noise": [2],
+    #"seed": [n for n in range(200, 300)]
+    #},
+    #{
+    #"experiment-name": "EMD test",
+    #"num": 100,
+    #"gridnum": 100,
+    #"noise": [3],
+    #"seed": [n for n in range(300, 400)]
+    #},
 ]
 
 def run_single_sim(params):
