@@ -87,6 +87,7 @@ experiments = [
     #"noise": [0], #0 is the reference distribution
     #"seed": [n for n in range(100)]
     #},
+
     ## Each noise level gets a different set of seeds. Using the same seed range, obstacles will
     ## be perturbed in the same directions but at different intensities
     ## for the same seed at a different noise level. A different seed range will account for that.

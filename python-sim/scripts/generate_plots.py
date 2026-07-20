@@ -25,7 +25,6 @@ import matplotlib.pyplot as plt
 # - The jamming transition
 # - The price of decentralized
 
-
 PLAYBACK = "playback.csv"
 ANALYTICS = "analytics.yaml"
 PARAMS = "params.yaml"
@@ -227,6 +226,28 @@ def makespan_heatmap(runs):
     f, ax = plt.subplots(figsize=(9, 6))
     sns.heatmap(makespans, annot=True, fmt=".1f", linewidths=.5, ax=ax)
     plt.show(block=False)
+
+# Produces a heatmap where x is obstacle noise, y is robot density
+def density_noise_heatmap(runs):
+    records = []
+    for _, run in runs.iterrows():
+        id = run["simulation_id"]
+        analytics = fetch_sim_file(id, ANALYTICS)
+        records.append({
+            "noise": run["noise"],
+            "density": run["density"],
+            "makespan": analytics["makespan"]
+        })
+    df = pd.DataFrame(records)
+    makespans = df.pivot_table(index="density", columns="noise", values="makespan", aggfunc="mean")
+    
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(makespans, annot=True, fmt=".1f", linewidths=.5, cmap="viridis")
+    plt.xlabel("Obstacle noise")
+    plt.ylabel("Robot density")
+    plt.title("Density vs Noise (mean makespan)")
+    plt.tight_layout()
+    plt.show()
 
 # EMD
 # for obstacle density levels present in runs
@@ -463,7 +484,6 @@ if __name__ == "__main__":
 
     # Run time stats for centralized
     #basic_stats([374326 , 120657 , 438299 , 296348 , 964136 , 282419 , 91692 , 534769 , 359769 , 128978 , 440450 , 177579 , 319498 , 489990 , 206046 , 243233 , 147214 , 227039 , 167838 , 236991], "Run times")
-
 
 
 
