@@ -24,12 +24,16 @@ def query_index(params):
     query = params
     if (type(params) != dict):
         query = vars(params)
+    valid_query = {k: v for k, v in query.items() if k in index.columns}
+    
+    if not valid_query:
+        print("Queried columns must exist and be indexed.")
+        return index.iloc[0:0]
 
-    cols = [key for key in query if key in index.columns]
-    mask = (index[list(cols)] == pd.Series(query)[cols]).all(axis=1)
-
-    result = index[mask]
-    return result
+    mask = pd.Series(True, index=index.index)
+    for col, val in valid_query.items():
+        mask &= (index[col] == val)
+    return index[mask]
 
 # Fetch a single simulation file.
 # Depending on the file extension, will return different types.

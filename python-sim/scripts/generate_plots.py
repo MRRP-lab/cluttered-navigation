@@ -428,14 +428,15 @@ if __name__ == "__main__":
 
 
 
-    #query = {
-    #        "experiment-name": "Gaussian test",
-    #        "disable-collision": True,
-    #}
-    #results = query_index(query)
+    query = {
+            "experiment_name": "Gaussian 2",
+            "disable_collision": False,
+    }
+    results = query_index(query)
+    print(results)
 
-    #distribution_ridge_plot(results.iloc[0], "")
-    #plt.show()
+    distribution_ridge_plot(results.iloc[0], "")
+    plt.show()
 
 
 
@@ -447,13 +448,13 @@ if __name__ == "__main__":
     # A higher spawn density causes more resistance to entering the middle.
     # in some cases, it's harder to tell. Like for seed 2. density is clearly further towards the center, but the furthest extent is the same.
     # Some distribution measurements (variance or quartiles) or kurtosis measurements would be perfect here to back up the claims.
-    query = {
-        "experiment-name": "Density Skewness",
-    }
-    results = query_index(query)
-    print("results: ", results)
-    for density, group in results.groupby(by="density", sort=True):
-        avg_distribution_ridge_plot(group, f"Average over 100 seeds with density {density}")
+    #query = {
+    #    "experiment-name": "Density Skewness",
+    #}
+    #results = query_index(query)
+    #print("results: ", results)
+    #for density, group in results.groupby(by="density", sort=True):
+    #    avg_distribution_ridge_plot(group, f"Average over 100 seeds with density {density}")
 
         #for idx, result in results.iterrows():
         #    print(result["density"])
