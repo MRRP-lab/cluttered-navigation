@@ -13,13 +13,29 @@ INDEXER = os.path.join(_here, "index_gen.py")
 java_server = "./src/optimal-mrppg/bytecode/server.jar"
 
 # All keys will have a double hyphen added. Ensure these use the same form as the long argument name.
+# All figures in the paper should be producible from the experiments listed here,
+# and all experiments here should contribute to being in the paper in some way.
+# Test experiments should be removed once they are no longer needed.
 experiments = [
     {
-    "experiment-name": "Boundary visuals",
-    "num": [100],
-    "density": [1, 0.1],
-    "boundary": [True, False],
-    "noise": [0, 1],
+    "experiment-name": "Sample image 1",
+    "num": 100,
+    "cell-size": 15,
+    "boundary": True,
+    "gridnum": 51,
+    "row-gap": 1,
+    "pin-gap": 1,
+    },
+
+    {
+    "experiment-name": "Sample image 2",
+    "num": 100,
+    "cell-size": 15,
+    "boundary": True,
+    "gridnum": 51,
+    "row-gap": 1,
+    "pin-gap": 1,
+    "noise": 1,
     },
 
     #{
