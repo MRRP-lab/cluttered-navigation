@@ -38,7 +38,9 @@ $(STAMPS)/plots: $(STAMPS)/analytics
 	python scripts/generate_plots.py
 	mkdir -p $(STAMPS) && touch $@
 
-# How to use: make single_sim args="(parameters go here)"
+# How to use: make single_sim ARGS="(parameters go here)"
+# Ex: make show_sim ARGS="--num 100 --density 1 --boundary --noise 0 --experiment-name 'Boundary visuals'"
+# Ex: make show_sim ARGS="--simulation-id 51ec09fd99eb675a30b138d36fdc6a880ea92128013585f9aa76521b4ca986de"
 single_sim: 
 	python scripts/generate_demo.py $(ARGS)
 	python scripts/index_gen.py
