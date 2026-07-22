@@ -5,18 +5,25 @@ import math
 import itertools
 
 class Environment():
-    def __init__(self, grid_num, seed, boundary, boundary_angle, boundary_offset, row_gap, pin_gap, noise):
+    def __init__(self, grid_num, seed, boundary, boundary_angle, boundary_offset, row_gap, pin_gap, noise, show_boundary=True):
         self.grid_num = grid_num
         self.seed = seed
         self.rng = np.random.default_rng(seed)
         self.obstacles = self.generate_plinko_grid(1, row_gap, pin_gap, noise)
         self.boundary = boundary
         self.boundary_offset = boundary_offset
+
         if self.boundary:
-            self.add_reflecting_boundary(self.obstacles, math.radians(boundary_angle), self.boundary_offset)
+            self.boundary_angle = math.radians(boundary_angle)
+
+        if self.boundary and show_boundary:
+            self.add_reflecting_boundary(self.obstacles, self.boundary_angle, self.boundary_offset)
 
         self.start_line = 0
         self.finish_line = self.grid_num
+    def generate_blank_obstacle_grid(self):
+        obstacles = np.full(self.grid_num**2, 0)
+        return np.reshape(obstacles, (self.grid_num, self.grid_num))
 
     def generate_random_obstacles(self, density):
         obstacles = np.full(self.grid_num**2, 0)
@@ -25,10 +32,16 @@ class Environment():
                 obstacles[i] = 1
         return np.reshape(obstacles, (self.grid_num, self.grid_num))
 
+    def get_boundary_cells(self):
+        sensed_boundary = self.generate_blank_obstacle_grid()
+        if self.boundary:
+            self.add_reflecting_boundary(sensed_boundary, self.boundary_angle, self.boundary_offset)
+        return sensed_boundary
+
     # noise is how far an obstacle can move from its original position
     def generate_plinko_grid(self, start_col, row_gap, pin_gap, noise):
-        obstacles = np.full(self.grid_num**2, 0)
-        obstacles = np.reshape(obstacles, (self.grid_num, self.grid_num))
+        obstacles = self.generate_blank_obstacle_grid()
+
         col = start_col
         offset = 0
         while col < obstacles.shape[0]:

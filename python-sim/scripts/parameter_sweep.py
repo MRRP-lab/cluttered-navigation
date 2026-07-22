@@ -14,16 +14,14 @@ java_server = "./src/optimal-mrppg/bytecode/server.jar"
 
 # All keys will have a double hyphen added. Ensure these use the same form as the long argument name.
 experiments = [
-    #{
-    #"experiment-name": "Heatmap test",
-    #"num": [n*50 for n in range(1,10)],
-    #"noise": [n for n in range(0,5)],
-    #"gridnum": [150],
-    #"seed": [s for s in range(5)],
-    #"disable-collision": False,
-    #"boundary": True,
-    #"boundary-angle": [22.5],
-    #},
+    {
+    "experiment-name": "Boundary visuals",
+    "num": [100],
+    "density": [1, 0.1],
+    "boundary": [True, False],
+    "noise": [0, 1],
+    },
+
     #{
     #"experiment-name": "Gaussian test",
     #"disable-collision": [True],
@@ -33,6 +31,7 @@ experiments = [
     #"pin-gap": 1,
     #"seed": 3,
     #},
+
     #{
     #"experiment-name": "Density Skewness",
     #"boundary": True,
@@ -42,6 +41,7 @@ experiments = [
     #"noise": 1,
     #"gridnum": 100,
     #},
+    
     #{
     #"experiment-name": "Centralized test",
     #"strategy": ["centralized"],
@@ -52,6 +52,7 @@ experiments = [
     #"boundary": True,
     #"num": 30,
     #},
+    
     #{
     #"experiment-name": "Centralized test",
     #"strategy": ["centralized"],
@@ -61,6 +62,7 @@ experiments = [
     #"boundary": True,
     #"num": 30,
     #},
+    
     #{
     #"experiment-name": "Centralized test",
     #"strategy": ["decentralized"],
@@ -70,6 +72,7 @@ experiments = [
     #"boundary": True,
     #"num": 30,
     #},
+    
     #{
     #"experiment-name": "Boundary test",
     #"num": 100,
@@ -80,6 +83,7 @@ experiments = [
     #"noise": [0, 1],
     #"row-gap": 2
     #},
+    
     #{
     #"experiment-name": "EMD test",
     #"num": 100,
@@ -98,6 +102,7 @@ experiments = [
     #"noise": [1],
     #"seed": [n for n in range(100, 200)]
     #},
+    
     #{
     #"experiment-name": "EMD test",
     #"num": 100,
@@ -105,6 +110,7 @@ experiments = [
     #"noise": [2],
     #"seed": [n for n in range(200, 300)]
     #},
+    
     #{
     #"experiment-name": "EMD test",
     #"num": 100,

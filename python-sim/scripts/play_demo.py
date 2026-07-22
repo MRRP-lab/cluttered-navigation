@@ -28,8 +28,6 @@ def find_simulation(params):
         print("query: ", params)
         raise FileNotFoundError("A simulation with the supplied parameters is not indexed.")
     elif (match_count > 1):
-        # TODO shouldn't be a generic exception. couldnt be asked to deal with figuring it out.
-        # we should make the user specify which one.
         print("query:", params)
         print(result)
         raise Exception("Ambiguous parameter set, could be a few different simulations")
@@ -48,8 +46,8 @@ VID_DIR = os.path.join(_here, '../videos')
 sim_data = find_simulation(sim_args)
 replay_data = fetch_sim_file(sim_data["simulation_id"], PLAYBACK, dtype='int32')
 sim_args = fetch_sim_file(sim_data["simulation_id"], PARAMS)
-print(sim_args["cell_size"])
-ss = sim_args["cell_size"] * sim_args["gridnum"]
+
+screen_size = sim_args["cell_size"] * sim_args["gridnum"]
 ########################## SETUP ##########################
 
 if not os.path.exists(VID_DIR):
@@ -63,12 +61,12 @@ if SAVE_VID:
     except OSError:
         pass
 
-width = ss # for vid
-height = ss # for vid
+width = screen_size # for vid
+height = screen_size # for vid
 
 # set up env
 pygame.init()
-screen = pygame.display.set_mode([ss,ss], pygame.SRCALPHA)
+screen = pygame.display.set_mode([screen_size,screen_size], pygame.SRCALPHA)
 clock = pygame.time.Clock()
 font = pygame.font.SysFont("Arial", 18)
 
@@ -79,12 +77,13 @@ y_list = replay_data["y"].values.reshape(-1, sim_data["num"])
 ########################## MAIN  ###########################################3
 start_line = 0
 spawn_layout = SpawnLayout(sim_args["seed"], sim_args["num"], sim_args["density"],
-                           sim_args["gridnum"], start_line
-                           )
+                           sim_args["gridnum"], start_line)
 
 env = Environment(sim_args["gridnum"], sim_args["seed"],
                   sim_args["boundary"], sim_args["boundary_angle"], spawn_layout.boundary_line_y_offset,
-                  sim_args["row_gap"], sim_args["pin_gap"], sim_args["noise"])
+                  sim_args["row_gap"], sim_args["pin_gap"], sim_args["noise"], show_boundary=False)
+
+env_boundary = env.get_boundary_cells()
 
 coords = np.array([x_list,y_list]).T
 
@@ -109,28 +108,32 @@ for time in range(sim_time):
 
     # Draw the start and finish Lines:
     pygame.draw.rect(screen, (255, 255, 0),
-                     pygame.Rect(sim_args["cell_size"] * env.start_line, 0, sim_args["cell_size"], ss))
+                     pygame.Rect(sim_args["cell_size"] * env.start_line, 0, sim_args["cell_size"], screen_size))
 
     pygame.draw.rect(screen, (0, 255, 0),
-                     pygame.Rect(sim_args["cell_size"] * (env.finish_line - 1), 0, sim_args["cell_size"], ss))
+                     pygame.Rect(sim_args["cell_size"] * (env.finish_line - 1), 0, sim_args["cell_size"], screen_size))
+
+    def draw_squares(obstacle_grid, color):
+        for row in range(sim_args["gridnum"]):
+            for square in range(sim_args["gridnum"]):
+                if obstacle_grid[row,square] == 1:
+                    rect = pygame.Rect(square * sim_args["cell_size"], row * sim_args["cell_size"],
+                                       sim_args["cell_size"], sim_args["cell_size"])
+                    pygame.draw.rect(screen, color, rect)
 
     # Draw obstacles:
-    for row in range(sim_args["gridnum"]):
-        for square in range(sim_args["gridnum"]):
-            if env.obstacles[row,square] == 1:
-                rect = pygame.Rect(square * sim_args["cell_size"], row * sim_args["cell_size"], 
-                                   sim_args["cell_size"], sim_args["cell_size"])
-                pygame.draw.rect(screen, (0, 0, 0), rect)
+    draw_squares(env_boundary, (255, 128, 128))
+    draw_squares(env.obstacles, (0, 0, 0))
 
     # Draws all of the lines needed to make the grid, prints the box numbers (starting at 1)
     # and draws small dots at all of the intersections of the gridlines
     if VIZGRID:
         for points in range(env.grid_num):
-            interval = ss/env.grid_num
+            interval = screen_size/env.grid_num
             pt = float(points*interval)
 
-            pygame.draw.line(screen, (255, 0, 0), (pt, 0), (pt, ss), width=1)
-            pygame.draw.line(screen, (255, 0, 0), (0, pt), (ss, pt), width=1)
+            pygame.draw.line(screen, (255, 0, 0), (pt, 0), (pt, screen_size), width=1)
+            pygame.draw.line(screen, (255, 0, 0), (0, pt), (screen_size, pt), width=1)
 
     ############################################################################
 
