@@ -19,22 +19,18 @@ java_server = "./src/optimal-mrppg/bytecode/server.jar"
 experiments = [
     {
     "experiment-name": "Sample image 1",
-    "num": 100,
+    "num": 50,
     "cell-size": 15,
     "boundary": True,
-    "gridnum": 51,
-    "row-gap": 1,
-    "pin-gap": 1,
+    "gridnum": 43,
     },
 
     {
     "experiment-name": "Sample image 2",
-    "num": 100,
+    "num": 50,
     "cell-size": 15,
     "boundary": True,
     "gridnum": 51,
-    "row-gap": 1,
-    "pin-gap": 1,
     "noise": 1,
     },
 
@@ -56,17 +52,6 @@ experiments = [
     #"seed": [n for n in range(100)],
     #"noise": 1,
     #"gridnum": 100,
-    #},
-    
-    #{
-    #"experiment-name": "Centralized test",
-    #"strategy": ["centralized"],
-    #"noise": [0],
-    #"row-gap": 1,
-    #"pin-gap": 1,
-    #"gridnum": 50,
-    #"boundary": True,
-    #"num": 30,
     #},
     
     #{
@@ -96,6 +81,16 @@ experiments = [
     #"boundary": True,
     #"boundary-angle": [22.5, 17.5, 12.5, 7.5, 2.5],
     #"seed": [n for n in range(100)],
+    #"noise": [0, 1],
+    #"row-gap": 2
+    #},
+
+    #{
+    #"experiment-name": "Boundary test",
+    #"num": 100,
+    #"gridnum": 100,
+    #"boundary": False,
+    #"seed": [n for n in range(100,200)],
     #"noise": [0, 1],
     #"row-gap": 2
     #},
