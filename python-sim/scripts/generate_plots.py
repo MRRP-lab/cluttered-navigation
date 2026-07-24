@@ -428,15 +428,15 @@ if __name__ == "__main__":
 
 
 
-    query = {
-            "experiment_name": "Gaussian 2",
-            "disable_collision": False,
-    }
-    results = query_index(query)
-    print(results)
+    #query = {
+    #        "experiment_name": "Gaussian 2",
+    #        "disable_collision": False,
+    #}
+    #results = query_index(query)
+    #print(results)
 
-    distribution_ridge_plot(results.iloc[0], "")
-    plt.show()
+    #distribution_ridge_plot(results.iloc[0], "")
+    #plt.show()
 
 
 
@@ -491,14 +491,14 @@ if __name__ == "__main__":
 
 
 
-    #query = {
-    #    "experiment-name": "Boundary test",
-    #    "noise": 1,
-    #}
-    #results = query_index(query)
+    query = {
+        "experiment-name": "Boundary test",
+        "noise": 1,
+    }
+    results = query_index(query)
 
-    #for angle, group in results.groupby(by="boundary_angle", sort=True):
-    #    avg_distribution_ridge_plot(group, f"Average over 100 seeds with angle {angle}")
+    for angle, group in results.groupby(by="boundary_angle", sort=True):
+        avg_distribution_ridge_plot(group, f"Average over 100 seeds with angle {angle}")
 
 
 

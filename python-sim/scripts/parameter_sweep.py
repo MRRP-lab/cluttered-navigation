@@ -17,22 +17,22 @@ java_server = "./src/optimal-mrppg/bytecode/server.jar"
 # and all experiments here should contribute to being in the paper in some way.
 # Test experiments should be removed once they are no longer needed.
 experiments = [
-    {
-    "experiment-name": "Sample image 1",
-    "num": 50,
-    "cell-size": 15,
-    "boundary": True,
-    "gridnum": 43,
-    },
+    #{
+    #"experiment-name": "Sample image 1",
+    #"num": 50,
+    #"cell-size": 15,
+    #"boundary": True,
+    #"gridnum": 43,
+    #},
 
-    {
-    "experiment-name": "Sample image 2",
-    "num": 50,
-    "cell-size": 15,
-    "boundary": True,
-    "gridnum": 51,
-    "noise": 1,
-    },
+    #{
+    #"experiment-name": "Sample image 2",
+    #"num": 50,
+    #"cell-size": 15,
+    #"boundary": True,
+    #"gridnum": 51,
+    #"noise": 1,
+    #},
 
     #{
     #"experiment-name": "Gaussian test",
@@ -85,15 +85,15 @@ experiments = [
     #"row-gap": 2
     #},
 
-    #{
-    #"experiment-name": "Boundary test",
-    #"num": 100,
-    #"gridnum": 100,
-    #"boundary": False,
-    #"seed": [n for n in range(100,200)],
-    #"noise": [0, 1],
-    #"row-gap": 2
-    #},
+    {
+    "experiment-name": "Boundary test",
+    "num": 100,
+    "gridnum": 100,
+    "boundary": False,
+    "seed": [n for n in range(100)],
+    "noise": [0, 1],
+    "row-gap": 2
+    },
     
     #{
     #"experiment-name": "EMD test",
