@@ -501,6 +501,14 @@ if __name__ == "__main__":
         avg_distribution_ridge_plot(group, f"Average over 100 seeds with angle {angle}")
 
 
+    query = {
+        "experiment-name": "Boundary test",
+        "noise": 0,
+    }
+    results = query_index(query)
+
+    for angle, group in results.groupby(by="boundary_angle", sort=True):
+        avg_distribution_ridge_plot(group, f"Average over 100 seeds with angle {angle}")
 
 
 

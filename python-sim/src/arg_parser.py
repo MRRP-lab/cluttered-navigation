@@ -23,7 +23,7 @@ return: a namespace with parsed arguments'''
 
     parser.add_argument("-s", "--strategy", 
                         help="choose decentralized or centralized strategy", 
-                        choices=["centralized", "decentralized"],
+                        # choices=["centralized", "decentralized"],
                         type=str, default = Params.strategy)
 
     parser.add_argument("-c", "--cell-size", 

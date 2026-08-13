@@ -31,5 +31,10 @@ def prepare_simulation(params) -> NavStrategy:
         case "centralized":
             from src.strategies.optimal import OptimalStrategy
             return OptimalStrategy(robots, env)
+
+        case "bug2":
+            from src.strategies.bug2 import Bug2
+            progress_timeout = 10
+            return Bug2(robots, env, progress_timeout)
         case _:
             raise ValueError(f"Unknown strategy: {params.strategy}")

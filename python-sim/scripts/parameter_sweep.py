@@ -85,15 +85,15 @@ experiments = [
     #"row-gap": 2
     #},
 
-    {
-    "experiment-name": "Boundary test",
-    "num": 100,
-    "gridnum": 100,
-    "boundary": False,
-    "seed": [n for n in range(100)],
-    "noise": [0, 1],
-    "row-gap": 2
-    },
+    #{
+    #"experiment-name": "Boundary test",
+    #"num": 100,
+    #"gridnum": 100,
+    #"boundary": False,
+    #"seed": [n for n in range(100)],
+    #"noise": [0, 1],
+    #"row-gap": 2
+    #},
     
     #{
     #"experiment-name": "EMD test",
@@ -129,6 +129,13 @@ experiments = [
     #"noise": [3],
     #"seed": [n for n in range(300, 400)]
     #},
+
+    {
+    "experiment-name": "bug2",
+    "strategy": "bug2",
+    "num": 10,
+    "gridnum": 100,
+    },
 ]
 
 def run_single_sim(params):
