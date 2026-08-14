@@ -136,7 +136,7 @@ experiments = [
     "num": 1,
     "gridnum": 100,
     "noise": 1,
-    "seed": 10,
+    "seed": 0,
     },
 ]
 
