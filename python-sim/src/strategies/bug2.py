@@ -54,6 +54,8 @@ class Bug2(NavStrategy):
         self.mode = [Bug2Mode.GOAL_SEEK] * self.num
         self.heading = [RIGHT] * self.num   # current wall-follow heading
         self.hit_x = [None] * self.num      # x where the m-line was last left
+        self.progress = [0] * self.num      # progress threshold per-robot. Robot must pass this to make "progress".
+                                            # Necessary to catch any infinite loops. Theoretically not necessary with proper bug2 logic.
 
         self.data = []
 
@@ -62,6 +64,7 @@ class Bug2(NavStrategy):
         time = 0
         while no_progress < self.no_prog_timeout:
             progress = self.update_movement()
+            print(f"No progress: {no_progress}")
             if not progress:
                 no_progress += 1
             else:
@@ -83,7 +86,8 @@ class Bug2(NavStrategy):
         for k in range(self.num):
             r = rightmost[k]
             progress |= self.bug2_movement_policy(r)
-
+        
+        print(f"update_movement progress: {progress}")
         return progress
 
     def _blocked(self, x, y):
@@ -106,17 +110,20 @@ class Bug2(NavStrategy):
     def bug2_movement_policy(self, r):
         x, y = self.robots.coords[r]
         progress = False
-
         if self.mode[r] == Bug2Mode.GOAL_SEEK:
             if not self._blocked(x + 1, y) or x < 0:
+                print("Progress")
+                print(f"Past finish: {x >= self.env.finish_line}")
                 move = RIGHT
             else:
+                print("Hit obstacle")
                 # Hit the obstacle: remember where we left the m-line and
                 # start hugging the wall.
                 self.hit_x[r] = x
                 self.mode[r] = Bug2Mode.WALL_FOLLOW
                 move = self._wall_follow_move(x, y, RIGHT, first=True)
         else:
+            print("Wall following")
             move = self._wall_follow_move(x, y, self.heading[r])
 
         if move is None:
@@ -126,14 +133,14 @@ class Bug2(NavStrategy):
         nx, ny = x + move[0], y + move[1]
         self.robots.coords[r] = np.array([nx, ny])
         
-        if move == RIGHT and x < self.env.finish_line:
+        if x < self.env.finish_line and x > self.progress[r]:
             progress = True
+            self.progress[r] = x
 
         if (self.mode[r] == Bug2Mode.WALL_FOLLOW and
-                #self.mline_y[r] and # This line right here enables/disables semi-circumnavigation
+                ny == self.mline_y[r] and # This line right here enables/disables circumnavigation
                 nx > self.hit_x[r]):
             self.mode[r] = Bug2Mode.GOAL_SEEK
-
         return progress
 
     def _wall_follow_move(self, x, y, heading, first=False):
@@ -150,7 +157,7 @@ class Bug2(NavStrategy):
         search actually means something.
         """
         if first:
-            order = (_rotate_ccw(heading), heading, _rotate_cw(heading), _reverse(heading))
+            order = (_rotate_ccw(heading), _reverse(heading), _rotate_cw(heading), heading)
         else:
             order = (_rotate_cw(heading), heading, _rotate_ccw(heading), _reverse(heading))
         for d in order:
