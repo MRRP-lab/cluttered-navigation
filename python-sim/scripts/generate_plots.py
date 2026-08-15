@@ -192,7 +192,7 @@ def avg_distribution_ridge_plot(runs, title, slices=None):
 
 
 # Produce a heatmap from runs where the x dimension is the row spacing and the y dimension is the pin spacing.
-# The heatmap is in reference to a default normal distribution because we're interested in seeing how our parameters make our robots deviate from the norm.
+# The heatmap is in reference to a default normal distribution because we're interested in seeing how our parameters make our robots deviate from the norm      "experiment-name": "bug2.
 def EMD_heatmap(runs):
     
     # Pre-load metrics
@@ -491,24 +491,24 @@ if __name__ == "__main__":
 
 
 
-    query = {
-        "experiment-name": "Boundary test",
-        "noise": 1,
-    }
-    results = query_index(query)
+    #query = {
+    #    "experiment-name": "Boundary test",
+    #    "noise": 1,
+    #}
+    #results = query_index(query)
 
-    for angle, group in results.groupby(by="boundary_angle", sort=True):
-        avg_distribution_ridge_plot(group, f"Average over 100 seeds with angle {angle}")
+    #for angle, group in results.groupby(by="boundary_angle", sort=True):
+    #    avg_distribution_ridge_plot(group, f"Average over 100 seeds with angle {angle}")
 
 
-    query = {
-        "experiment-name": "Boundary test",
-        "noise": 0,
-    }
-    results = query_index(query)
+    #query = {
+    #    "experiment-name": "Boundary test",
+    #    "noise": 0,
+    #}
+    #results = query_index(query)
 
-    for angle, group in results.groupby(by="boundary_angle", sort=True):
-        avg_distribution_ridge_plot(group, f"Average over 100 seeds with angle {angle}")
+    #for angle, group in results.groupby(by="boundary_angle", sort=True):
+    #    avg_distribution_ridge_plot(group, f"Average over 100 seeds with angle {angle}")
 
 
 
@@ -519,5 +519,13 @@ if __name__ == "__main__":
     #}
     #results = query_index(query)
     #EMD_stats(results)
+
+    query = {
+        "strategy": "bug2",
+    }
+    results = query_index(query)
+    print(results)
+    centralized_stats(results, "Modified Bug 2")
+
 
     plt.show()

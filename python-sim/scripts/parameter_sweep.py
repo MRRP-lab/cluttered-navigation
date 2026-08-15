@@ -133,10 +133,10 @@ experiments = [
     {
     "experiment-name": "bug2",
     "strategy": "bug2",
-    "num": 1,
-    "gridnum": 100,
+    "num": 30,
+    "gridnum": 50,
     "noise": 1,
-    "seed": 0,
+    "seed": [n for n in range(200)],
     },
 ]
 
